@@ -1638,7 +1638,7 @@ const K11a = {
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.12, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
