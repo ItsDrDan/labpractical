@@ -543,7 +543,7 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
  </ol>
  <p class="labset" id="labset"></p>
  <div class="mode-switch" id="modes" role="tablist" aria-label="Choose a mode">
-  <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>One timed station per lab + 2 lab-skills stations. Follow your version color.</small></span></button>
+  <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>10 timed stations: 8 labs + 2 lab-skills stations. Follow your version color.</small></span></button>
   <button type="button" data-mode="practice" role="tab"><span class="ms-ico" data-icon="flask" aria-hidden="true"><img class="ms-pic" src="assets/modes/practice.webp" alt="" onerror="this.remove()"></span><span><b>Practice by Lab</b><small>Pick labs. No timer, hints on.</small></span></button>
   <button type="button" data-mode="bench" role="tab"><span class="ms-ico" data-icon="sliders" aria-hidden="true"><img class="ms-pic" src="assets/modes/phet.webp" alt="" onerror="this.remove()"></span><span><b>PhET Lab Bench</b><small>Hands-on simulations with tasks.</small></span></button>
   <button type="button" data-mode="vlab" role="tab"><span class="ms-ico" data-icon="beaker" aria-hidden="true"><img class="ms-pic" src="assets/modes/vlab.webp" alt="" onerror="this.remove()"></span><span><b>Virtual Lab</b><small>Weigh, pour, mix and measure, then do the math.</small></span></button>
@@ -561,7 +561,7 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
    </div>
    <h2 class="pick-title" style="margin:4px 0 0"><span class="stepnum">2</span>Timer</h2>
    <div class="timerpick" id="timerpick"><button type="button" class="chip on" data-t="real">Real: 4 min per station + 1 min to rotate</button><button type="button" class="chip" data-t="off">No timer</button></div>
-   <ul class="rules-mini"><li>Every station shows Versions A, B and C. <b>Only answer your version.</b></li><li>When time is up, pens down and rotate. You get time at the end to finish your work.</li><li>One station from each of your labs, plus 2 general stations: equipment names and measurements.</li><li>Answers are free response: numbers, units and sig figs all count.</li></ul>
+   <ul class="rules-mini"><li>Every station shows Versions A, B and C. <b>Only answer your version.</b></li><li>When time is up, pens down and rotate. You get time at the end to finish your work.</li><li>10 stations: 8 of your labs, plus 2 general stations (equipment names and measurements). The labs rotate, so every lab comes up as you take more mocks.</li><li>Answers are free response: numbers, units and sig figs all count.</li></ul>
    <div class="start-row"><button type="button" class="btn primary" id="mockStart">Start the practical <span data-icon="arrow" aria-hidden="true"></span></button></div>
   </div>
   <div id="mockRun" hidden></div>
@@ -2075,7 +2075,8 @@ function newQuestion() {
   const weights = pool.map(id => 1 / (1 + ((P.lab[id] || {}).c || 0) * 0.15));
   let r = Math.random() * weights.reduce((a, b) => a + b, 0), lab = pool[0];
   for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r <= 0) { lab = pool[i]; break; } }
-  let q; for (let i = 0; i < 6; i++) { q = makeQ(lab); if (!state.q || q.kind !== state.q.kind || i > 3) break; }
+  let q; state.recent = state.recent || []; for (let i = 0; i < 8; i++) { q = makeQ(lab); if (!state.recent.includes(famOf(lab, q.kind)) || i > 6) break; }
+  state.recent = [famOf(lab, q.kind), ...state.recent].slice(0, 3);
   Object.assign(state, { q, tries: 0, helped: false, done: false, logged: false });
   $('emptyBox').hidden = true; $('playArea').hidden = false;
   $('playTitle').textContent = 'Practice';
@@ -2141,21 +2142,52 @@ function genStation() {
   const vq = v => { const two = items.slice('ABC'.indexOf(v) * 2, 'ABC'.indexOf(v) * 2 + 2); return { lab: 'gen', labName: 'General Lab Knowledge', kind: 'bench', tag: 'Name the equipment', prompt: `What are the names of the two pieces of equipment labeled <b>${v}</b>?`, parts: two.map((e, k) => textPart(e[5], { ans: e[1], partial: eqPartial(e), label: `Piece ${k + 1} labeled ${v}` })), solution: two.map(e => `<b>${e[1]}</b>: ${e[2]}.`).join('<br>'), video: 'practical1', skill: 'equip' }; };
   return { lab: 'gen', title: 'General Lab Knowledge', shared: art, versions: { A: vq('A'), B: vq('B'), C: vq('C') } };
 }
-function genSkills() {
-  const src = { A: ['0a', 'cyl'], B: ['7a', 'thermo'], C: ['1a', 'ruler'] }, v = {};
-  'ABC'.split('').forEach(V => { const q = makeQ(src[V][0], src[V][1]); q.lab = 'gen'; q.labName = 'General Lab Knowledge'; v[V] = q; });
+// "family" of each question kind, so one mock never shows two near-identical questions (two buret readings, two hydrate molar masses...)
+const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '12b.buret': 'buret', '12b.used': 'buret', '0a.balance': 'balance', '0a.massWater': 'balance',
+  '0a.equipName': 'equip', '0a.equipUse': 'equip', '5a.equipment': 'equip', '9a.glass': 'equip', '11a.parts': 'equip', '1a.ruler': 'ruler', '1a.rulerMM': 'ruler', '1a.rectVolume': 'vol', '1a.cylVolume': 'vol',
+  '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light',
+  '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
+  '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr',
+  '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
+  '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula' };
+const famOf = (lab, kind) => FAM[lab + '.' + kind] || lab + '.' + kind;
+const HFAM = { '0a': ['cyl', 'balance', 'density'], '1a': ['cyl', 'balance', 'density'], '9a': ['balance', 'density'], '10a': ['rxn', 'rxtype'], '12a': ['cabbage', 'ph'], '12b': ['buret', 'titr'], '6a': ['vsepr', '6a.valence'] };
+const MOCK_N = 10, MOCK_GEN = 2;
+// readings for the general Measurements station; it picks ones the lab stations didn't already use
+const READS = [['0a', 'cyl'], ['7a', 'thermo'], ['1a', 'ruler'], ['0a', 'buret'], ['0a', 'balance'], ['0a', 'volumetric'], ['8a', 'readTube']];
+function genSkills(used = new Set()) {
+  let pool = shuffle(READS.filter(r => !used.has(famOf(r[0], r[1]))));
+  if (pool.length < 3) pool = pool.concat(shuffle(READS.filter(r => !pool.includes(r))));
+  const v = {};
+  'ABC'.split('').forEach((V, i) => { const q = makeQ(pool[i][0], pool[i][1]); q.lab = 'gen'; q.labName = 'General Lab Knowledge'; v[V] = q; used.add(famOf(pool[i][0], pool[i][1])); });
   return { lab: 'gen', title: 'General Lab Knowledge: Measurements', versions: v };
 }
 function buildPractical(ver, timer) {
   buildingMock = true; try { buildPractical0(ver, timer); } finally { buildingMock = false; }
 }
 function buildPractical0(ver, timer) {
-  const pool = shuffle(labSet());
-  const stations = pool.map(id => { const l = labById(id), kinds = shuffle(l.mock || Object.keys(l.K)); const ks = [0, 1, 2].map(i => kinds[i % kinds.length]); const v = {}; 'ABC'.split('').forEach((V, i) => { v[V] = makeQ(id, ks[i]); }); return { lab: id, title: l.name, versions: v }; });
-  let nh = 0; stations.forEach((st, k) => { if (HANDS[st.lab] && nh < 4 && Math.random() < 0.6) { stations[k] = HANDS[st.lab](); nh++; } });
+  // 8 lab stations + 2 general = 10, like the real practical. Labs rotate: the ones you've seen least come first.
+  P.mockLabs = P.mockLabs || {};
+  const set = labSet(), order = shuffle(set).sort((a, b) => (P.mockLabs[a] || 0) - (P.mockLabs[b] || 0));
+  const seq = []; while (seq.length < MOCK_N - MOCK_GEN && order.length) seq.push(order[seq.length % order.length]);
+  const used = new Set(['equip']); let stations = [], nh = 0;
+  // labs with the fewest question types pick first, so they don't run out of fresh ones
+  seq.sort((a, b) => Object.keys(labById(a).K).length - Object.keys(labById(b).K).length).forEach(id => {
+    const l = labById(id);
+    if (!stations.some(st => st.lab === id) && HANDS[id] && nh < 3 && Math.random() < 0.6 && HFAM[id].every(f => !used.has(f))) { stations.push(HANDS[id]()); HFAM[id].forEach(f => used.add(f)); nh++; P.mockLabs[id] = (P.mockLabs[id] || 0) + 1; return; }
+    const all = [...new Set(l.mock || Object.keys(l.K))], fresh = shuffle(all.filter(k => !used.has(famOf(id, k))));
+    const pickK = [], fams = new Set();
+    fresh.forEach(k => { if (pickK.length < 3 && !fams.has(famOf(id, k))) { pickK.push(k); fams.add(famOf(id, k)); } });
+    fresh.forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); });
+    shuffle(all).forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); });
+    const v = {}; 'ABC'.split('').forEach((V, i) => { const k = pickK[i % pickK.length]; v[V] = makeQ(id, k); used.add(famOf(id, k)); });
+    stations.push({ lab: id, title: l.name, versions: v }); P.mockLabs[id] = (P.mockLabs[id] || 0) + 1;
+  });
+  stations = shuffle(stations);
+  stations.splice(rint(0, stations.length), 0, genSkills(used));
   stations.splice(rint(0, stations.length), 0, genStation());
-  stations.splice(rint(0, stations.length), 0, genSkills());
   stations.forEach(st => 'ABC'.split('').forEach(V => { const q = st.versions[V]; if (q && q.skill === 'read') q.parts.forEach(pt => { if (pt.type === 'num') { pt.read = true; if (pt.rtol == null) pt.rtol = RTOL[pt.unit] != null ? RTOL[pt.unit](pt) : null; } }); }));
+  save();
   const n = stations.length, start = rint(0, n - 1);
   mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
 }
