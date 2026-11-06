@@ -30,6 +30,8 @@ html.dd-embedded .topbar{position:relative}
 .tb-xp b{display:block;font-size:.82rem;line-height:1.1}.tb-xp small{display:block;font-size:.72rem;color:var(--faint);font-weight:700}
 .xpbar{height:6px;width:110px;background:#e9eaf3;border-radius:9px;overflow:hidden;margin:4px 0 2px}.xpbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#72c9a8,#7884ea);border-radius:9px;transition:width .5s}
 .tb-streak{display:flex;align-items:center;gap:5px;font-weight:800;font-size:.92rem;padding:7px 11px;border-radius:10px;background:var(--rose);color:var(--rose-ink);white-space:nowrap}
+.tb-btn#calcBtn{background:#fff4c2;border-color:#e6c34a;color:#7a5a00}.tb-btn#calcBtn:hover{background:#ffe98a}.tb-btn#refBtn{background:#e3f2ff;border-color:#8cc4ff;color:#1d5aa6}.tb-btn#refBtn:hover{background:#cfe6ff}
+body.calc-open .tb-btn#calcBtn{background:#ffd166;border-color:#c99a1e}
 .tb-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);background:#fff;border-radius:11px;padding:7px 13px;font-weight:800;color:#3d4a73;min-height:44px;white-space:nowrap}.tb-btn:hover{background:var(--accent-soft)}
 
 /* page */
@@ -322,6 +324,7 @@ body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
 @media(max-width:760px){body.compact .mode-switch{grid-template-columns:1fr 1fr}}
 .cats.labs.mini{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.cats.labs.mini .cat{min-height:0;padding:7px 30px 7px 10px;flex-direction:column;align-items:flex-start;text-align:left;gap:0;border-radius:12px}.cats.labs.mini .cat img,.cats.labs.mini .cat small,.cats.labs.mini .cat .oldtag{display:none}.cats.labs.mini .cat b{font-size:.88rem;line-height:1.2}.cats.labs.mini .cat .labno{font-size:.68rem}
 .simgrid.mini{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}.simgrid.mini .simcard{padding:7px 10px;border-radius:12px}.simgrid.mini .simcard small{display:none}.simgrid.mini .simcard b{font-size:.92rem}.simgrid.mini .simcard .labno{font-size:.66rem}
+.rrow .bd{display:block;color:#656c83;font-weight:700}
 .ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
 .eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
@@ -758,7 +761,7 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
   if (needUnit && spec.unit && !String(unitRaw || '').trim() && sp) { if (sp.tail) unitRaw = sp.tail; }
   if (!u) return { score: 0, ok: false, valueOk: false, note: 'Type a number (you can use 3.2E-5 for scientific notation).' };
   const x = toNum(u.d);
-  const v = spec.v, tol = spec.tol != null ? spec.tol : Math.max(Math.abs(v) * (spec.rel != null ? spec.rel : 0.006), 1e-12);
+  const v = spec.v, tol = needUnit && spec.rtol != null ? spec.rtol : spec.tol != null ? spec.tol : Math.max(Math.abs(v) * (spec.rel != null ? spec.rel : 0.006), 1e-12);
   let valueOk = Math.abs(x - v) <= tol + 1e-12;
   // their number may simply be rounded to a different number of sig figs
   if (!valueOk && u.sf >= 1 && u.sf <= 8) { const r = Number(v.toPrecision(u.sf)); if (Math.abs(x - r) <= Math.abs(r) * 1e-9 + 1e-15) valueOk = 'rounded'; }
@@ -769,22 +772,57 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
   if (spec.sf != null && u.sf !== spec.sf && !ambig) { precOk = false; precNote = `Sig figs: this answer should have <b>${spec.sf}</b> (you wrote ${u.sf}).`; }
   if (spec.dp != null && u.dp !== spec.dp) { precOk = false; precNote = `Precision: record <b>${plural(spec.dp, 'decimal place')}</b> here (you wrote ${u.dp}).`; }
   const uOk = needUnit ? unitOk(unitRaw, spec.unit) : true;
-  let score = 0;
-  if (valueOk) score += needUnit && spec.unit ? 0.7 : 0.8;
-  if (valueOk && precOk) score += needUnit && spec.unit ? 0.15 : 0.2;
-  if (needUnit && spec.unit && uOk && valueOk) score += 0.15;
-  if (!needUnit || !spec.unit) score = Math.min(1, score);
+  let score = 0, bd = null;
+  if (needUnit) {
+    // graded like the real practical: readings = accuracy 4 / precision 4 / unit 2; calculations = answer 8 / sig figs 1 / unit 1.
+    // Precision and units earn their points even when the value is off. A known setup slip earns half the answer points.
+    const slipHit = !valueOk && spec.slip && spec.slip(x);
+    const W = spec.read ? [0.4, 0.4, 0.2] : spec.unit ? [0.8, 0.1, 0.1] : [0.8, 0.2, 0];
+    const a = valueOk ? W[0] : slipHit ? W[0] / 2 : 0, pr = precOk ? W[1] : 0, un = spec.unit && uOk ? W[2] : 0;
+    score = a + pr + un;
+    bd = [[spec.read ? 'Accuracy' : 'Answer', a, W[0]], [spec.dp != null ? 'Precision' : 'Sig figs', pr, W[1]]]; if (W[2]) bd.push(['Units', un, W[2]]);
+  } else {
+    if (valueOk) score += 0.8;
+    if (valueOk && precOk) score += 0.2;
+    score = Math.min(1, score);
+  }
   const ok = !!valueOk && precOk && uOk;
   let note = '';
   if (!valueOk) note = spec.slip ? (spec.slip(x) || '') : '';
   else if (!precOk) note = precNote;
   else if (!uOk) note = `Units: write <b>${spec.unit}</b>.`;
-  return { score: +score.toFixed(2), ok, valueOk: !!valueOk, precOk, uOk, note };
+  return { score: +score.toFixed(2), ok, valueOk: !!valueOk, precOk, uOk, note, bd };
 }
+// Full chemical equation typed by the student, e.g. "2HCl(aq) + Na2CO3(aq) -> 2NaCl(aq) + H2O(l) + CO2(g)"
+function parseEq(str) {
+  const sides = toPlain(str).split(/→|-+>|=+>|=/); if (sides.length !== 2) return null;
+  const side = t => t.split('+').map(x => x.trim()).filter(Boolean).map(term => {
+    const ph = (term.match(/\((s|l|g|aq)\)\s*$/i) || [])[1]; let f = term.replace(/\((s|l|g|aq)\)\s*$/i, '').trim(); const c = (f.match(/^(\d+)\s*/) || [])[1]; if (c) f = f.slice(f.match(/^(\d+)\s*/)[0].length);
+    return { f: normFormula(f), c: c ? +c : 1, ph: ph ? ph.toLowerCase() : '' }; });
+  return [side(sides[0]), side(sides[1])];
+}
+function gradeEq(p, val) {
+  const got = parseEq(val), want = p.eq;
+  if (!got) return { score: 0, ok: false, note: 'Write it as reactants → products (type -> for the arrow).' };
+  const match = (g, w) => { const used = new Set(); let n = 0; w.forEach(x => { const k = g.findIndex((y, i) => !used.has(i) && y.f === x.f); if (k >= 0) { used.add(k); n++; } }); return n; };
+  const rOk = match(got[0], want[0]) === want[0].length && got[0].length === want[0].length;
+  const pN = match(got[1], want[1]), pOk = pN === want[1].length && got[1].length === want[1].length;
+  const find = (side, x) => side.find(y => y.f === x.f);
+  const bal = rOk && pOk && [0, 1].every(k => want[k].every(x => find(got[k], x).c === x.c));
+  const phs = rOk && pOk && [0, 1].every(k => want[k].every(x => find(got[k], x).ph === x.ph));
+  // rubric split for the equation: reactants 1, products 3 (1 if only one is right), balanced 1, phases 1
+  const score = ((rOk ? 1 : 0) + (pOk ? 3 : pN >= 1 ? 1 : 0) + (bal ? 1 : 0) + (phs ? 1 : 0)) / 6;
+  const note = !rOk ? 'Copy the reactants from the bottles.' : !pOk ? (pN ? 'One product is right. Swap partners and balance the charges for the other.' : 'Predict the products: swap partners (double displacement), then fix each formula from its ion charges.') : !bal ? 'Products are right. Now balance it with the smallest whole numbers.' : !phs ? 'Add the phase to every formula: (s), (l), (g) or (aq).' : '';
+  return { score: +score.toFixed(3), ok: score >= 0.999, note };
+}
+const eqPart = (rx, o = {}) => { const term = x => { const ph = (x.match(/\((s|l|g|aq)\)$/) || [])[1]; return { f: normFormula(x.replace(/\((s|l|g|aq)\)$/, '')), ph }; };
+  const r = rx.r.map((x, i) => Object.assign(term(x), { c: rx.c[i] })), pr = rx.p.map((x, i) => Object.assign(term(x), { c: rx.c[rx.r.length + i] }));
+  return Object.assign({ type: 'eq', eq: [r, pr], ans: rxHTML(rx, true) }, o); };
 function gradePart(p, val, unitVal, needUnit) {
+  if (p.type === 'eq') return gradeEq(p, val);
   if (p.type === 'num') return gradeNum(p, val, unitVal, needUnit);
   if (p.type === 'choice') { const ok = String(val) === String(p.ok); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.why && p.why[val]) || '' }; }
-  if (p.type === 'text') { const ok = wordMatch(val, p.accept); return { score: ok ? 1 : 0, ok, note: '' }; }
+  if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
   if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
   if (p.type === 'coef') { const got = String(val).split(',').map(s => parseInt(s, 10)); const ok = p.vals.every((c, i) => (got[i] || (got[i] === 0 ? 0 : 1)) === c); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Count each element on both sides. Use the smallest whole numbers.' }; }
@@ -1133,6 +1171,10 @@ const tableHTML = (rows, head) => `<table class="data">${head ? `<tr>${head.map(
 const sfMin = (...xs) => Math.min(...xs.map(sfCount));
 const EQ_ALL = EQUIP.map(e => [...e, EQ_SYN[e[0]] || [e[1]]]).concat(EQUIP_MORE);
 const eqById = id => EQ_ALL.find(e => e[0] === id);
+const EQ_NAMING = EQ_ALL.filter(e => e[0] !== 'eudiometer'); // looks too much like a test tube to name fairly
+// generic word that earns partial credit (e.g. "flask" for Erlenmeyer flask)
+const EQ_PART = { ringstand: ['stand'], pipetbulb: ['bulb'], crucible: ['crucible'], calorimeter: ['calorimeter', 'cup'], eudiometer: ['tube'], utilityclamp: ['clamp'], buretclamp: ['clamp'], clampholder: ['clamp', 'holder'], volpipet: ['pipet', 'pipette'], transferpipet: ['pipet', 'pipette'], filterflask: ['flask'], volflask: ['flask'] };
+const eqPartial = e => EQ_PART[e[0]] || (e[1].replace(/\(.*?\)/g, '').trim().split(/\s+/).length > 1 ? [e[1].replace(/\(.*?\)/g, '').trim().split(/\s+/).pop().toLowerCase()] : []);
 const eqDraw = (e, tag) => `<figure class="eq-fig">${eqPic(e, 'A piece of lab equipment' + (tag ? ' labeled ' + tag : ''))}${tag ? `<figcaption class="vtag v${tag.toLowerCase()}">${tag}</figcaption>` : ''}</figure>`;
 
 /* ---------------- Exp 0a: Lab Exploration ---------------- */
@@ -1140,7 +1182,7 @@ const K0a = {
   cyl() {
     const cap = pick([10, 50, 100]), dp = cap === 10 ? 2 : 1, v = cap === 10 ? offLine(1.5, 9.2, 2) : offLine(cap * 0.15, cap * 0.92, 1);
     return { tag: `${cap} mL graduated cylinder`, prompt: `Record the volume of liquid in this <b>${cap} mL graduated cylinder</b>. Read the bottom of the meniscus and estimate one digit past the smallest lines.`, art: cylinderSVG(cap, v),
-      parts: [num(v, { dp, unit: 'mL', tol: cap === 10 ? 0.02 : 0.2 })], hint: `The smallest lines are ${cap === 10 ? '0.1' : '1'} mL apart, so record to the ${cap === 10 ? 'hundredths (0.01 mL)' : 'tenths (0.1 mL)'}.`,
+      parts: [num(v, { dp, unit: 'mL', tol: cap === 10 ? 0.02 : 0.2, rtol: cap === 10 ? 0.03 : 0.3 })], hint: `The smallest lines are ${cap === 10 ? '0.1' : '1'} mL apart, so record to the ${cap === 10 ? 'hundredths (0.01 mL)' : 'tenths (0.1 mL)'}.`,
       solution: `Lines every ${cap === 10 ? '0.1' : '1'} mL → estimate the ${cap === 10 ? 'hundredths' : 'tenths'}. About <b>${dpStr(v, dp)} mL</b> (your last digit can be off by a little).`, video: 'sigfig', skill: 'read' };
   },
   buret() {
@@ -1165,13 +1207,13 @@ const K0a = {
       parts: [num(water, { dp: 4, unit: 'g', tol: 0.00011 })], hint: 'Subtract: (flask + water) − (empty flask). Keep 4 decimal places.', solution: `${full.toFixed(4)} − ${empty.toFixed(4)} = <b>${water.toFixed(4)} g</b> of water.`, video: 'density', skill: 'calc' };
   },
   equipName() {
-    const e = pick(EQ_ALL.filter(x => !['clampholder', 'utilityclamp'].includes(x[0]) || chance(0.3)));
-    return { tag: 'Name that equipment', prompt: 'What is the name of this piece of lab equipment?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })],
+    const e = pick(EQ_NAMING.filter(x => !['clampholder', 'utilityclamp'].includes(x[0]) || chance(0.3)));
+    return { tag: 'Name that equipment', prompt: 'What is the name of this piece of lab equipment?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })],
       hint: `It ${e[2]}.`, solution: `This is a <b>${e[1].toLowerCase()}</b>. It ${e[2]}.`, video: 'practical1', skill: 'equip' };
   },
   equipUse() {
-    const e = pick(EQ_ALL.filter(x => ['measure', 'heat', 'move'].includes(x[3])));
-    return { tag: 'What is it for?', prompt: `Which piece of equipment <b>${e[2]}</b>? Type its name.`, parts: [textPart(e[5], { ans: e[1] })],
+    const e = pick(EQ_NAMING.filter(x => ['measure', 'heat', 'move'].includes(x[3])));
+    return { tag: 'What is it for?', prompt: `Which piece of equipment <b>${e[2]}</b>? Type its name.`, parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })],
       hint: `Think about the labs where you had to ${e[3] === 'measure' ? 'measure something' : e[3] === 'heat' ? 'heat something' : 'move or transfer something'}.`, solution: `The <b>${e[1].toLowerCase()}</b> ${e[2]}.`, video: 'practical1', skill: 'equip' };
   }
 };
@@ -1391,7 +1433,7 @@ const K5a = {
   },
   equipment() {
     const e = eqById(pick(['crucible', 'claytriangle', 'tongs', 'bunsen', 'wiregauze', 'ringstand']));
-    return { tag: 'Empirical formula equipment', prompt: 'Name this piece of equipment from the empirical formula lab.', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'part2_5a', skill: 'equip' };
+    return { tag: 'Empirical formula equipment', prompt: 'Name this piece of equipment from the empirical formula lab.', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'part2_5a', skill: 'equip' };
   },
   why() {
     const q = pick([
@@ -1501,7 +1543,7 @@ function gasRun() {
 const K8a = {
   readTube() {
     const v = offLine(18, 48, 2);
-    return { tag: 'Gas collection tube', prompt: 'Record the volume of hydrogen gas collected in this gas collection tube (eudiometer).', art: eudiometerSVG(v), parts: [num(v, { dp: 2, unit: 'mL', tol: 0.02 })],
+    return { tag: 'Gas collection tube', prompt: 'Record the volume of hydrogen gas collected in this gas collection tube (eudiometer).', art: eudiometerSVG(v), parts: [num(v, { dp: 2, unit: 'mL', tol: 0.02, rtol: 0.2 })],
       hint: 'The numbers increase going down, like a buret. Read the bottom of the meniscus to 0.01 mL.', solution: `About <b>${v.toFixed(2)} mL</b> of gas.`, video: 'part2_8a', skill: 'read' };
   },
   moles() {
@@ -1610,6 +1652,18 @@ const K10a = {
     return { tag: 'Reaction type (scheme 2)', prompt: `You mix ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [choice(S2, rx.s2)],
       hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. An uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
+  station() {
+    const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
+    const others = shuffle(RX.filter(x => x.tube && x.obs !== rx.obs && x.s2 !== rx.s2)).slice(0, 3).map(x => x.obs), opts = shuffle([rx.obs, ...others]);
+    const parts = [choice(opts, opts.indexOf(rx.obs), { label: 'Observation', w: 2 }), choice(S2, rx.s2, { label: 'Type of reaction', w: 2 }), eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
+    return { tag: 'Types of reactions station', prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then <b>predict the products</b> and write the <b>balanced equation with phases</b>.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
+      hint: 'Swap partners (double displacement) or let the metal replace the ion (single displacement). Fix each formula from the ion charges, check the solubility rules for (s) vs (aq), then balance.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
+  },
+  predict() {
+    const rx = pick(RX.filter(x => x.r.length === 2 && x.p.length && x.s2 !== 5 && x.s2 !== 4));
+    return { tag: 'Predict and balance', prompt: `Predict the products and write the <b>balanced equation with phases</b> for: <b>${rxPlain(rx.r)}</b>. ${rx.obs}`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [eqPart(rx)],
+      hint: 'Reactants → products. Type -> for the arrow. Write the phase after each formula, like NaCl(aq).', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
+  },
   scheme1() {
     const rx = pick(RX);
     return { tag: 'Reaction type (scheme 1)', prompt: 'Classify this reaction by its pattern:', art: eqn(rxHTML(rx, true)), parts: [choice(S1, rx.s1)], hint: 'A + B → AB combination; AB → A + B decomposition; A + BC → AC + B single displacement; AB + CD → AD + CB double displacement; fuel + O₂ combustion.', solution: `<b>${S1[rx.s1]}</b>.`, video: 'reactions', skill: 'concept' };
@@ -1643,7 +1697,7 @@ const ALUM = 474.37;
 const K11a = {
   parts() {
     const e = eqById(pick(['buchner', 'filterflask']));
-    return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
+    return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
     return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
@@ -1651,7 +1705,12 @@ const K11a = {
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
     return { tag: 'Theoretical yield', prompt: `A student starts with <b>${al.toFixed(4)} g of aluminum</b>. Every 1 mol of Al makes 1 mol of alum. What is the theoretical yield of alum?`,
-      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.39 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.39 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
+      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.37 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.37 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
+  },
+  actual() {
+    const empty = rnd(14, 19, 4), m = rnd(5.5, 11.5, 4), full = +(empty + m).toFixed(4), al = full - empty;
+    return { tag: 'Actual yield', prompt: 'The dry alum crystals were weighed in a vial. What mass of alum was collected, and what is this mass called?', ref: tableHTML([['Mass of empty vial', `${empty.toFixed(4)} g`], ['Mass of vial + dry alum', `${full.toFixed(4)} g`]]),
+      parts: [num(al, { dp: 4, unit: 'g', tol: 0.00011, label: 'Mass of alum' }), choice(['Actual yield', 'Theoretical yield', 'Percent yield'], 0, { label: 'This mass is the…' })], hint: 'Subtract the empty vial. What you really collect in lab is the actual yield.', solution: `${full.toFixed(4)} − ${empty.toFixed(4)} = <b>${al.toFixed(4)} g</b> (keep 4 decimal places). The mass you collect is the <b>actual yield</b>.`, video: 'yield', skill: 'calc' };
   },
   percentYield() {
     const th = rnd(9, 18, 2), act = +(th * rnd(0.55, 1.12, 3)).toFixed(2), py = act / th * 100;
@@ -1749,7 +1808,7 @@ const LABS = [
   { id: '7a', name: 'Calorimetry', blurb: 'Thermometers, q = mcΔT, exo vs endo', K: Object.assign({}, K7a, K7aOld), badge: 'heat', cur: 1, mock: ['thermo', 'exoEndo', 'qSolution', 'qReaction', 'qWater', 'ice'] },
   { id: '8a', name: 'Gas Constant R', blurb: 'Gas collection, Dalton’s law, PV = nRT', K: K8a, badge: 'gaslaw', cur: 1 },
   { id: '9a', name: 'Solutions and Dilutions', blurb: 'Standard curve, molarity, M₁V₁ = M₂V₂', K: K9a, badge: 'molarity', cur: 1 },
-  { id: '10a', name: 'Types of Reactions', blurb: 'Observations, reaction types, net ionic', K: K10a, badge: 'precipitate', cur: 1 },
+  { id: '10a', name: 'Types of Reactions', blurb: 'Observations, reaction types, net ionic', K: K10a, badge: 'precipitate', cur: 1, mock: ['station', 'station', 'predict', 'scheme2', 'ppt'] },
   { id: '11a', name: 'Synthesis of Alum', blurb: 'Vacuum filtration, hydrates, % yield', K: K11a, badge: 'lattice', cur: 0 },
   { id: '12a', name: 'pH of Household Items', blurb: 'pH, pOH, cabbage indicator', K: K12a, badge: 'phgauge', cur: 1 },
   { id: '12b', name: 'Citric Acid in Soda', blurb: 'Burets, standardization, titration math', K: K12b, badge: 'titrate', cur: 1 }
@@ -1915,7 +1974,7 @@ function partsHTML(parts, key, mock, saved = []) {
       const cells = p.terms.map((tm, k) => `${k === p.nr ? '<span>→</span>' : k ? '<span>+</span>' : ''}<input type="text" data-pc="${i}" data-k="${k}" inputmode="numeric" autocomplete="off" aria-label="Coefficient for ${tm}" value="${esc((v.val || '').split(',')[k] || '')}"><span>${fhtml(tm.replace(/\((s|l|g|aq)\)$/, ''))}</span>`).join(' ');
       inner = `<div class="coef" id="${id}">${cells}</div>`;
     } else {
-      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" ${p.type === 'formula' ? 'data-smart="formula" ' : ''}autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : 'Type your answer'}" value="${esc(v.val || '')}"></div>`;
+      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" ${p.type === 'formula' ? 'data-smart="formula" ' : p.type === 'eq' ? 'data-smart="eq" ' : ''}autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : p.type === 'eq' ? 'e.g. 2HCl(aq) + Na2CO3(aq) -> …' : 'Type your answer'}" value="${esc(v.val || '')}"></div>`;
     }
     return `<div class="part" data-part="${i}">${lab}${inner}<div class="pnote"></div></div>`;
   }).join('');
@@ -1931,7 +1990,7 @@ function readParts(root, parts) {
 function gradeAll(parts, vals, mock) {
   return parts.map((p, i) => {
     let spec = p;
-    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (!spec) return { score: 0, ok: false, note: p.type === 'num' && !p.free && p.label == null ? 'You didn’t finish the measurement at this station.' : 'Fill in the first box first.' }; }
+    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (spec && (p.read || p.rtol != null)) spec = Object.assign({}, spec, { read: p.read, rtol: p.rtol != null ? p.rtol : spec.rtol }); if (!spec) return { score: 0, ok: false, note: p.type === 'num' && !p.free && p.label == null ? 'You didn’t finish the measurement at this station.' : 'Fill in the first box first.' }; }
     if (p.free) { const ok = !!parseEntry(vals[i].val); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Type the number you see.' }; }
     if (!String(vals[i].val).trim()) return { score: 0, ok: false, empty: true, note: '' };
     return gradePart(spec, vals[i].val, vals[i].unit, mock);
@@ -2008,11 +2067,13 @@ function showSolution() {
 
 /* ---------- mock practical ---------- */
 let mock = null, tick = null;
+// accuracy windows from the practical's grading (readings only): buret ±0.1 mL, gas tube ±0.2 mL, 50/100 mL cylinder ±0.3 mL, thermometer ±0.3 °C, ruler ±0.1 cm
+const RTOL = { 'mL': p => (p.dp === 2 ? 0.1 : 0.3), '°C': () => 0.3, 'cm': () => 0.1, 'mm': () => 1, 'g': () => 0.0002 };
 const fmtClock = s => `${Math.floor(Math.max(0, s) / 60)}:${String(Math.max(0, Math.ceil(s) % 60 === 60 ? 0 : Math.floor(Math.max(0, s)) % 60)).padStart(2, '0')}`;
 function genStation() {
-  const items = shuffle(EQ_ALL.filter(e => !['clampholder'].includes(e[0]))).slice(0, 6);
+  const items = shuffle(EQ_NAMING.filter(e => !['clampholder'].includes(e[0]))).slice(0, 6);
   const art = `<div class="bench">${items.map((e, i) => eqDraw(e, 'ABC'[Math.floor(i / 2)])).join('')}</div>`;
-  const vq = v => { const two = items.slice('ABC'.indexOf(v) * 2, 'ABC'.indexOf(v) * 2 + 2); return { lab: 'gen', labName: 'General Lab Knowledge', kind: 'bench', tag: 'Name the equipment', prompt: `What are the names of the two pieces of equipment labeled <b>${v}</b>?`, parts: two.map((e, k) => textPart(e[5], { ans: e[1], label: `Piece ${k + 1} labeled ${v}` })), solution: two.map(e => `<b>${e[1]}</b>: ${e[2]}.`).join('<br>'), video: 'practical1', skill: 'equip' }; };
+  const vq = v => { const two = items.slice('ABC'.indexOf(v) * 2, 'ABC'.indexOf(v) * 2 + 2); return { lab: 'gen', labName: 'General Lab Knowledge', kind: 'bench', tag: 'Name the equipment', prompt: `What are the names of the two pieces of equipment labeled <b>${v}</b>?`, parts: two.map((e, k) => textPart(e[5], { ans: e[1], partial: eqPartial(e), label: `Piece ${k + 1} labeled ${v}` })), solution: two.map(e => `<b>${e[1]}</b>: ${e[2]}.`).join('<br>'), video: 'practical1', skill: 'equip' }; };
   return { lab: 'gen', title: 'General Lab Knowledge', shared: art, versions: { A: vq('A'), B: vq('B'), C: vq('C') } };
 }
 function buildPractical(ver, timer) {
@@ -2020,6 +2081,7 @@ function buildPractical(ver, timer) {
   const stations = pool.map(id => { const l = labById(id), kinds = shuffle(l.mock || Object.keys(l.K)); const ks = [0, 1, 2].map(i => kinds[i % kinds.length]); const v = {}; 'ABC'.split('').forEach((V, i) => { v[V] = makeQ(id, ks[i]); }); return { lab: id, title: l.name, versions: v }; });
   let nh = 0; stations.forEach((st, k) => { if (HANDS[st.lab] && nh < 4 && Math.random() < 0.7) { stations[k] = HANDS[st.lab](); nh++; } });
   stations.splice(rint(0, stations.length), 0, genStation());
+  stations.forEach(st => 'ABC'.split('').forEach(V => { const q = st.versions[V]; if (q && q.skill === 'read') q.parts.forEach(pt => { if (pt.type === 'num') { pt.read = true; if (pt.rtol == null) pt.rtol = RTOL[pt.unit] != null ? RTOL[pt.unit](pt) : null; } }); }));
   const n = stations.length, start = rint(0, n - 1);
   mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
 }
@@ -2088,17 +2150,17 @@ function turnIn() {
   mock.phase = 'done'; let total = 0;
   const rows = mock.stations.map((s, i) => {
     const q = s.versions[mock.ver], vals = mock.answers[i] || q.parts.map(() => ({ val: '' })), res = gradeAll(q.parts, vals, true);
-    const pts = Math.round(res.reduce((a, r) => a + r.score, 0) / q.parts.length * 10 * 2) / 2; total += pts;
+    const wt = q.parts.map(pt => pt.w || 1), wsum = wt.reduce((a, b) => a + b, 0), pts = Math.round(res.reduce((a, r, k) => a + r.score * wt[k], 0) / wsum * 10 * 2) / 2; total += pts;
     if (q.lab !== 'gen') { bumpLab(q.lab, pts >= 10); ddLog('Mock Practical', q, pts >= 10, res.find(r => !r.ok) ? (res.find(r => !r.ok).valueOk ? 'precision-or-units' : 'value') : ''); }
     if (pts >= 10) P.skill[q.skill] = (P.skill[q.skill] || 0) + 1;
-    const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}</div>`; }).join('');
+    const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; const share = 10 * (p.w || 1) / q.parts.reduce((a, b) => a + (b.w || 1), 0), bdTxt = r && r.bd ? ` <small class="bd">${r.bd.map(b => `${b[0]} ${+(b[1] * share).toFixed(1)}/${+(b[2] * share).toFixed(1)}`).join(' · ')}</small>` : p.type === 'eq' && r ? ` <small class="bd">Equation ${+(r.score * share).toFixed(1)}/${+share.toFixed(1)} (reactants 1 · products 3 · balanced 1 · phases 1, out of 6)</small>` : ''; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}${bdTxt}</div>`; }).join('');
     return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${stShared(s)}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;
   }).join('');
   total = Math.round(total * 10) / 10;
   P.mocks++; P.bestMock = Math.max(P.bestMock || 0, total); P.versions[mock.ver] = 1; P.xp += Math.round(total); renderStats(); save(); checkAch();
   const weak = mock.stations.map((s, i) => ({ s, i })).filter(x => x.s.lab !== 'gen').filter(x => { const q = x.s.versions[mock.ver]; return gradeAll(q.parts, mock.answers[x.i] || [], true).some(r => !r.ok); }).map(x => x.s.lab);
   $('mockRun').innerHTML = `<div class="station results"><p class="eyebrow">Version ${mock.ver} · ${VCOL[mock.ver]} sheet</p><div class="score"><b>${total} / 100</b><span>${total >= 90 ? 'Outstanding: you’re ready.' : total >= 70 ? 'Solid. Review the stations below.' : 'Keep practicing: open the worked answers below.'}</span></div>
-    <p class="small-note">Each station is worth 10 points: 7 for the right value, 1.5 for sig figs and 1.5 for units (choice and name questions are all or nothing).</p>${rows}
+    <p class="small-note">Graded like the real practical. <b>Readings:</b> accuracy 4, precision 4, units 2. <b>Calculations:</b> answer 8, sig figs 1, units 1. A known setup mistake earns half the answer points. <b>Equipment:</b> a partial name earns 2 of 5. On the real practical most calculation points come from your written setup, so show every conversion.</p>${rows}
     <div class="check-row">${weak.length ? `<button type="button" class="btn" id="practiceWeak">Practice the labs I missed (${[...new Set(weak)].length})</button>` : ''}<button type="button" class="btn primary" id="newMock">New mock practical <span data-icon="loop" aria-hidden="true"></span></button></div></div>`;
   paintIcons($('mockRun'));
   if (total >= 90) confetti();
@@ -2515,7 +2577,7 @@ function lewisSVG(s) {
   const angs = { 2: [180, 0], 3: [-90, 150, 30], 4: [-90, 0, 90, 180] }[n];
   const pos = angs.map(a => [cx + L * Math.cos(a * Math.PI / 180), cy + L * Math.sin(a * Math.PI / 180)]);
   const pair = (x, y, a, r) => { const ux = Math.cos(a), uy = Math.sin(a), px = x + ux * r, py = y + uy * r; return `<circle cx="${px - uy * 6}" cy="${py + ux * 6}" r="4" fill="#1f2a44"/><circle cx="${px + uy * 6}" cy="${py - ux * 6}" r="4" fill="#1f2a44"/>`; };
-  const freeDirs = (taken, k) => { const c = []; for (let d = 0; d < 360; d += 45) c.push(d); return c.map(d => [d, Math.min(...taken.map(t => Math.abs(((d - t + 540) % 360) - 180)))]).sort((a, b) => a[1] - b[1]).reverse().reduce((acc, [d]) => { if (acc.length < k && acc.every(x => Math.abs(((d - x + 540) % 360) - 180) >= 90)) acc.push(d); return acc; }, []); };
+  const freeDirs = (taken, k) => { const c = []; for (let d = 0; d < 360; d += 45) c.push(d); return c.map(d => [d, Math.min(...taken.map(t => Math.abs(((d - t + 540) % 360) - 180)))]).sort((a, b) => a[1] - b[1]).reverse().reduce((acc, [d]) => { if (acc.length < k && acc.every(x => Math.abs(((d - x + 540) % 360) - 180) >= 90)) acc.push(d); return acc; }, []).concat(c.filter(d => true)).filter((d, i, arr) => arr.indexOf(d) === i).filter(d => !taken.some(t => Math.abs(((d - t + 540) % 360) - 180) < 30)).slice(0, k); };
   let t = `<svg viewBox="0 0 340 280" role="img" aria-label="Lewis structure builder for ${m[0]}">`;
   pos.forEach((p, i) => {
     const o = s.bo[i], dx = p[0] - cx, dy = p[1] - cy, d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d, x0 = cx + ux * 20, y0 = cy + uy * 20, x1 = p[0] - ux * 20, y1 = p[1] - uy * 20;
@@ -2529,7 +2591,7 @@ function lewisSVG(s) {
 }
 function lewisCheck(s) {
   const m = s.m, used = 2 * s.bo.reduce((a, b) => a + b, 0) + 2 * s.lp.reduce((a, b) => a + b, 0);
-  if (used !== m[4]) return `You used <b>${used}</b> electrons. ${m[0]} has <b>${m[4]}</b>.`;
+  if (used !== m[4]) return `Your structure has <b>${used}</b> electrons, and that doesn’t match the total valence electrons. Recount them with the periodic table (each bond = 2, each lone pair = 2), then fix your structure.`;
   const els = [m[1], ...m[2]], bondE = k => (k === 0 ? s.bo.reduce((a, b) => a + b, 0) : s.bo[k - 1]);
   for (let k = 0; k < els.length; k++) { const el = els[k], tot = 2 * bondE(k) + 2 * s.lp[k], need = el === 'H' ? 2 : 8; if (tot !== need) return `<b>${el}</b> has ${tot} electrons around it. It needs ${need}${el === 'H' ? ' (a duet)' : ' (an octet)'}.`; }
   for (let k = 0; k < els.length; k++) { const fc = GVE[els[k]] - 2 * s.lp[k] - bondE(k); if (fc !== 0) return `Close! Every atom has an octet, but <b>${els[k]}</b> has a formal charge of ${fc > 0 ? '+' : ''}${fc}. Try moving a double bond.`; }
@@ -2542,16 +2604,16 @@ const BENCH_MODEL = {
   scene(s) {
     const g = s.built ? s.m[3] : null;
     return `<div class="vl-row rev"><div class="vl-st"><div class="vl-st-label">Lewis structure of <b>${fhtml(s.m[0])}</b> ${!s.built ? '· tap a bond to change it, tap an atom to add a lone pair' : ''}</div><div id="vlLewis" class="${s.built ? 'locked' : ''}">${lewisSVG(s)}</div>
-    ${!s.built && VL.step >= 1 ? `<div class="vl-ctl"><span class="vl-count" id="vlCount">Electrons used: <b>${this.used(s)}</b> of ${s.m[4]}</span><button type="button" class="btn" id="lwReset">Reset</button><button type="button" class="btn primary" id="lwCheck">Check my structure</button></div>` : ''}</div>
-    <div class="vl-st"><div class="vl-st-label">3D model</div><div id="vlModel">${g ? modelSVG(g, s.m[1], s.m[2], `A 3D model of ${s.m[0]}`) : '<div class="empty small">Finish the Lewis structure to see the 3D shape.</div>'}</div></div></div>`;
+    ${!s.built && VL.step >= 1 ? `<div class="vl-ctl"><span class="vl-count" id="vlCount">Electrons placed: <b>${this.used(s)}</b></span><button type="button" class="btn" id="lwReset">Reset</button><button type="button" class="btn primary" id="lwCheck">Check my structure</button></div>` : ''}</div>
+    <div class="vl-st"><div class="vl-st-label">3D model</div>${ptBox()}<div id="vlModel">${g ? modelSVG(g, s.m[1], s.m[2], `A 3D model of ${s.m[0]}`) : '<div class="empty small">Finish the Lewis structure to see the 3D shape.</div>'}</div></div></div>`;
   },
   restore(s) {
     const box = $('vlLewis'); if (!box || s.built || VL.step < 1) return;
-    const redraw = () => { box.innerHTML = lewisSVG(s); const c = $('vlCount'); if (c) c.innerHTML = `Electrons used: <b>${this.used(s)}</b> of ${s.m[4]}`; };
+    const redraw = () => { box.innerHTML = lewisSVG(s); const c = $('vlCount'); if (c) c.innerHTML = `Electrons placed: <b>${this.used(s)}</b>`; };
     box.addEventListener('click', e => {
       const b = e.target.closest('[data-bond]'), a = e.target.closest('[data-atom]');
       if (b) { const i = +b.dataset.bond; s.bo[i] = s.bo[i] % 3 + 1; redraw(); }
-      else if (a) { const k = a.dataset.atom === 'c' ? 0 : +a.dataset.atom + 1; s.lp[k] = (s.lp[k] + 1) % 4; redraw(); }
+      else if (a) { const k = a.dataset.atom === 'c' ? 0 : +a.dataset.atom + 1; s.lp[k] = (s.lp[k] + 1) % 5; redraw(); }
     });
     box.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.lw-hit')) { e.preventDefault(); e.target.closest('.lw-hit').dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
     $('lwReset').onclick = () => { s.bo = s.m[2].map(() => 1); s.lp = [0, ...s.m[2].map(() => 0)]; redraw(); };
@@ -2559,7 +2621,7 @@ const BENCH_MODEL = {
   },
   async drop() { return 'Tap the bonds and atoms in the Lewis structure.'; },
   steps: [
-    { title: 'Count valence electrons', say: s => `How many valence electrons does <b>${fhtml(s.m[0])}</b> have?`, ref: () => '<p class="small-note">H = 1 · C, Si = 4 · N, P = 5 · O, S = 6 · F, Cl = 7</p>', parts: s => [num(s.m[4], { unit: '', tol: 0, ans: String(s.m[4]), label: 'Valence electrons' })], sol: s => `${[s.m[1], ...s.m[2]].map(e => `${e} ${GVE[e]}`).join(' + ')} = <b>${s.m[4]}</b>.` },
+    { title: 'Count valence electrons', say: s => `How many valence electrons does <b>${fhtml(s.m[0])}</b> have? Use the periodic table (group number).`, pt: true, parts: s => [num(s.m[4], { unit: '', tol: 0, ans: String(s.m[4]), label: 'Valence electrons' })], sol: s => `${[s.m[1], ...s.m[2]].map(e => `${e} ${GVE[e]}`).join(' + ')} = <b>${s.m[4]}</b>.` },
     { title: 'Build the Lewis structure', say: 'Tap a <b>bond</b> to make it single → double → triple. Tap an <b>atom</b> to add lone pairs. Use every electron, give every atom an octet (H gets 2).', act: s => s.built, auto: true },
     { title: 'Electron groups', say: 'How many electron groups (bonded atoms + lone pairs) are around the central atom? A double or triple bond counts as one group.', parts: s => [num(s.m[2].length + s.m[5], { unit: '', tol: 0, ans: String(s.m[2].length + s.m[5]), label: 'Electron groups' })], sol: s => `${s.m[2].length} bonded atoms + ${s.m[5]} lone pair${s.m[5] === 1 ? '' : 's'} = <b>${s.m[2].length + s.m[5]}</b>.` },
     { title: 'Molecular shape', say: 'Name the shape of the molecule (look at the atoms, not the lone pairs).', parts: s => [geoChoice(s.m[3])], sol: s => `<b>${GEO_NAMES[s.m[3]]}</b>.` },
@@ -2576,8 +2638,8 @@ const BENCH_WATER = {
   shown(s) { if (!s.onBal) return 0; const m = s.tareM + s.v * (s.rho || RHO_W) + (s.v ? s.noise : 0); return s.tared ? m - s.tareM : m; },
   scene(s) {
     const ctl = s.tared && !s.filled ? `<div class="vl-ctl"><button type="button" class="btn" id="wSquirt">Squirt <small>(hold)</small></button><button type="button" class="btn" id="wDrop">1 drop (pipet)</button><button type="button" class="btn" id="wOut">Pour some out</button><button type="button" class="btn primary" id="wDone">Done filling</button></div>` : '';
-    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('cyl', cylOnPan, '10 mL cylinder (empty)') : ''}<span class="vl-hint">Target: <b>${s.target.toFixed(2)} mL</b> of ${s.salt ? 'NaCl solution' : 'DI water'}</span></div>
-    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance(this.shown(s).toFixed(4))}</div>${s.onBal ? `<div class="vl-onpan static">${cylOnPan}</div>` : ''}</div>${s.onBal && !s.tared ? '<div class="vl-ctl"><button type="button" class="btn primary" id="wTare">Press TARE</button></div>' : ''}</div>
+    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('cyl', cylOnPan, s.fixed ? `10 mL cylinder of ${s.salt ? 'NaCl solution' : 'water'}` : '10 mL cylinder (empty)') : ''}<span class="vl-hint">${s.fixed ? `Label on the cylinder: <b>empty mass ${s.tareM.toFixed(4)} g</b>` : `Target: <b>${s.target.toFixed(2)} mL</b> of ${s.salt ? 'NaCl solution' : 'DI water'}`}</span></div>
+    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance(this.shown(s).toFixed(4))}</div>${s.onBal ? `<div class="vl-onpan static">${cylOnPan}</div>` : ''}</div>${s.onBal && !s.tared && !s.fixed ? '<div class="vl-ctl"><button type="button" class="btn primary" id="wTare">Press TARE</button></div>' : ''}</div>
     <div class="vl-st wide"><div class="vl-st-label">10 mL graduated cylinder (on the balance)</div><div id="vlCyl">${cylinderSVG(10, s.v)}</div>${ctl}</div></div>`;
   },
   draw(s) { vlSet('vlCyl', cylinderSVG(10, s.v)); vlSet('vlBal', vlBalance(this.shown(s).toFixed(4))); },
@@ -2593,7 +2655,7 @@ const BENCH_WATER = {
     $('wDone').onclick = () => { if (s.v < 1) { vlSay('Add some water first.', 'bad'); return; } s.filled = true; vlScene(); vlSteps(); };
   },
   async drop(s, what, where) {
-    if (what === 'cyl' && where === 'balance') { s.onBal = true; vlScene(); await vlWeigh('vlBal', this.shown(s), 4); vlSay('That’s the mass of the empty cylinder. Press TARE to zero it.'); return true; }
+    if (what === 'cyl' && where === 'balance') { s.onBal = true; vlScene(); await vlWeigh('vlBal', this.shown(s), 4); vlSay(s.fixed ? 'That’s the cylinder plus the liquid. Record every digit.' : 'That’s the mass of the empty cylinder. Press TARE to zero it.'); return true; }
     return 'Put the cylinder on the balance.';
   },
   steps: [
@@ -2629,11 +2691,12 @@ function livePart(get, o) {
 const handQ = (lab, prompt, parts, sol, skill) => { const q = { lab, labName: labById(lab).name, kind: 'hands', tag: 'Hands-on station', prompt, parts, video: (LAB_VIDEOS[lab] || [])[0], skill }; Object.defineProperty(q, 'solution', { get: sol }); return q; };
 const HANDS = {
   '0a'() {
-    const b = BENCH_WATER, s = b.setup(), m = () => b.shown(s), ok = () => s.v > 0.5;
-    return { lab: '0a', title: 'Lab Exploration (hands-on)', hands: { bench: b, s, snap: () => `Your cylinder: ${s.v.toFixed(2)} mL · balance: ${m().toFixed(4)} g${s.tared ? '' : ' (never tared)'}` }, versions: {
-      A: handQ('0a', `Fill the 10 mL cylinder to <b>${s.target.toFixed(2)} mL</b> with DI water. Record the volume you actually measured.`, [livePart(() => (ok() ? num(s.v, { dp: 2, unit: 'mL', tol: 0.02 }) : null), { unit: 'mL' })], () => `Your cylinder read <b>${s.v.toFixed(2)} mL</b>. Lines every 0.1 mL → read to 0.01 mL.`, 'read'),
-      B: handQ('0a', `Put the empty cylinder on the balance and <b>tare</b> it. Add about ${s.target.toFixed(0)} mL of water. Record the mass of the water.`, [livePart(() => (ok() && s.tared ? num(m(), { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `The tared balance read <b>${m().toFixed(4)} g</b>.${s.tared ? '' : ' (Tare first, or the cylinder’s mass gets counted.)'}`, 'read'),
-      C: handQ('0a', 'Measure a volume of water in the 10 mL cylinder and its mass (tare first). Calculate the density of water.', [livePart(() => (ok() && s.tared ? num(m() / s.v, { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} g ÷ ${s.v.toFixed(2)} mL = <b>${sfHTML(m() / s.v, sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc') } };
+    const b = BENCH_WATER, s = b.setup(); Object.assign(s, { v: offLine(5.2, 9.6, 2), filled: true, fixed: true });
+    const full = () => b.shown(s), water = () => full() - s.tareM;
+    return { lab: '0a', title: 'Lab Exploration (hands-on)', hands: { bench: b, s, snap: () => `Cylinder: ${s.v.toFixed(2)} mL of water · empty ${s.tareM.toFixed(4)} g · full ${s.onBal ? full().toFixed(4) + ' g' : 'not weighed'}` }, versions: {
+      A: handQ('0a', 'Record the volume of water in the 10 mL graduated cylinder.', [num(s.v, { dp: 2, unit: 'mL', tol: 0.02, rtol: 0.03 })], () => `Lines every 0.1 mL → read to 0.01 mL: <b>${s.v.toFixed(2)} mL</b>.`, 'read'),
+      B: handQ('0a', 'Weigh the cylinder of water. Use the empty mass on its label to find the <b>mass of the water</b>.', [livePart(() => (s.onBal ? num(water(), { dp: 4, unit: 'g', tol: 0.00011 }) : null), { unit: 'g' })], () => `${full().toFixed(4)} − ${s.tareM.toFixed(4)} = <b>${water().toFixed(4)} g</b> (mass by difference, 4 decimal places).`, 'calc'),
+      C: handQ('0a', 'Read the volume, weigh the cylinder (subtract its empty mass), then calculate the <b>density of the water</b>.', [livePart(() => (s.onBal ? num(water() / s.v, { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${water().toFixed(4)} g ÷ ${s.v.toFixed(2)} mL = <b>${sfHTML(water() / s.v, sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc') } };
   },
   '1a'() {
     const b = BENCH_DENSITY, s = b.setup(), V = () => +(s.vf - s.vi).toFixed(1);
@@ -2643,11 +2706,12 @@ const HANDS = {
       C: handQ('1a', 'Find the density of the metal by water displacement.', [livePart(() => (s.inCyl && s.onBal ? num(s.m / V(), { sf: sfCount(V().toFixed(1)), unit: 'g/mL', rel: 0.035 }) : null), { unit: 'g/mL' })], () => `${s.m.toFixed(4)} g ÷ ${V().toFixed(1)} mL = <b>${sfHTML(s.m / V(), sfCount(V().toFixed(1)))} g/mL</b>.`, 'calc') } };
   },
   '9a'() {
-    const b = BENCH_SALT, s = b.setup(), m = () => b.shown(s), ok = () => s.v > 0.5 && s.tared;
-    return { lab: '9a', title: 'Solutions and Dilutions (hands-on)', hands: { bench: b, s, snap: () => `NaCl solution: ${s.v.toFixed(2)} mL · ${m().toFixed(4)} g${s.tared ? '' : ' (never tared)'}` }, versions: {
-      A: handQ('9a', 'Tare the cylinder, add about 7 mL of the NaCl solution, and record the <b>mass of the solution</b>.', [livePart(() => (ok() ? num(m(), { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `<b>${m().toFixed(4)} g</b>.`, 'read'),
-      B: handQ('9a', 'Measure a volume of the NaCl solution and its mass (tare first). Calculate its <b>density</b>.', [livePart(() => (ok() ? num(m() / s.v, { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} ÷ ${s.v.toFixed(2)} = <b>${sfHTML(m() / s.v, sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc'),
-      C: handQ('9a', 'Find the density of the NaCl solution, then use the standard curve <b>y = 0.0435x + 0.9984</b> to find its concentration (mol/L).', [livePart(() => (ok() ? num((m() / s.v - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.04 }) : null), { unit: 'M' })], () => `d = ${(m() / s.v).toFixed(4)} g/mL → x = (d − 0.9984) ÷ 0.0435 = <b>${sfHTML((m() / s.v - 0.9984) / 0.0435, 3)} M</b>.`, 'calc') } };
+    const b = BENCH_SALT, s = b.setup(); Object.assign(s, { v: offLine(5.2, 9.6, 2), filled: true, fixed: true });
+    const full = () => b.shown(s), m = () => full() - s.tareM, d = () => m() / s.v;
+    return { lab: '9a', title: 'Solutions and Dilutions (hands-on)', hands: { bench: b, s, snap: () => `NaCl solution: ${s.v.toFixed(2)} mL · empty ${s.tareM.toFixed(4)} g · full ${s.onBal ? full().toFixed(4) + ' g' : 'not weighed'}` }, versions: {
+      A: handQ('9a', 'Weigh the cylinder of NaCl solution. Use the empty mass on its label to find the <b>mass of the solution</b>.', [livePart(() => (s.onBal ? num(m(), { dp: 4, unit: 'g', tol: 0.00011 }) : null), { unit: 'g' })], () => `${full().toFixed(4)} − ${s.tareM.toFixed(4)} = <b>${m().toFixed(4)} g</b>.`, 'calc'),
+      B: handQ('9a', 'Read the volume of the NaCl solution and find its mass (subtract the empty mass). Calculate its <b>density</b>.', [livePart(() => (s.onBal ? num(d(), { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} g ÷ ${s.v.toFixed(2)} mL = <b>${sfHTML(d(), sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc'),
+      C: handQ('9a', 'Find the density of the NaCl solution, then use the standard curve <b>y = 0.0435x + 0.9984</b> to find its concentration (mol/L).', [livePart(() => (s.onBal ? num((d() - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.04 }) : null), { unit: 'M' })], () => `d = ${d().toFixed(4)} g/mL → x = (d − 0.9984) ÷ 0.0435 = <b>${sfHTML((d() - 0.9984) / 0.0435, 3)} M</b>.`, 'calc') } };
   },
   '10a'() {
     const b = BENCH_MIX, s = b.setup(), keys = Object.keys(VR), all = [];
@@ -2944,6 +3008,7 @@ function toPlain(t) { return String(t).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺�
 function smartFormat(mode, raw) {
   let t = toPlain(raw);
   if (mode === 'formula') { t = t.replace(/\^([0-9]*[+\-])/g, (m, g) => SUPC(g)); t = t.replace(/([A-Za-z\)\]])(\d+)/g, (m, a, d) => a + SUBC(d)); t = t.replace(/([₀-₉A-Za-z\)\]])([+\-])(?=\s|$|\)|,)/g, (m, a, c) => a + SUPD[c]); return t; }
+  if (mode === 'eq') { t = t.replace(/-+>|=>/g, '→'); t = t.replace(/([A-Za-z\)\]])(\d+)/g, (m, a, d) => a + SUBC(d)); return t; }
   if (mode === 'num') { t = t.replace(/(\d)\s*[eE]\s*([+\-]?\d+)/g, (m, a, e) => a + '×10' + SUPC(e)); t = t.replace(/\^([+\-]?\d+)/g, (m, e) => SUPC(e)); t = t.replace(/\*/g, '×'); return t; }
   return t;
 }
