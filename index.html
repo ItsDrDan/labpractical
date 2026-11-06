@@ -212,6 +212,61 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 @media(max-width:760px){.cats{grid-template-columns:1fr 1fr;gap:9px}.cat{min-height:150px;padding:12px 8px}.cat img{width:64px;height:64px}.cat b{font-size:1.02rem}.chip-row>span{min-width:100%}.lab-pair{grid-template-columns:1fr}}
 @media(max-width:760px){table.data{font-size:.95rem}table.data th,table.data td{padding:5px 7px}}
 
+/* ---------- Virtual Lab ---------- */
+.vl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.vl-wrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.vl-wrap{grid-template-columns:1fr}}
+.vl-scene{background:linear-gradient(#fbfbfe,#eef1fa);border:1px solid var(--line);border-radius:16px;padding:10px}
+.vl-shelf{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:74px;padding:6px;background:repeating-linear-gradient(90deg,#f6efe2 0 40px,#f2e9d8 40px 80px);border:2px solid #e2d3b6;border-radius:12px;margin-bottom:10px}
+.vl-shelf.many .vl-item{width:78px}.vl-shelf.many .vl-item svg{width:38px;height:44px}
+.vl-item{display:flex;flex-direction:column;align-items:center;gap:2px;width:92px;padding:6px 4px;border:2px solid transparent;border-radius:12px;background:#fff;box-shadow:var(--shadow);touch-action:none;cursor:grab;font-size:.78rem;font-weight:700;line-height:1.15;text-align:center;color:#26326a;user-select:none;-webkit-user-select:none}
+.vl-item svg{width:46px;height:52px;pointer-events:none}.vl-item span{pointer-events:none}
+.vl-item.sel{border-color:var(--accent);box-shadow:0 0 0 3px #4b57d140}
+.vl-item.dragging{cursor:grabbing;z-index:50;position:relative;box-shadow:0 10px 24px #1f2a4433;opacity:.95}
+.vl-item:disabled{opacity:.35;cursor:not-allowed}
+.vl-hint{font-size:.85rem;color:var(--muted);font-weight:700;padding:0 6px}
+.vl-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:10px}
+@media(max-width:560px){.vl-row{grid-template-columns:1fr}}
+.vl-st{position:relative;background:#fff;border:2px dashed #cdd3ee;border-radius:14px;padding:6px;min-height:120px;transition:border-color .15s,background .15s}
+.vl-st.ready{border-color:#9fb0ff}.vl-st.over{border-color:var(--accent);background:#f3f4ff}
+.vl-st-label{font-size:.8rem;font-weight:800;color:#656c83;padding:2px 4px}
+.vl-st svg{display:block;width:100%;height:auto}
+.vl-bal{position:relative}.vl-onpan{position:absolute;left:41%;top:-6%;width:18%!important;padding:2px!important;background:transparent!important;box-shadow:none!important}.vl-onpan svg{width:100%!important;height:auto!important}
+.vl-tubebox svg{max-height:300px}
+.vl-stack{position:relative}.vl-over{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vl-room{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;padding:4px 6px}
+.vl-msg{min-height:1.4em;margin:8px 2px 0;font-weight:700;color:#4f5a74}.vl-msg.good{color:#21794a}.vl-msg.bad{color:#b0304a}
+.vl-pop{margin:0;padding:6px;animation:vlPop .45s ease-out both}.vl-pop figcaption{font-weight:800;font-size:.8rem;color:#656c83}.vl-pop p{margin:6px 2px 0;font-size:.92rem;font-weight:700}
+.vl-popbox .empty.small{font-size:.9rem;padding:20px 10px}
+.vl-cab{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:4px;font-size:.82rem;padding:4px}.vl-cab span{display:flex;align-items:center;gap:6px}.vl-cab i{width:18px;height:18px;border-radius:5px;flex:none;border:1px solid #0002}.vl-cab b{margin-left:auto;font-size:.76rem;color:#656c83}
+.vl-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.vl-list li{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff}
+.vl-list li.todo{opacity:.5}.vl-list li.done{background:var(--mint);border-color:var(--mint-line)}.vl-list li.done b::before{content:'✓ ';color:#21794a}
+.vl-list li.done span{display:block;font-size:.88rem;color:#4f5a74}
+.vl-list li.now{border:2px solid var(--accent);box-shadow:0 0 0 3px #4b57d11a}.vl-list li.now p{margin:4px 0 8px}
+.vl-wait{font-weight:800;color:var(--accent)}
+.vl-list .feedback{display:block}
+@keyframes vlPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes vlBub{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(var(--by));opacity:0}}
+@keyframes vlFall{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--fy));opacity:.2}}
+@keyframes vlDrop{0%{transform:translateY(0);opacity:1}90%{opacity:1}100%{transform:translateY(var(--dy));opacity:0}}
+@keyframes vlHeat{0%,100%{opacity:.15;transform:translateY(0)}50%{opacity:.95;transform:translateY(-8px)}}
+@keyframes vlGlow{0%,100%{opacity:.18}50%{opacity:.45}}
+@keyframes vlMove{to{transform:translate(var(--mx),var(--my))}}
+@keyframes vlUp{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--uy));opacity:0}}
+@keyframes vlDrift{from{transform:translate(0,0)}to{transform:translate(10px,-8px)}}
+@keyframes vlRecolor{to{fill:var(--to)}}
+@keyframes vlMeet{0%{transform:none;opacity:1}70%{transform:translateX(var(--mx));opacity:1}100%{transform:translateX(var(--mx));opacity:0}}
+@keyframes vlBorn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+.vl-meet{animation:vlMeet 1.2s ease-in both}.vl-born{animation:vlBorn .6s ease-out both;transform-box:fill-box;transform-origin:center}
+@keyframes vlFade{from{opacity:0}to{opacity:1}}
+@keyframes vlSwirl{0%{opacity:0}40%{opacity:.9}100%{opacity:0}}
+@keyframes vlPaper{from{fill:#e57373}to{fill:#5d8df0}}
+.vl-bub{animation:vlBub 1.8s ease-in infinite both}.vl-fall{animation:vlFall 1.6s ease-in both}.vl-drop{animation:vlDrop .5s ease-in both}
+.vl-heat{animation:vlHeat 1.6s ease-in-out infinite}.vl-glow{animation:vlGlow 2s ease-in-out infinite}
+.vl-move{animation:vlMove 1.2s ease-in-out both}.vl-up{animation:vlUp 2.4s ease-in infinite both}.vl-drift{animation:vlDrift 1.4s ease-in-out infinite alternate}
+.vl-recolor{animation:vlRecolor .8s ease both}.vl-coat,.vl-ppt{animation:vlFade 1.8s ease both}.vl-swirl{animation:vlSwirl .8s ease both}.vl-paper{animation:vlPaper 2s ease both}
+.ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
 .eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
 
@@ -365,6 +420,7 @@ html.dd-embedded .mockbar{position:relative}
   <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"></span><span><b>Mock Practical</b><small>10 timed stations. Follow your version color.</small></span></button>
   <button type="button" data-mode="practice" role="tab"><span class="ms-ico" data-icon="flask" aria-hidden="true"></span><span><b>Practice by Lab</b><small>Pick labs. No timer, hints on.</small></span></button>
   <button type="button" data-mode="bench" role="tab"><span class="ms-ico" data-icon="sliders" aria-hidden="true"></span><span><b>PhET Lab Bench</b><small>Hands-on simulations with tasks.</small></span></button>
+  <button type="button" data-mode="vlab" role="tab"><span class="ms-ico" data-icon="beaker" aria-hidden="true"></span><span><b>Virtual Lab</b><small>Weigh, pour, mix and measure, then do the math.</small></span></button>
  </div>
 
  <!-- ===== Mock practical ===== -->
@@ -414,6 +470,15 @@ html.dd-embedded .mockbar{position:relative}
    <div class="section-head"><h2>PhET Lab Bench</h2><span>Simulations by PhET Interactive Simulations, University of Colorado Boulder</span></div>
    <div class="simgrid" id="simGrid"></div>
    <div id="simArea"></div>
+  </div>
+ </section>
+
+ <!-- ===== Virtual lab ===== -->
+ <section id="vlabView" hidden>
+  <div class="panel section">
+   <div class="section-head"><h2>Virtual Lab</h2><span>Drag items onto the equipment, or tap an item and then tap where it goes.</span></div>
+   <div class="simgrid" id="vlGrid"></div>
+   <div id="vlArea"></div>
   </div>
  </section>
 
@@ -555,7 +620,7 @@ const sfCount = s => sfOf(String(s).replace(/^[−-]/, ''));
 const dpCount = s => (String(s).split('.')[1] || '').length;
 
 /* ---------- chemistry helpers ---------- */
-const AM = { H: 1.008, He: 4.003, Li: 6.94, Be: 9.012, B: 10.81, C: 12.01, N: 14.01, O: 16.00, F: 19.00, Na: 22.99, Mg: 24.31, Al: 26.98, Si: 28.09, P: 30.97, S: 32.06, Cl: 35.45, K: 39.10, Ca: 40.08, Cr: 52.00, Mn: 54.94, Fe: 55.85, Co: 58.93, Ni: 58.69, Cu: 63.55, Zn: 65.38, Br: 79.90, Sr: 87.62, Ag: 107.87, Sn: 118.71, I: 126.90, Ba: 137.33, Pb: 207.2 };
+const AM = { H: 1.008, He: 4.003, Li: 6.94, Be: 9.012, B: 10.81, C: 12.011, N: 14.007, O: 15.999, F: 18.998, Na: 22.99, Mg: 24.31, Al: 26.98, Si: 28.09, P: 30.97, S: 32.06, Cl: 35.45, K: 39.10, Ca: 40.08, Cr: 52.00, Mn: 54.94, Fe: 55.85, Co: 58.93, Ni: 58.69, Cu: 63.55, Zn: 65.39, Br: 79.90, Sr: 87.62, Ag: 107.87, Sn: 118.71, I: 126.90, Ba: 137.33, Pb: 207.20 };
 function parseFormula(f) {
   // supports parentheses and one hydrate dot: "KAl(SO4)2·12H2O"
   const parts = String(f).replace(/\s/g, '').split(/[·•.*]/);
@@ -1133,7 +1198,7 @@ const K3z = {
   },
   whichMine() {
     const keys = Object.keys(PB), target = pick(keys), sampleMass = +avgPb(PB[target]).toFixed(2);
-    return { tag: 'Where did the lead come from?', prompt: `Lead from the white paint has an average atomic mass of <b>${sampleMass.toFixed(2)} g/mol</b>. Calculate the average for each mine. Which mine does the lead come from?`,
+    return { tag: 'Where did the lead come from?', pt: false, prompt: `Lead from the white paint has an average atomic mass of <b>${sampleMass.toFixed(2)} g/mol</b>. Calculate the average for each mine. Which mine does the lead come from?`,
       ref: `<table class="data small"><tr><th>Isotope</th>${keys.map(k => `<th>${k}</th>`).join('')}</tr>${[204, 206, 207, 208].map((n, i) => `<tr><td>Pb-${n}</td>${keys.map(k => `<td>${PB[k][i].toFixed(2)}%</td>`).join('')}</tr>`).join('')}</table>`,
       parts: [choice(keys, keys.indexOf(target))], hint: 'Do Σ (mass number × fraction) for each mine and compare to the sample.', solution: keys.map(k => `${k}: ${avgPb(PB[k]).toFixed(2)}`).join(' · ') + `. The closest is <b>${target}</b>.${target === 'Europe' ? ' That fits a real Vermeer.' : ' Vermeer used European lead, so this points to a forgery.'}`, video: 'isotopes', skill: 'calc' };
   },
@@ -1220,7 +1285,7 @@ const K4b = {
 /* ---------------- Exp 5a: Empirical Formula ---------------- */
 const EMP = [['Mg', 'O', 1, 1], ['Fe', 'O', 2, 3], ['Al', 'Cl', 1, 3], ['Cu', 'S', 2, 1], ['Ca', 'Cl', 1, 2], ['Zn', 'Cl', 1, 2], ['Al', 'O', 2, 3], ['Ni', 'Cl', 1, 2], ['Fe', 'Cl', 1, 3], ['Na', 'O', 2, 1]];
 const empF = (a, b, x, y) => `${a}${x > 1 ? x : ''}${b}${y > 1 ? y : ''}`;
-function mgoData() { const cr = rnd(20.5, 23.5, 4), mg = rnd(0.12, 0.19, 4), ox = mg / 24.31 * 16.00 * rnd(0.97, 1.02, 3), w1 = +(cr + mg + ox + rnd(0.0004, 0.0015, 4)).toFixed(4), w2 = +(cr + mg + ox).toFixed(4); return { cr, mg, ox: +(w2 - cr - mg).toFixed(4), w1, w2, comp: +(w2 - cr).toFixed(4) }; }
+function mgoData() { const cr = rnd(20.5, 23.5, 4), mg = rnd(0.12, 0.19, 4), ox = mg / 24.31 * 15.999 * rnd(0.97, 1.02, 3), w1 = +(cr + mg + ox + rnd(0.0004, 0.0015, 4)).toFixed(4), w2 = +(cr + mg + ox).toFixed(4); return { cr, mg, ox: +(w2 - cr - mg).toFixed(4), w1, w2, comp: +(w2 - cr).toFixed(4) }; }
 const K5a = {
   massO() {
     const d = mgoData();
@@ -1235,9 +1300,9 @@ const K5a = {
   formula() {
     const [a, b, x, y] = pick(EMP), base = rnd(0.4, 1.6, 3), ma = +(base * x * AM[a] / 10 * rnd(0.985, 1.015, 3)).toFixed(4), mb = +(base * y * AM[b] / 10).toFixed(4), f = empF(a, b, x, y);
     const na = ma / AM[a], nb = mb / AM[b], r = Math.min(na, nb);
-    return { tag: 'Empirical formula', prompt: `A sample of a compound contains <b>${ma.toFixed(4)} g ${a}</b> and <b>${mb.toFixed(4)} g ${b}</b>. What is its empirical formula?`,
+    return { tag: 'Empirical formula', pt: true, prompt: `A sample of a compound contains <b>${ma.toFixed(4)} g ${a}</b> and <b>${mb.toFixed(4)} g ${b}</b>. What is its empirical formula?`,
       parts: [{ type: 'formula', accept: [f], ans: fhtml(f) }], hint: 'Grams → moles for each element, divide by the smaller number of moles, then (if needed) multiply to get whole numbers.',
-      solution: `mol ${a} = ${ma.toFixed(4)} ÷ ${AM[a].toFixed(2)} = ${na.toFixed(5)}; mol ${b} = ${mb.toFixed(4)} ÷ ${AM[b].toFixed(2)} = ${nb.toFixed(5)}. Ratio ${(na / r).toFixed(2)} : ${(nb / r).toFixed(2)} → <b>${fhtml(f)}</b>.`, video: 'empirical', skill: 'calc' };
+      solution: `mol ${a} = ${ma.toFixed(4)} ÷ ${AM[a]} = ${na.toFixed(5)}; mol ${b} = ${mb.toFixed(4)} ÷ ${AM[b]} = ${nb.toFixed(5)}. Ratio ${(na / r).toFixed(2)} : ${(nb / r).toFixed(2)} → <b>${fhtml(f)}</b>.`, video: 'empirical', skill: 'calc' };
   },
   pctFormula() {
     const c = pick([['Na2O', 'O'], ['MgO', 'O'], ['MgO', 'Mg'], ['Al2O3', 'Al'], ['CaCl2', 'Cl'], ['Fe2O3', 'Fe'], ['CuSO4', 'Cu'], ['K2CO3', 'K'], ['NH4NO3', 'N'], ['C6H12O6', 'C']]), cnt = parseFormula(c[0])[c[1]], mm = molarMass(c[0]), pc = cnt * AM[c[1]] / mm * 100;
@@ -1494,14 +1559,14 @@ const K10a = {
 };
 
 /* ---------------- Exp 11a (older): Synthesis of Alum ---------------- */
-const ALUM = 474.39;
+const ALUM = 474.37;
 const K11a = {
   parts() {
     const e = eqById(pick(['buchner', 'filterflask']));
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.39' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 16.00) + 12(18.016) = <b>474.39 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
@@ -1546,9 +1611,9 @@ const K12a = {
       parts: [num(pH, { dp: sf, unit: '', tol: 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf)} M. pH = −log(${sfStr(M, sf)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
   },
   baseMass() {
-    const g = rnd(2.0, 6.0, 2), V = pick([0.500, 0.750, 1.00]), M = g / 121.64 / V, oh = 2 * M, pOH = -Math.log10(oh), pH = 14 - pOH, sf = 3;
+    const g = rnd(2.0, 6.0, 2), V = pick([0.500, 0.750, 1.00]), M = g / 121.63 / V, oh = 2 * M, pOH = -Math.log10(oh), pH = 14 - pOH, sf = 3;
     return { tag: 'pH of a strong base', prompt: `<b>${g.toFixed(2)} g Sr(OH)<sub>2</sub></b> is dissolved to make <b>${V.toFixed(V < 1 ? 3 : 2)} L</b> of solution. What is the pH?`, eq: PH_EQ,
-      parts: [num(pH, { dp: sf, unit: '', tol: 0.006, slip: x => Math.abs(x - (14 + Math.log10(M))) < 0.01 ? 'Each Sr(OH)₂ releases <b>2</b> OH⁻. Double the molarity first.' : '' })], hint: 'Sr(OH)₂ = 121.64 g/mol, and each one gives 2 OH⁻. Find pOH, then pH = 14 − pOH.', solution: `${g.toFixed(2)} ÷ 121.64 ÷ ${V.toFixed(V < 1 ? 3 : 2)} = ${sfStr(M, 3)} M Sr(OH)₂ → [OH⁻] = ${sfStr(oh, 3)} M. pOH = ${pOH.toFixed(3)}, pH = <b>${pH.toFixed(3)}</b>.`, video: 'acidbase', skill: 'calc' };
+      parts: [num(pH, { dp: sf, unit: '', tol: 0.006, slip: x => Math.abs(x - (14 + Math.log10(M))) < 0.01 ? 'Each Sr(OH)₂ releases <b>2</b> OH⁻. Double the molarity first.' : '' })], hint: 'Sr(OH)₂ = 121.63 g/mol, and each one gives 2 OH⁻. Find pOH, then pH = 14 − pOH.', solution: `${g.toFixed(2)} ÷ 121.63 ÷ ${V.toFixed(V < 1 ? 3 : 2)} = ${sfStr(M, 3)} M Sr(OH)₂ → [OH⁻] = ${sfStr(oh, 3)} M. pOH = ${pOH.toFixed(3)}, pH = <b>${pH.toFixed(3)}</b>.`, video: 'acidbase', skill: 'calc' };
   }
 };
 
@@ -1563,12 +1628,12 @@ const K12b = {
       parts: [num(V, { dp: 2, unit: 'mL', tol: 0.03, slip: x => Math.abs(x - b) < 0.05 ? 'That’s the final reading. Subtract the initial reading.' : '' })], hint: 'Volume used = final − initial. Both go to 0.01 mL.', solution: `${b.toFixed(2)} − ${a.toFixed(2)} = <b>${V.toFixed(2)} mL</b>.`, video: 'titration', skill: 'read' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.07, { unit: 'g/mol', tol: 0.03, ans: '126.07' })], hint: 'Add H₂C₂O₄ (90.03) and 2 waters (2 × 18.02).', solution: '2(1.008) + 2(12.01) + 4(16.00) + 2(18.016) = <b>126.07 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.06, { unit: 'g/mol', tol: 0.03, ans: '126.06' })], hint: 'Add H₂C₂O₄ (90.03) and 2 waters (2 × 18.02).', solution: '2(1.008) + 2(12.011) + 4(15.999) + 2(18.015) = <b>126.06 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   standardize() {
-    const Vs = offLine(18, 42, 2), M = rnd(0.09, 0.12, 4), m = +(M * Vs / 1000 / 2 * 126.07).toFixed(4), Mx = m / 126.07 * 2 / (Vs / 1000);
-    return { tag: 'Standardizing NaOH', prompt: `<b>${m.toFixed(4)} g</b> of oxalic acid dihydrate needed <b>${Vs.toFixed(2)} mL</b> of NaOH to reach the endpoint. What is the molarity of the NaOH?`, art: RXN_OX, ref: '<p class="small-note">H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O = 126.07 g/mol</p>',
-      parts: [num(Mx, { sf: 4, unit: 'M', slip: x => Math.abs(x - Mx / 2) < Mx * 0.01 ? 'Use the 1 : 2 ratio: each oxalic acid reacts with 2 NaOH.' : '' })], hint: 'g acid → mol acid → mol NaOH (× 2) → ÷ L NaOH.', solution: `${m.toFixed(4)} ÷ 126.07 = ${(m / 126.07).toExponential(4)} mol × 2 = ${(m / 126.07 * 2).toExponential(4)} mol NaOH ÷ ${(Vs / 1000).toFixed(5)} L = <b>${sfHTML(Mx, 4)} M</b>.`, video: 'titration', skill: 'calc' };
+    const Vs = offLine(18, 42, 2), M = rnd(0.09, 0.12, 4), m = +(M * Vs / 1000 / 2 * 126.06).toFixed(4), Mx = m / 126.06 * 2 / (Vs / 1000);
+    return { tag: 'Standardizing NaOH', prompt: `<b>${m.toFixed(4)} g</b> of oxalic acid dihydrate needed <b>${Vs.toFixed(2)} mL</b> of NaOH to reach the endpoint. What is the molarity of the NaOH?`, art: RXN_OX, ref: '<p class="small-note">H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O = 126.06 g/mol</p>',
+      parts: [num(Mx, { sf: 4, unit: 'M', slip: x => Math.abs(x - Mx / 2) < Mx * 0.01 ? 'Use the 1 : 2 ratio: each oxalic acid reacts with 2 NaOH.' : '' })], hint: 'g acid → mol acid → mol NaOH (× 2) → ÷ L NaOH.', solution: `${m.toFixed(4)} ÷ 126.06 = ${(m / 126.06).toExponential(4)} mol × 2 = ${(m / 126.06 * 2).toExponential(4)} mol NaOH ÷ ${(Vs / 1000).toFixed(5)} L = <b>${sfHTML(Mx, 4)} M</b>.`, video: 'titration', skill: 'calc' };
   },
   citric() {
     const Mb = rnd(0.09001, 0.11499, 5), Vi = offLine(0.5, 4, 2), Vf = +(Vi + rnd(5, 13, 2)).toFixed(2), Vb = Vf - Vi, C = Mb * Vb / 1000 / 3 / 0.01000;
@@ -1725,12 +1790,17 @@ const labSet = () => (state.setAll ? LABS.map(l => l.id) : DAN_LABS.filter(id =>
 const labTitle = id => `Exp ${id} · ${labById(id).name}`;
 function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.ddTrack({ game: 'labpractical', course: '3A', mode, topic: `Exp ${q.lab} ${q.labName} · ${q.tag}`, correct: !!ok, tries: ok ? '' : 'slip:' + (slip || 'other'), slip: ok ? '' : (slip || 'other') }); } catch (e) {} }
 
+/* ---------- Yellow Sheet periodic table (for molar mass questions) ---------- */
+const PT_SRC = 'assets/yellow-sheet-periodic-table.webp';
+const PT_IMG = `<img class="pt-img" src="${PT_SRC}" alt="Yellow Sheet periodic table with element names, atomic numbers, average atomic masses and electronegativities" loading="lazy">`;
+const ptBox = () => `<details class="ptbox"><summary>Periodic table (Yellow Sheet)</summary><div class="pt-scroll">${PT_IMG}</div><a class="pt-full" href="${PT_SRC}" target="_blank" rel="noopener">Open full size</a></details>`;
 /* ---------- rendering a question and its answer parts ---------- */
 function qHTML(q, opt = {}) {
   let t = `<p class="prompt">${q.prompt}</p>`;
   if (q.eq) t += `<div class="eqline">${q.eq}</div>`;
   if (q.art) t += `<div class="artbox">${q.art}</div>`;
   if (q.ref) t += `<div class="ref">${q.ref}</div>`;
+  if (q.pt !== false && (q.pt || /g\/mol|molar mass/i.test(`${q.prompt} ${q.hint || ''} ${q.solution || ''}`))) t += ptBox();
   if (opt.mock) q.parts.forEach(p => { if (p.type === 'choice') t += `${p.label ? `<p class="small-note"><b>${p.label}</b></p>` : ''}<ol class="chooselist" type="a">${p.options.map(o => `<li>${o}</li>`).join('')}</ol>`; });
   return t;
 }
@@ -1961,13 +2031,424 @@ function checkTask(i) {
   const card = $('simGrid').querySelector(`[data-sim="${s.id}"] small:last-child`); if (card) card.textContent = ` ${s.tasks.filter((x, k) => P.benchDone[s.id + k]).length}/${s.tasks.length} tasks`;
 }
 
+/* ===================== Virtual Lab: hands-on benches ===================== */
+const VL = { done: [], bench: null, s: null, step: 0, sel: null, busy: false, tries: 0, parts: null, revealed: false };
+const reduceMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+function tween(ms, fn, done) {
+  if (reduceMotion()) ms = 1;
+  const t0 = performance.now();
+  const f = now => { const k = Math.min(1, (now - t0) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; fn(e); if (k < 1) requestAnimationFrame(f); else if (done) done(); };
+  requestAnimationFrame(f);
+}
+const wait = ms => new Promise(r => setTimeout(r, reduceMotion() ? 0 : ms));
+const tw = (ms, fn) => new Promise(r => tween(ms, fn, r));
+const vlNum = raw => { const m = String(raw).replace(/,/g, '').match(/-?\d*\.?\d+(e[-+]?\d+)?/i); return m ? parseFloat(m[0]) : NaN; };
+const vlSet = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+function vlSay(html, kind = '') { const m = $('vlMsg'); if (m) { m.className = 'vl-msg ' + kind; m.innerHTML = html; } }
+
+/* ---------- little pictures for the shelf ---------- */
+const VLI = {
+  slug: c => `<svg viewBox="0 0 60 60" aria-hidden="true"><ellipse cx="30" cy="16" rx="13" ry="5" fill="${c}" stroke="#2f4d70" stroke-width="2"/><path d="M17 16 L17 44 Q30 52 43 44 L43 16 Q30 24 17 16 Z" fill="${c}" stroke="#2f4d70" stroke-width="2"/><rect x="21" y="22" width="4" height="20" rx="2" fill="#fff" opacity=".55"/></svg>`,
+  bottle: (c, label) => `<svg viewBox="0 0 60 70" aria-hidden="true"><rect x="24" y="2" width="12" height="10" rx="2" fill="#4f5a74"/><path d="M22 12 L38 12 L38 18 Q48 20 48 30 L48 62 Q48 67 43 67 L17 67 Q12 67 12 62 L12 30 Q12 20 22 18 Z" fill="${c}" stroke="#2f4d70" stroke-width="2"/><rect x="15" y="34" width="30" height="20" rx="3" fill="#fff" stroke="#c9cfe6"/>${label ? `<text x="30" y="47" text-anchor="middle" font-size="8" font-weight="800" fill="#2f4d70">${label}</text>` : ''}</svg>`,
+  dropper: c => `<svg viewBox="0 0 60 70" aria-hidden="true"><path d="M26 2 Q30 -1 34 2 L34 16 L26 16 Z" fill="#4f5a74"/><rect x="22" y="16" width="16" height="6" rx="2" fill="#4f5a74"/><path d="M18 24 L42 24 L44 62 Q44 67 39 67 L21 67 Q16 67 16 62 Z" fill="#f4f9ff" stroke="#2f4d70" stroke-width="2"/><path d="M18 38 L42 38 L44 62 Q44 66 39 66 L21 66 Q17 66 17 62 Z" fill="${c}"/><rect x="21" y="28" width="3" height="32" rx="1.5" fill="#fff" opacity=".7"/></svg>`,
+  wash: () => `<svg viewBox="0 0 60 70" aria-hidden="true"><path d="M30 14 L30 4 L50 4 L56 12" fill="none" stroke="#2f4d70" stroke-width="2.5" stroke-linecap="round"/><rect x="22" y="12" width="16" height="8" rx="2" fill="#e8eef7" stroke="#2f4d70" stroke-width="2"/><rect x="14" y="20" width="32" height="47" rx="7" fill="#fbfbff" stroke="#2f4d70" stroke-width="2"/><rect x="15" y="40" width="30" height="26" rx="6" fill="#cbe8fa"/><text x="30" y="35" text-anchor="middle" font-size="9" font-weight="800" fill="#2f4d70">DI H₂O</text></svg>`,
+  ribbon: () => `<svg viewBox="0 0 60 60" aria-hidden="true"><path d="M10 40 Q18 14 26 40 Q34 14 42 40 Q48 24 52 30" fill="none" stroke="#b8bfcc" stroke-width="6" stroke-linecap="round"/><path d="M10 40 Q18 14 26 40 Q34 14 42 40 Q48 24 52 30" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".8"/></svg>`,
+  probe: () => `<svg viewBox="0 0 60 70" aria-hidden="true"><rect x="8" y="4" width="34" height="24" rx="5" fill="#eef0fe" stroke="#2f4d70" stroke-width="2"/><rect x="12" y="8" width="26" height="12" rx="2" fill="#c9f2d9"/><text x="25" y="18" text-anchor="middle" font-size="8" font-weight="800" fill="#1f3b2b">pH</text><path d="M42 16 Q52 18 50 30" fill="none" stroke="#4f5a74" stroke-width="2.5"/><rect x="45" y="30" width="10" height="30" rx="4" fill="#f4f9ff" stroke="#2f4d70" stroke-width="2"/><circle cx="50" cy="60" r="5" fill="#cbe8fa" stroke="#2f4d70" stroke-width="2"/></svg>`
+};
+const shelfBtn = (id, icon, label, extra = '') => `<button type="button" class="vl-item${VL.sel === id ? ' sel' : ''}" data-drag="${id}" ${extra}>${icon}<span>${label}</span></button>`;
+
+/* ---------- balance (for the bench) ---------- */
+function vlBalance(text, obj) {
+  let t = `<svg viewBox="0 0 600 300" role="img" aria-label="An analytical balance. The display reads ${text} grams">`;
+  t += `<ellipse cx="300" cy="62" rx="150" ry="22" fill="#e6ebf3" stroke="#9aa9c2" stroke-width="3"/><rect x="290" y="78" width="20" height="26" fill="#b9c4d6"/>`;
+  if (obj) t += obj;
+  t += `<path d="M90 104 L510 104 L540 270 L60 270 Z" fill="#f1f3f8" stroke="#9aa9c2" stroke-width="3"/>`;
+  t += `<rect x="150" y="140" width="300" height="86" rx="10" fill="#1f2a44"/><rect x="160" y="150" width="280" height="66" rx="6" fill="#c9f2d9"/>`;
+  t += `<circle cx="130" cy="248" r="10" fill="#f28aa3"/><text x="150" y="254" font-size="15" font-weight="800" fill="#4f5a74">TARE</text><circle cx="470" cy="248" r="10" fill="#9fb0ff"/><text x="428" y="254" font-size="15" font-weight="800" fill="#4f5a74">ON</text>`;
+  t += `<text x="400" y="200" text-anchor="end" font-family="'Courier New',ui-monospace,monospace" font-size="44" font-weight="700" fill="#1f3b2b" letter-spacing="2">${text}</text><text x="410" y="200" font-size="26" font-weight="800" fill="#1f3b2b">g</text>`;
+  return t + '</svg>';
+}
+async function vlWeigh(id, mass, dp, obj) {
+  await tw(900, e => vlSet(id, vlBalance((mass * e + (e < 1 ? (Math.random() - 0.5) * mass * 0.02 * (1 - e) : 0)).toFixed(dp), obj)));
+  vlSet(id, vlBalance(mass.toFixed(dp), obj));
+}
+
+/* ---------- test tube for the bench (with effect layers) ---------- */
+function vlTube(o = {}) {
+  const lv = o.level == null ? 280 : o.level, liq = o.liquid || '#dff1fb';
+  let t = `<svg viewBox="0 0 220 320" role="img" aria-label="${esc(o.aria || 'A test tube')}"><defs><clipPath id="vltc"><path d="M82 40 L82 250 Q82 284 110 284 Q138 284 138 250 L138 40 Z"/></clipPath></defs>`;
+  if (o.glow) t += `<ellipse class="vl-glow" cx="110" cy="210" rx="70" ry="100" fill="#ff9a62" opacity=".35"/>`;
+  t += `<g clip-path="url(#vltc)"><rect class="vl-liq" x="80" y="${lv}" width="60" height="${300 - lv}" fill="${liq}"/>`;
+  if (o.cloud) t += `<rect class="vl-cloud" x="80" y="${lv}" width="60" height="${300 - lv}" fill="${o.cloud}" opacity=".45"/>`;
+  if (o.ppt) t += `<path class="vl-ppt" d="M82 254 Q96 242 110 248 Q124 242 138 252 L138 300 L82 300 Z" fill="${o.ppt}"/>`;
+  if (o.fall) t += Array.from({ length: 34 }, (_, i) => `<circle class="vl-fall" cx="${rint(86, 134)}" cy="${rint(lv + 4, lv + 60)}" r="${rnd(1.6, 3.2, 1)}" fill="${o.fall}" style="animation-delay:${(i * 0.06).toFixed(2)}s;--fy:${rint(150, 230) - (lv - 150)}px"/>`).join('');
+  if (o.pellets) t += `<ellipse cx="100" cy="268" rx="11" ry="8" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/><ellipse cx="121" cy="272" rx="10" ry="7" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/>`;
+  if (o.coat) t += `<ellipse class="vl-coat" cx="100" cy="268" rx="12" ry="9" fill="none" stroke="${o.coat}" stroke-width="5"/><ellipse class="vl-coat" cx="121" cy="272" rx="11" ry="8" fill="none" stroke="${o.coat}" stroke-width="5"/>`;
+  if (o.bubbles) t += Array.from({ length: o.bubbles }, (_, i) => `<circle class="vl-bub" cx="${rint(88, 132)}" cy="${rint(250, 280)}" r="${rnd(2.5, 5, 1)}" fill="#fff" stroke="#7aa3c8" stroke-width="1.2" style="animation-delay:${(i * 0.13).toFixed(2)}s;--by:${-(280 - lv) - 10}px"/>`).join('');
+  if (o.drops) t += Array.from({ length: 5 }, (_, i) => `<circle class="vl-drop" cx="110" cy="-6" r="4" fill="${o.drops}" style="animation-delay:${(i * 0.14).toFixed(2)}s;--dy:${lv + 6}px"/>`).join('');
+  if (o.swirl) t += `<path class="vl-swirl" d="M86 ${lv + 20} Q110 ${lv + 2} 134 ${lv + 26} Q110 ${lv + 50} 86 ${lv + 40}" fill="none" stroke="${o.swirl}" stroke-width="10" stroke-linecap="round" opacity=".8"/>`;
+  t += `<line x1="82" y1="${lv}" x2="138" y2="${lv}" stroke="#000" stroke-opacity=".12" stroke-width="3"/></g>`;
+  t += `<path d="M82 40 L82 250 Q82 284 110 284 Q138 284 138 250 L138 40" fill="none" stroke="#8aa6c8" stroke-width="3"/><path d="M75 40 L82 40 M138 40 L145 40" stroke="#8aa6c8" stroke-width="4" stroke-linecap="round"/>${shine(89, 50, 6, 200)}`;
+  if (o.heat) t += [64, 156].map((x, i) => `<path class="vl-heat" style="animation-delay:${i * 0.4}s" d="M${x} 250 q-8 -14 0 -28 q8 -14 0 -28 q-8 -14 0 -28" fill="none" stroke="#f08a4b" stroke-width="4" stroke-linecap="round"/>`).join('');
+  if (o.smell) t += [96, 124].map((x, i) => `<path class="vl-heat" style="animation-delay:${i * 0.3}s" d="M${x} 34 q-6 -8 0 -16 q6 -8 0 -16" fill="none" stroke="#9aa9c2" stroke-width="3" stroke-linecap="round"/>`).join('');
+  if (o.litmus) t += `<rect x="98" y="2" width="24" height="26" rx="3" fill="${o.litmus}" stroke="#2f4d70" stroke-width="1.5" class="vl-paper"/><line x1="110" y1="-4" x2="110" y2="4" stroke="#2f4d70" stroke-width="2"/>`;
+  if (o.probe) t += `<rect x="102" y="10" width="16" height="${lv - 10 + 24}" rx="6" fill="#f4f9ff" stroke="#2f4d70" stroke-width="2"/><circle cx="110" cy="${lv + 30}" r="8" fill="#cbe8fa" stroke="#2f4d70" stroke-width="2"/>`;
+  return t + '</svg>';
+}
+
+/* ---------- particle view pop-up ---------- */
+// atoms/ions as labeled dots; kinds: ppt | gas | neutral | redox | none
+function particleView(kind, x) {
+  const dot = (cx, cy, r, fill, label, cls = '', style = '') => `<g class="${cls}" style="${style}"><circle cx="${cx}" cy="${cy}" r="${r * 1.3}" fill="${fill}" stroke="#2f4d70" stroke-width="1.5"/><text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${label.length > 3 ? 9.5 : 12}" font-weight="800" fill="#1f2a44">${label}</text></g>`;
+  let t = `<svg viewBox="0 0 300 200" role="img" aria-label="${esc(x.aria)}"><rect x="0" y="0" width="300" height="200" rx="16" fill="#f3f9ff"/>`;
+  if (kind === 'ppt') {
+    // lattice: cations and anions in the formula's ratio
+    const nC = x.nc || 1, nA = x.na || 1, unit = [...Array(nC).fill(1), ...Array(nA).fill(0)], N = unit.length * Math.max(1, Math.floor(9 / unit.length));
+    const kinds = Array.from({ length: N }, (_, i) => unit[i % unit.length]);
+    const spots = []; for (let r = 0, k = 0; k < N; r++) for (let c = 0; c < 5 - r && k < N; c++, k++) spots.push([150 - (4 - r) * 14 + c * 28, 170 - r * 24]);
+    kinds.forEach((cat, i) => { const sx = spots[i][0], sy = spots[i][1], px = 30 + ((i * 67) % 240), py = 24 + ((i * 41) % 90); t += dot(px, py, 11, cat ? x.cc : x.ac, cat ? x.cat : x.an, 'vl-move', `--mx:${sx - px}px;--my:${sy - py}px;animation-delay:${(i * 0.1).toFixed(2)}s`); });
+    t += dot(26, 178, 10, '#e9edf5', x.sp1) + dot(274, 178, 10, '#e9edf5', x.sp2) + dot(270, 120, 10, '#e9edf5', x.sp1) + dot(30, 120, 10, '#e9edf5', x.sp2);
+  } else if (kind === 'gas') {
+    t += `<rect x="0" y="80" width="300" height="120" rx="0" fill="#dff1fb"/><line x1="0" y1="80" x2="300" y2="80" stroke="#3b8ec2" stroke-width="2"/>`;
+    [[50, 170], [110, 150], [170, 175], [230, 155], [270, 180], [140, 120]].forEach((p, i) => { t += dot(p[0], p[1], 13, '#ffffff', x.gas, 'vl-up', `--uy:${-p[1] + 20}px;animation-delay:${(i * 0.35).toFixed(2)}s`); });
+  } else if (kind === 'neutral') {
+    [[40, 50], [180, 50], [90, 125], [200, 125]].forEach((p, i) => {
+      const d = (i * 0.2).toFixed(1);
+      t += dot(p[0], p[1], 12, '#ffd1dc', 'H₃O⁺', 'vl-meet', `--mx:20px;animation-delay:${d}s`) + dot(p[0] + 64, p[1], 12, '#d6e4ff', 'OH⁻', 'vl-meet', `--mx:-20px;animation-delay:${d}s`);
+      t += dot(p[0] + 16, p[1], 11, '#e3f4ff', 'H₂O', 'vl-born', `animation-delay:${(+d + 1.1).toFixed(1)}s`) + dot(p[0] + 48, p[1], 11, '#e3f4ff', 'H₂O', 'vl-born', `animation-delay:${(+d + 1.1).toFixed(1)}s`);
+      t += `<path class="vl-heat" style="animation-delay:${(+d + 1.2).toFixed(1)}s" d="M${p[0] + 32} ${p[1] - 20} q-5 -8 0 -16 q5 -8 0 -16" fill="none" stroke="#f08a4b" stroke-width="3" stroke-linecap="round"/>`;
+    });
+    t += `<text x="150" y="190" text-anchor="middle" font-size="13" font-weight="800" fill="#c2552a">H₃O⁺ + OH⁻ → 2 H₂O + heat</text>`;
+  } else if (kind === 'redox') {
+    t += `<rect x="0" y="150" width="300" height="50" fill="#b8bfcc"/><text x="150" y="182" text-anchor="middle" font-size="12" font-weight="800" fill="#1f2a44">Zn metal surface</text>`;
+    [[50, 40], [130, 70], [210, 40], [260, 90], [90, 100]].forEach((p, i) => {
+      const sx = 40 + i * 55;
+      t += `<g class="vl-move" style="--mx:${sx - p[0]}px;--my:${136 - p[1]}px;animation-delay:${(i * 0.25).toFixed(2)}s"><circle class="vl-recolor" style="--to:${x.metalColor};animation-delay:${(1.2 + i * 0.25).toFixed(2)}s" cx="${p[0]}" cy="${p[1]}" r="12" fill="${x.ionColor}" stroke="#2f4d70" stroke-width="1.5"/><text x="${p[0]}" y="${p[1] + 4}" text-anchor="middle" font-size="9" font-weight="800" fill="#1f2a44">${x.ion}</text></g>`;
+    });
+    t += `<text x="150" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#2f4d70">Zn gives electrons to ${x.ion} → ${x.metal} metal forms on the zinc</text>`;
+  } else {
+    [[40, 50], [100, 120], [160, 60], [220, 140], [270, 60], [70, 170], [190, 100], [250, 180]].forEach((p, i) => { t += dot(p[0], p[1], 11, i % 2 ? '#d6e4ff' : '#ffe2b8', x.ions[i % x.ions.length], 'vl-drift', `animation-delay:${(i * 0.3).toFixed(2)}s`); });
+    t += `<text x="150" y="196" text-anchor="middle" font-size="12" font-weight="800" fill="#4f5a74">Every ion stays dissolved: no new substance</text>`;
+  }
+  return t + '</svg>';
+}
+const popView = (kind, x, cap) => `<figure class="vl-pop"><figcaption>Particle view</figcaption>${particleView(kind, x)}<p>${cap}</p></figure>`;
+
+/* ====================== Bench 1: density ====================== */
+const METALS = [['Aluminum', 2.70, '#cfd6df'], ['Zinc', 7.14, '#aab4c3'], ['Iron', 7.87, '#7d8794'], ['Brass', 8.47, '#d6b04c'], ['Copper', 8.96, '#c8733f'], ['Lead', 11.3, '#8590a3']];
+const cylBare = (v, slug) => { const f = fullCylinder(50, v); let x = f.svg; if (slug) x += `<g opacity=".95"><rect x="94" y="${336 - 26}" width="22" height="28" rx="4" fill="${slug}" stroke="#2f4d70" stroke-width="1.5"/></g><rect x="88" y="${Math.max(f.y, 300)}" width="34" height="${360 - Math.max(f.y, 300)}" fill="${LAB.liquid}" opacity=".35"/>`; return `<svg viewBox="0 0 220 410" role="img" aria-label="A 50 mL graduated cylinder">${x}</svg>`; };
+const cylZoom = (v, slug) => { const f = fullCylinder(50, v); if (slug) f.svg += `<rect x="94" y="310" width="22" height="28" rx="4" fill="${slug}" stroke="#2f4d70" stroke-width="1.5"/><rect x="88" y="300" width="34" height="60" fill="${LAB.liquid}" opacity=".35"/>`; return instrumentSVG(f, { minor: 1, label: 5, value: v, fill: 'liquid', min: 0, max: 50, unit: 'mL' }, 'A 50 mL graduated cylinder with a zoomed-in view of the meniscus'); };
+const BENCH_DENSITY = {
+  id: 'density', labs: ['1a'], title: 'Density by Displacement', blurb: 'Weigh a metal, add water, drop it in, find the density.',
+  setup() {
+    const M = pick(METALS), vi = offLine(18.0, 27.5, 1); let vf = +(vi + rnd(4.2, 9.0, 1)).toFixed(1); if (Math.round(vf * 10) % 10 === 0) vf = +(vf + 0.1).toFixed(1);
+    const m = +((vf - vi) * M[1] * rnd(0.99, 1.01, 3)).toFixed(4);
+    return { M, vi, vf, m, onBal: false, poured: false, inCyl: false };
+  },
+  scene(s) {
+    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('metal', VLI.slug(s.M[2]), 'Metal sample') : ''}${!s.poured ? shelfBtn('water', VLI.wash(), 'Water') : ''}${s.onBal && !s.inCyl ? '<span class="vl-hint">Drag the metal from the balance pan.</span>' : ''}</div>
+    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance('0.0000')}</div>${s.onBal && !s.inCyl ? `<button type="button" class="vl-item vl-onpan${VL.sel === 'metal' ? ' sel' : ''}" data-drag="metal" aria-label="Metal sample on the balance">${VLI.slug(s.M[2])}</button>` : ''}</div></div>
+    <div class="vl-st wide" data-drop="cyl" tabindex="0" role="button" aria-label="50 mL graduated cylinder"><div class="vl-st-label">50 mL graduated cylinder</div><div id="vlCyl">${cylBare(0)}</div></div></div>`;
+  },
+  restore(s) {
+    if (s.onBal) vlSet('vlBal', vlBalance(s.inCyl ? '0.0000' : s.m.toFixed(4)));
+    if (s.poured) vlSet('vlCyl', cylZoom(s.inCyl ? s.vf : s.vi, s.inCyl ? s.M[2] : null));
+  },
+  async drop(s, what, where) {
+    if (what === 'metal' && where === 'balance' && !s.onBal) { s.onBal = true; vlScene(); await vlWeigh('vlBal', s.m, 4); vlSay('The balance settled. Record <b>every digit</b> on the display.', 'good'); return true; }
+    if (what === 'water' && where === 'cyl') {
+      if (!s.onBal) return 'Weigh the metal first (step 1).';
+      s.poured = true; vlScene(); await tw(1300, e => vlSet('vlCyl', cylBare(s.vi * e))); vlSet('vlCyl', cylZoom(s.vi)); vlSay('Read the bottom of the meniscus. Use the zoomed-in view.', 'good'); return true;
+    }
+    if (what === 'metal' && where === 'cyl') {
+      if (!s.onBal) return 'Weigh the metal first.';
+      if (!s.poured) return 'Add water to the cylinder first, so you can see how much it rises.';
+      if (VL.step < 2) return 'Record the starting volume first (step 2).';
+      s.inCyl = true; vlScene(); vlSet('vlBal', vlBalance('0.0000'));
+      await tw(600, e => { const f = fullCylinder(50, s.vi); vlSet('vlCyl', `<svg viewBox="0 0 220 410">${f.svg}<rect x="94" y="${30 + 280 * e}" width="22" height="28" rx="4" fill="${s.M[2]}" stroke="#2f4d70" stroke-width="1.5"/></svg>`); });
+      await tw(900, e => vlSet('vlCyl', cylBare(s.vi + (s.vf - s.vi) * e, s.M[2])));
+      vlSet('vlCyl', cylZoom(s.vf, s.M[2])); vlSay('The water rose. The rise is the volume of the metal.', 'good'); return true;
+    }
+    if (where === 'balance' && what === 'water') return 'You don’t need to weigh the water here.';
+    return 'That doesn’t go there. Check the step on the right.';
+  },
+  steps: [
+    { title: 'Weigh the metal', say: 'Drag the <b>metal sample</b> onto the balance pan.', act: s => s.onBal, parts: s => [num(s.m, { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of the metal' })], rec: (s, v) => { s.mR = v[0]; }, sol: s => `Copy every digit on a digital display: <b>${s.m.toFixed(4)} g</b>.` },
+    { title: 'Add water', say: 'Drag the <b>water</b> to the graduated cylinder. Then read the starting volume.', act: s => s.poured, parts: s => [num(s.vi, { dp: 1, unit: 'mL', tol: 0.2, label: 'Initial volume' })], rec: (s, v) => { s.viR = v[0]; }, sol: s => `Lines are 1 mL apart, so estimate the tenths: about <b>${s.vi.toFixed(1)} mL</b>.` },
+    { title: 'Add the metal', say: 'Drag the <b>metal</b> from the balance into the cylinder (tilt it and let it slide in). Read the new volume.', act: s => s.inCyl, parts: s => [num(s.vf, { dp: 1, unit: 'mL', tol: 0.2, label: 'Final volume' })], rec: (s, v) => { s.vfR = v[0]; }, sol: s => `About <b>${s.vf.toFixed(1)} mL</b>.` },
+    { title: 'Volume of the metal', say: 'Volume of the metal = final − initial.', parts: s => [num(s.vfR - s.viR, { dp: 1, unit: 'mL', tol: 0.051, label: 'Volume of the metal' })], rec: (s, v) => { s.VR = v[0]; }, sol: s => `${s.vfR.toFixed(1)} − ${s.viR.toFixed(1)} = <b>${(s.vfR - s.viR).toFixed(1)} mL</b> (subtraction keeps the tenths).` },
+    { title: 'Density', say: 'Density = mass ÷ volume (1 mL = 1 cm³).', eq: 'd = m / V', parts: s => { const sf = sfCount(s.VR.toFixed(1)); return [num(s.mR / s.VR, { sf, unit: 'g/mL', rel: 0.012, label: 'Density' })]; }, rec: (s, v) => { s.dR = v[0]; }, sol: s => { const sf = sfCount(s.VR.toFixed(1)); return `${s.mR.toFixed(4)} g ÷ ${s.VR.toFixed(1)} mL = <b>${sfHTML(s.mR / s.VR, sf)} g/mL</b> (${sf} sig figs, from the volume).`; } },
+    { title: 'Identify the metal', say: 'Which metal is closest to your density?', ref: () => tableHTML(METALS.map(m => [m[0], m[1].toFixed(2) + ' g/mL']), ['Metal', 'Density']), parts: s => { const k = METALS.reduce((b, m, i) => (Math.abs(m[1] - s.dR) < Math.abs(METALS[b][1] - s.dR) ? i : b), 0); return [choice(METALS.map(m => m[0]), k)]; }, sol: s => `Your density is closest to <b>${METALS.reduce((b, m) => (Math.abs(m[1] - s.dR) < Math.abs(b[1] - s.dR) ? m : b))[0]}</b>. (This sample was ${s.M[0].toLowerCase()}, ${s.M[1]} g/mL.)` }
+  ]
+};
+
+/* ====================== Bench 2: mixing reactions ====================== */
+const VR = {
+  'AgNO3': { c: 'Ag', a: 'NO3' }, 'Pb(NO3)2': { c: 'Pb', a: 'NO3' }, 'BaCl2': { c: 'Ba', a: 'Cl' }, 'CuSO4': { c: 'Cu', a: 'SO4', col: '#8cc4ff' },
+  'Na2CO3': { c: 'Na', a: 'CO3' }, 'Na2SO4': { c: 'Na', a: 'SO4' }, 'KI': { c: 'K', a: 'I' }, 'NaCl': { c: 'Na', a: 'Cl' },
+  'NaOH': { c: 'Na', a: 'OH' }, 'HCl': { c: 'H', a: 'Cl' }, 'NH4Cl': { c: 'NH4', a: 'Cl' }, 'Zn': { metal: 1 }
+};
+const ION = { Ag: ['Ag⁺', 1], Pb: ['Pb²⁺', 2], Ba: ['Ba²⁺', 2], Cu: ['Cu²⁺', 2], Na: ['Na⁺', 1], K: ['K⁺', 1], NH4: ['NH₄⁺', 1], H: ['H₃O⁺', 1], NO3: ['NO₃⁻', 1], Cl: ['Cl⁻', 1], I: ['I⁻', 1], SO4: ['SO₄²⁻', 2], CO3: ['CO₃²⁻', 2], OH: ['OH⁻', 1] };
+// insoluble combinations (Tro solubility rules) and the color of each solid
+const INSOL = { 'Ag|Cl': '#f4f4f4', 'Ag|I': '#f1e6a0', 'Ag|CO3': '#efe4b8', 'Ag|SO4': '#f4f4f4', 'Ag|OH': '#7a5230', 'Pb|Cl': '#f4f4f4', 'Pb|I': '#f7d417', 'Pb|SO4': '#f4f4f4', 'Pb|CO3': '#f4f4f4', 'Pb|OH': '#f4f4f4', 'Ba|SO4': '#f4f4f4', 'Ba|CO3': '#f4f4f4', 'Cu|CO3': '#5fb3a8', 'Cu|OH': '#5a9cf0' };
+const POLY = ['NO3', 'SO4', 'CO3', 'OH', 'NH4'];
+function saltFormula(c, a) {
+  if (c === 'Ag' && a === 'OH') return 'Ag2O';
+  const qc = ION[c][1], qa = ION[a][1], g = qc === qa ? qc : 1, nc = qa / g, na = qc / g;
+  const part = (x, n) => (n > 1 ? (POLY.includes(x) ? `(${x})${n}` : x + n) : x);
+  return part(c, nc) + part(a, na);
+}
+const OBS6 = ['A precipitate (solid) formed', 'A gas formed (bubbles or a smell)', 'The tube got warm, nothing else', 'A coating formed on the metal', 'No visible change'];
+const TYPE5 = ['Precipitation', 'Acid/base neutralization', 'Gas evolution', 'Redox', 'No reaction'];
+function mixResult(A, B) {
+  const [x, y] = [VR[A], VR[B]];
+  if (x.metal || y.metal) {
+    const sol = x.metal ? y : x, name = x.metal ? B : A;
+    if (sol.c === 'H') return { kind: 'gas', gas: 'H2', obs: 1, type: 3, text: 'The zinc fizzes as hydrogen gas bubbles off.', tube: { pellets: '#b8bfcc', bubbles: 22 }, view: ['redoxH'] };
+    const coat = { Cu: ['#b5562a', 'Cu', 'copper'], Ag: ['#3d3f45', 'Ag', 'silver'], Pb: ['#4a4f5c', 'Pb', 'lead'] }[sol.c];
+    if (coat) return { kind: 'redox', obs: 3, type: 3, text: `A ${sol.c === 'Cu' ? 'reddish-brown' : 'dark gray'} ${coat[2]} coating grows on the zinc${sol.c === 'Cu' ? ' and the blue color fades' : ''}.`, tube: { pellets: '#b8bfcc', coat: coat[0] }, fade: sol.c === 'Cu', view: { ion: ION[sol.c][0], metal: coat[1], ionColor: sol.c === 'Cu' ? '#8cc4ff' : '#e9edf5', metalColor: coat[0] } };
+    return { kind: 'none', obs: 4, type: 4, text: 'Nothing visible happens to the zinc.', tube: { pellets: '#b8bfcc' }, ions: [ION[sol.c][0], ION[sol.a][0]] };
+  }
+  for (const [c, a] of [[x.c, y.a], [y.c, x.a]]) { const col = INSOL[`${c}|${a}`]; if (col) { const f = saltFormula(c, a); return { kind: 'ppt', ppt: f, obs: 0, type: 0, text: `A ${col === '#f4f4f4' ? 'white' : col === '#f7d417' ? 'bright yellow' : col === '#5a9cf0' ? 'pale blue' : col === '#5fb3a8' ? 'blue-green' : col === '#7a5230' ? 'brown' : 'pale yellow'} solid forms and settles: ${fhtml(f)}.`, color: col, view: { nc: c === 'Ag' && a === 'OH' ? 2 : ION[a][1] / (ION[c][1] === ION[a][1] ? ION[c][1] : 1), na: c === 'Ag' && a === 'OH' ? 1 : ION[c][1] / (ION[c][1] === ION[a][1] ? ION[c][1] : 1), cat: ION[c][0], an: c === 'Ag' && a === 'OH' ? 'O²⁻' : ION[a][0], cc: '#ffe2b8', ac: '#d6e4ff', sp1: ION[c === x.c ? y.c : x.c][0], sp2: ION[a === x.a ? y.a : x.a][0] } }; } }
+  const has = (c, a) => (x.c === c && y.a === a) || (y.c === c && x.a === a);
+  if (has('H', 'CO3')) return { kind: 'gas', gas: 'CO2', obs: 1, type: 2, text: 'Lots of fizzing: colorless CO₂ gas bubbles out.', tube: { bubbles: 26 } };
+  if (has('NH4', 'OH')) return { kind: 'gas', gas: 'NH3', obs: 1, type: 2, text: 'A sharp ammonia smell. Moist red litmus held over the tube turns blue.', tube: { smell: 1, litmus: '#5d8df0' } };
+  if (has('H', 'OH')) return { kind: 'neutral', obs: 2, type: 1, text: 'No visible change, but the test tube feels warm.', tube: { heat: 1, glow: 1 } };
+  return { kind: 'none', obs: 4, type: 4, text: 'Nothing happens: the mixture stays clear, with no temperature change.', tube: {}, ions: [ION[x.c][0], ION[x.a][0], ION[y.c][0], ION[y.a][0]] };
+}
+const BENCH_MIX = {
+  id: 'mix', labs: ['10a'], title: 'Mix and Observe', blurb: 'Combine two chemicals in a test tube and watch what happens.',
+  setup() { return { added: [], res: null }; },
+  scene(s) {
+    const shelf = Object.keys(VR).map(k => shelfBtn('r:' + k, k === 'Zn' ? VLI.slug('#b8bfcc') : VLI.dropper(VR[k].col || '#e8f4fc'), k === 'Zn' ? 'Zn(s)' : fhtml(k) + '(aq)', s.added.includes(k) || s.added.length >= 2 ? 'disabled' : '')).join('');
+    return `<div class="vl-shelf many">${shelf}</div><div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.added.length ? ': ' + s.added.map(k => fhtml(k)).join(' + ') : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div></div><div class="vl-st wide vl-popbox" id="vlPop"><div class="empty small">Add two chemicals. A particle view of the reaction pops up here.</div></div></div>`;
+  },
+  restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', this.pop(s)); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s) })); },
+  liq(s) { return s.added.some(k => k === 'CuSO4') ? '#8cc4ff' : '#e6f3fb'; },
+  final(s) {
+    const r = s.res, o = Object.assign({ level: 160, liquid: r.fade ? '#e6f3fb' : this.liq(s), aria: r.text }, r.tube || {});
+    if (r.kind === 'ppt') Object.assign(o, { ppt: r.color, cloud: r.color });
+    if (s.added.includes('Zn')) o.level = 200;
+    return o;
+  },
+  pop(s) {
+    const r = s.res;
+    if (r.kind === 'ppt') return popView('ppt', Object.assign({ aria: 'Ions joining into a solid' }, r.view), `${r.view.cat} and ${r.view.an} lock together into the solid ${fhtml(r.ppt)}. ${r.view.sp1} and ${r.view.sp2} are spectators.`);
+    if (r.kind === 'gas' && r.gas === 'H2') return popView('gas', { aria: 'Hydrogen molecules bubbling out', gas: 'H₂' }, 'Zn gives electrons to H₃O⁺, making H₂ gas (redox).');
+    if (r.kind === 'gas') return popView('gas', { aria: 'Gas molecules leaving the solution', gas: r.gas === 'CO2' ? 'CO₂' : 'NH₃' }, r.gas === 'CO2' ? 'CO₃²⁻ + 2H₃O⁺ → 3H₂O + CO₂(g)' : 'NH₄⁺ + OH⁻ → H₂O + NH₃(g)');
+    if (r.kind === 'neutral') return popView('neutral', { aria: 'Hydronium and hydroxide ions forming water' }, 'The acid and base neutralize. Energy is released, so the tube warms up (exothermic).');
+    if (r.kind === 'redox') return popView('redox', Object.assign({ aria: 'Metal ions plating onto zinc' }, r.view), 'Electrons move from Zn to the metal ion: a redox (single displacement) reaction.');
+    return popView('none', { aria: 'Ions moving around without reacting', ions: r.ions }, 'No precipitate, gas or heat: no reaction.');
+  },
+  async drop(s, what, where) {
+    if (where !== 'tube' || !what.startsWith('r:')) return 'Drag a chemical into the test tube.';
+    const k = what.slice(2);
+    if (s.added.includes(k)) return 'That one is already in the tube. Pick a different chemical.';
+    if (s.added.length >= 2) return 'The tube already has two chemicals. Press <b>New run</b> to start over.';
+    if (k === 'Zn' && s.added.length === 0) { /* fine either way */ }
+    s.added.push(k); vlScene();
+    if (s.added.length === 1) { const lv = k === 'Zn' ? 300 : 220; vlSet('vlTube', vlTube({ level: lv, liquid: this.liq(s), drops: k === 'Zn' ? null : (VR[k].col || '#cfe6f8'), pellets: k === 'Zn' ? '#b8bfcc' : null })); await wait(900); vlSay(`${k === 'Zn' ? 'Zinc pieces are' : fhtml(k) + ' solution is'} in the tube. Add a second chemical.`); return true; }
+    s.res = mixResult(s.added[0], s.added[1]);
+    vlSet('vlTube', vlTube({ level: 170, liquid: this.liq(s), drops: '#cfe6f8', pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); await wait(900);
+    const r = s.res, f = this.final(s);
+    if (r.kind === 'ppt') { vlSet('vlTube', vlTube(Object.assign({}, f, { ppt: null, cloud: r.color, fall: r.color }))); await wait(1800); }
+    vlSet('vlTube', vlTube(f)); vlSet('vlPop', this.pop(s));
+    vlSay(`<b>Observation:</b> ${r.text}`, 'good'); return true;
+  },
+  steps: [
+    { title: 'Mix two chemicals', say: 'Drag <b>two different chemicals</b> into the test tube, one at a time.', act: s => !!s.res, parts: s => [choice(OBS6, s.res.obs, { label: 'What did you observe?' })], sol: s => s.res.text },
+    { title: 'Classify it', say: 'What type of reaction is this?', parts: s => [choice(TYPE5, s.res.type)], sol: s => `<b>${TYPE5[s.res.type]}</b>. ${s.res.kind === 'ppt' ? 'A solid formed from two solutions.' : s.res.kind === 'neutral' ? 'Acid + base → water + a salt, and heat.' : s.res.kind === 'gas' && s.res.gas !== 'H2' ? 'A gas formed from two solutions.' : s.res.kind === 'none' ? 'No evidence of a chemical change.' : 'An uncombined element (Zn) changes into an ion.'}` },
+    { title: 'Name the product', skip: s => !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
+  ]
+};
+
+/* ====================== Bench 3: pH and indicator ====================== */
+const HOUSE = [['Lemon juice', 2.0, 2.4, '#fff4a8'], ['Vinegar', 2.6, 3.2, '#f6f1e3'], ['Soda', 2.6, 3.4, '#c79a6b'], ['Orange juice', 3.4, 4.2, '#ffc46b'], ['Black coffee', 4.8, 5.4, '#8a5a3a'], ['Milk', 6.4, 6.8, '#fbfbf6'], ['DI water', 6.9, 7.1, '#e6f3fb'], ['Baking soda solution', 8.0, 8.4, '#eef3f8'], ['Antacid', 9.2, 10.2, '#f2f2f6'], ['Window cleaner', 10.8, 11.8, '#a7d8f5'], ['Drain cleaner', 13.1, 13.7, '#eef3f8']];
+const cabIdx = pH => (pH < 2.5 ? 0 : pH < 4.5 ? 1 : pH < 7.5 ? 2 : pH < 8.5 ? 3 : pH < 10.5 ? 4 : pH < 12.5 ? 5 : 6);
+const BENCH_PH = {
+  id: 'ph', labs: ['12a'], title: 'Red Cabbage Indicator', blurb: 'Add a household product, then the indicator, then the pH meter.',
+  setup() { return { item: null, pH: null, ind: false, meter: false, calc: pick(['h3o', 'oh']) }; },
+  scene(s) {
+    const shelf = s.item ? '' : HOUSE.map((h, i) => shelfBtn('h:' + i, VLI.bottle(h[3]), h[0])).join('');
+    return `<div class="vl-shelf many">${shelf}${s.item && !s.ind ? shelfBtn('cabbage', VLI.dropper('#8a4bb0'), 'Red cabbage juice') : ''}${s.ind && !s.meter ? shelfBtn('meter', VLI.probe(), 'pH meter') : ''}</div>
+    <div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.item ? ': ' + s.item[0].toLowerCase() : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div></div>
+    <div class="vl-st wide"><div class="vl-st-label">Red cabbage color chart</div>${this.chart()}<div id="vlMeter"></div></div></div>`;
+  },
+  chart() { return `<div class="vl-cab">${CABBAGE.map(c => `<span><i style="background:${c[0]}"></i>${c[1]}<b>pH ${c[2]}</b></span>`).join('')}</div>`; },
+  restore(s) {
+    if (s.item) vlSet('vlTube', vlTube({ level: 170, liquid: s.ind ? CABBAGE[cabIdx(s.pH)][0] : s.item[3], probe: s.meter }));
+    if (s.meter) vlSet('vlMeter', lcd(s.pH.toFixed(2), '', 'meter', 'A pH meter'));
+  },
+  async drop(s, what, where) {
+    if (where !== 'tube') return 'Drag it into the test tube.';
+    if (what.startsWith('h:')) { const h = HOUSE[+what.slice(2)]; s.item = h; s.pH = rnd(h[1], h[2], 2); vlScene(); await tw(900, e => vlSet('vlTube', vlTube({ level: 300 - 130 * e, liquid: h[3] }))); vlSay(`${h[0]} is in the tube. Now add the indicator.`); return true; }
+    if (what === 'cabbage') {
+      s.ind = true; vlScene(); const c = CABBAGE[cabIdx(s.pH)][0];
+      vlSet('vlTube', vlTube({ level: 170, liquid: s.item[3], drops: '#8a4bb0' })); await wait(800);
+      vlSet('vlTube', vlTube({ level: 170, liquid: s.item[3], swirl: c })); await wait(700);
+      vlSet('vlTube', vlTube({ level: 170, liquid: c })); vlSay('The color changed. Match it to the chart.', 'good'); return true;
+    }
+    if (what === 'meter') { if (VL.step < 2) return 'Use the indicator colors first (steps 2 and 3).'; s.meter = true; vlScene(); vlSet('vlTube', vlTube({ level: 170, liquid: CABBAGE[cabIdx(s.pH)][0], probe: true })); await tw(900, e => vlSet('vlMeter', lcd((7 + (s.pH - 7) * e).toFixed(2), '', 'meter', 'A pH meter'))); vlSet('vlMeter', lcd(s.pH.toFixed(2), '', 'meter', 'A pH meter')); vlSay('The meter reading is steady.', 'good'); return true; }
+    return 'That doesn’t go there.';
+  },
+  steps: [
+    { title: 'Add a product', say: 'Drag a <b>household product</b> into the test tube.', act: s => !!s.item, auto: true },
+    { title: 'Add the indicator', say: 'Drag the <b>red cabbage juice</b> into the tube. About what pH is it?', act: s => s.ind, parts: s => [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], sol: s => `${CABBAGE[cabIdx(s.pH)][1]} → about <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.` },
+    { title: 'Measure the pH', say: 'Drag the <b>pH meter</b> into the tube and record the reading.', act: s => s.meter, parts: s => [num(s.pH, { dp: 2, unit: '', tol: 0.001, label: 'pH' })], rec: (s, v) => { s.pHR = v[0]; }, sol: s => `Copy the display: <b>${s.pH.toFixed(2)}</b>.` },
+    { title: 'Acid or base?', say: s => `Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. Below 7 is acidic, above 7 is basic.` },
+    { title: 'Calculate', say: s => `Use your pH to calculate <b>${s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}</b>.`, eq: PH_EQ, parts: s => { const v = s.calc === 'h3o' ? Math.pow(10, -s.pHR) : Math.pow(10, -(14 - s.pHR)); return [num(v, { sf: 2, unit: 'M', rel: 0.06, label: s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]' })]; }, sol: s => (s.calc === 'h3o' ? `[H₃O⁺] = 10<sup>−${s.pHR.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pHR), 2)} M</b>` : `pOH = 14 − ${s.pHR.toFixed(2)} = ${(14 - s.pHR).toFixed(2)}; [OH⁻] = 10<sup>−${(14 - s.pHR).toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -(14 - s.pHR)), 2)} M</b>`) + ' (2 decimal places in pH → 2 sig figs).' }
+  ]
+};
+
+/* ====================== Bench 4: gas collection (R) ====================== */
+const eudBare = v => `<svg viewBox="0 0 220 410" role="img" aria-label="A gas collection tube upside down in a beaker of water">${fullEudiometer(v).svg}<path d="M100 350 q4 -6 8 0 q4 6 8 0" fill="none" stroke="#b8bfcc" stroke-width="4"/></svg>`;
+const eudBubbles = () => `<svg class="vl-over" viewBox="0 0 220 410" aria-hidden="true">${Array.from({ length: 14 }, (_, i) => `<circle class="vl-bub" cx="${rint(100, 116)}" cy="348" r="${rnd(1.5, 3, 1)}" fill="#fff" stroke="#7aa3c8" stroke-width="1" style="animation-delay:${(i * 0.17).toFixed(2)}s;--by:-220px"/>`).join('')}</svg>`;
+const eudZoom = v => instrumentSVG(fullEudiometer(v), { minor: 0.1, label: 1, value: v, fill: 'liquid', topDown: true, min: 0, max: 50, unit: 'mL' }, 'A gas collection tube with a zoomed-in view of the water level. The numbers increase going down.');
+const BENCH_GAS = {
+  id: 'gas', labs: ['8a'], title: 'Collect Hydrogen Gas', blurb: 'React Mg with HCl, read the gas tube, use the water vapor table.',
+  setup() { const g = gasRun(); return Object.assign(g, { onBal: false, acid: false, inTube: false }); },
+  scene(s) {
+    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('mg', VLI.ribbon(), 'Mg ribbon') : ''}${!s.acid ? shelfBtn('hcl', VLI.bottle('#fff7d6', '6 M HCl'), 'HCl') : ''}${s.onBal && !s.inTube ? '<span class="vl-hint">Drag the Mg ribbon from the balance pan.</span>' : ''}</div>
+    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance('0.0000')}</div>${s.onBal && !s.inTube ? `<button type="button" class="vl-item vl-onpan${VL.sel === 'mg' ? ' sel' : ''}" data-drag="mg" aria-label="Mg ribbon on the balance">${VLI.ribbon()}</button>` : ''}</div>
+    <div class="vl-room"><span>Room: <b>${s.Pin.toFixed(2)} in Hg</b></span><span>Water: <b>${s.T}.0 °C</b></span></div></div>
+    <div class="vl-st wide" data-drop="tube" tabindex="0" role="button" aria-label="Gas collection tube"><div class="vl-st-label">Gas collection tube</div><div id="vlEud">${eudBare(0)}</div></div></div>`;
+  },
+  restore(s) { if (s.onBal) vlSet('vlBal', vlBalance(s.inTube ? '0.0000' : s.mg.toFixed(4))); if (s.inTube) vlSet('vlEud', eudZoom(s.V)); },
+  async drop(s, what, where) {
+    if (what === 'mg' && where === 'balance' && !s.onBal) { s.onBal = true; vlScene(); await vlWeigh('vlBal', s.mg, 4); vlSay('Record every digit on the display.', 'good'); return true; }
+    if (what === 'hcl' && where === 'tube') { if (VL.step < 1) return 'Weigh the magnesium first.'; s.acid = true; vlScene(); vlSay('About 10 mL of HCl is in the tube. Next, the Mg ribbon (in its copper cage) goes in, the tube is filled with water and flipped into the beaker.'); return true; }
+    if (what === 'mg' && where === 'tube') {
+      if (!s.onBal) return 'Weigh the magnesium first.'; if (VL.step < 1) return 'Record the mass first.'; if (!s.acid) return 'Add the HCl to the tube first.';
+      s.inTube = true; vlScene(); vlSet('vlBal', vlBalance('0.0000'));
+      vlSay('The tube is filled with water and inverted. The acid sinks and reaches the Mg… bubbles!');
+      vlSet('vlEud', `<div class="vl-stack"><div id="vlEudBase">${eudBare(0)}</div>${eudBubbles()}</div>`);
+      await tw(3400, e => vlSet('vlEudBase', eudBare(s.V * e)));
+      vlSet('vlEud', eudZoom(s.V)); vlSay('The Mg is gone and the bubbling stopped. Read the gas volume (numbers increase going down).', 'good'); return true;
+    }
+    return 'That doesn’t go there.';
+  },
+  steps: [
+    { title: 'Weigh the Mg', say: 'Drag the <b>Mg ribbon</b> onto the balance.', act: s => s.onBal, parts: s => [num(s.mg, { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of Mg' })], rec: (s, v) => { s.mgR = v[0]; }, sol: s => `<b>${s.mg.toFixed(4)} g</b>: copy every digit.` },
+    { title: 'Run the reaction', say: 'Drag the <b>HCl</b> into the gas tube, then drag the <b>Mg ribbon</b> in. Read the volume of H₂.', act: s => s.inTube, ref: () => RXN_MG, parts: s => [num(s.V, { dp: 2, unit: 'mL', tol: 0.02, label: 'Volume of H₂ gas' })], rec: (s, v) => { s.VR = v[0]; }, sol: s => `Lines every 0.1 mL → estimate the hundredths: about <b>${s.V.toFixed(2)} mL</b>.` },
+    { title: 'Room pressure', say: s => `The barometer reads <b>${s.Pin.toFixed(2)} in Hg</b>. Convert it to mmHg.`, eq: '1 in Hg = 25.4 mmHg', parts: s => [num(s.Pmm, { dp: 1, unit: 'mmHg', tol: 0.06, label: 'P<sub>total</sub>' })], rec: (s, v) => { s.PmmR = v[0]; }, sol: s => `${s.Pin.toFixed(2)} × 25.4 = <b>${s.Pmm.toFixed(1)} mmHg</b>.` },
+    { title: 'Water vapor pressure', say: s => `The water is at <b>${s.T}.0 °C</b>. Look up the vapor pressure of water in the table.`, ref: () => vpTable(), parts: s => [num(VP[s.T], { dp: 1, unit: 'mmHg', tol: 0.001, label: 'P<sub>water</sub>' })], sol: s => `At ${s.T} °C, P<sub>water</sub> = <b>${VP[s.T].toFixed(1)} mmHg</b>.` },
+    { title: 'Pressure of H₂', say: 'The gas in the tube is H₂ <i>mixed with water vapor</i>. Use Dalton’s law.', eq: 'P<sub>total</sub> = P<sub>H₂</sub> + P<sub>water</sub>', parts: s => [num(s.PmmR - VP[s.T], { dp: 1, unit: 'mmHg', tol: 0.06, label: 'P<sub>H₂</sub>', slip: x => (Math.abs(x - s.PmmR) < 0.2 ? 'That is the total pressure. Subtract the water vapor pressure.' : '') })], rec: (s, v) => { s.PhR = v[0]; }, sol: s => `${s.PmmR.toFixed(1)} − ${VP[s.T].toFixed(1)} = <b>${(s.PmmR - VP[s.T]).toFixed(1)} mmHg</b>.` },
+    { title: 'Experimental R', pt: true, say: 'Moles of H₂ = moles of Mg (1 : 1). Convert P to atm, V to L and T to K.', eq: 'R = PV / nT &nbsp;&nbsp; 760 mmHg = 1 atm &nbsp;&nbsp; K = °C + 273.15', parts: s => { const n = s.mgR / 24.31, R = (s.PhR / 760) * (s.VR / 1000) / (n * (s.T + 273.15)); return [num(R, { sf: sfCount(s.mgR.toFixed(4)), unit: 'L·atm/(mol·K)', rel: 0.01, label: 'R', slip: x => (Math.abs(x - R * 1000) < R * 20 ? 'Convert mL to L first.' : Math.abs(x - R * 760) < R * 15 ? 'Convert mmHg to atm.' : '') })]; }, sol: s => { const n = s.mgR / 24.31, P = s.PhR / 760, V = s.VR / 1000, T = s.T + 273.15, R = P * V / (n * T), sf = sfCount(s.mgR.toFixed(4)); return `n = ${s.mgR.toFixed(4)} ÷ 24.31 = ${sfStr(n, sf)} mol; P = ${P.toFixed(4)} atm; V = ${V.toFixed(5)} L; T = ${T.toFixed(2)} K. R = PV ÷ nT = <b>${sfHTML(R, sf)} L·atm/(mol·K)</b> (accepted: 0.08206).`; } }
+  ]
+};
+
+const VBENCH = [BENCH_DENSITY, BENCH_MIX, BENCH_PH, BENCH_GAS];
+
+/* ---------- engine ---------- */
+function renderVLab() {
+  const set = labSet(), list = VBENCH.filter(b => b.labs.some(l => set.includes(l)));
+  P.vlab = P.vlab || {};
+  $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
+  if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
+  vlRenderAll();
+}
+function vlStart(id) { VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+function vlRenderAll() {
+  const b = VL.bench;
+  $('vlArea').innerHTML = `<div class="vl-head"><h3 class="play-title">${b.title}</h3><button type="button" class="btn" id="vlNew">New run <span data-icon="arrow" aria-hidden="true"></span></button></div><div class="vl-wrap"><div class="vl-scene" id="vlScene"></div><div class="vl-steps" id="vlSteps"></div></div>`;
+  $('vlNew').onclick = () => vlStart(b.id);
+  vlScene(); vlSteps(); paintIcons($('vlArea'));
+}
+function vlScene() {
+  const msg = $('vlMsg') ? $('vlMsg').outerHTML : '<p class="vl-msg" id="vlMsg" role="status" aria-live="polite"></p>';
+  $('vlScene').innerHTML = VL.bench.scene(VL.s) + msg;
+  if (VL.bench.restore) VL.bench.restore(VL.s);
+  vlWire($('vlScene'));
+}
+function vlWire(root) {
+  root.querySelectorAll('[data-drag]').forEach(el => {
+    el.addEventListener('pointerdown', e => {
+      if (VL.busy || el.disabled || e.button > 0) return;
+      const sx = e.clientX, sy = e.clientY; let moved = false;
+      try { el.setPointerCapture(e.pointerId); } catch (x) {}
+      const move = m => { const dx = m.clientX - sx, dy = m.clientY - sy; if (!moved && Math.hypot(dx, dy) > 6) { moved = true; el.classList.add('dragging'); } if (moved) { el.style.transform = `translate(${dx}px,${dy}px)`; vlHover(m.clientX, m.clientY); } };
+      const up = u => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); el.classList.remove('dragging'); el.style.transform = ''; vlHover(); if (!moved) { vlSelect(el.dataset.drag); return; } el.dataset.justDragged = 1; const t = vlTarget(u.clientX, u.clientY); if (t) vlDrop(el.dataset.drag, t.dataset.drop); };
+      el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+    });
+    el.addEventListener('click', e => { e.stopPropagation(); if (e.detail === 0) vlSelect(el.dataset.drag); });
+  });
+  root.querySelectorAll('[data-drop]').forEach(el => {
+    el.addEventListener('click', e => { if (e.target.closest('[data-drag]')) return; if (VL.sel) vlDrop(VL.sel, el.dataset.drop); else vlSay('Pick an item first: drag it here, or tap it and then tap here.'); });
+    el.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === el) { e.preventDefault(); el.click(); } });
+  });
+}
+const vlTarget = (x, y) => document.elementsFromPoint(x, y).map(n => n.closest && n.closest('#vlScene [data-drop]')).find(Boolean);
+function vlHover(x, y) { document.querySelectorAll('#vlScene [data-drop]').forEach(n => n.classList.remove('over')); if (x != null) { const t = vlTarget(x, y); if (t) t.classList.add('over'); } }
+function vlSelect(id) { VL.sel = VL.sel === id ? null : id; document.querySelectorAll('#vlScene [data-drag]').forEach(n => n.classList.toggle('sel', n.dataset.drag === VL.sel)); document.querySelectorAll('#vlScene [data-drop]').forEach(n => n.classList.toggle('ready', !!VL.sel)); if (VL.sel) vlSay('Now tap where it goes (or drag it there).'); }
+async function vlDrop(what, where) {
+  if (VL.busy) return; VL.sel = null; VL.busy = true;
+  let r;
+  try { r = await VL.bench.drop(VL.s, what, where); } catch (e) { r = 'Something went wrong. Press New run.'; }
+  VL.busy = false;
+  if (typeof r === 'string') { vlSay(r, 'bad'); document.querySelectorAll('#vlScene [data-drop]').forEach(n => n.classList.remove('ready')); return; }
+  vlSteps();
+}
+const vlTxt = (x, s) => (typeof x === 'function' ? x(s) : x || '');
+function vlSteps() {
+  const b = VL.bench, s = VL.s, steps = b.steps;
+  // skip steps that don't apply, auto-advance steps that only need an action
+  while (VL.step < steps.length) { const st = steps[VL.step]; if (st.skip && st.skip(s)) { VL.step++; continue; } if (st.auto && st.act(s)) { VL.step++; continue; } break; }
+  let h = '<ol class="vl-list">';
+  steps.forEach((st, i) => {
+    if (st.skip && i <= VL.step && st.skip(s)) return;
+    if (i < VL.step) { h += `<li class="done"><b>${st.title}</b>${VL.done[i] ? `<span>${VL.done[i]}</span>` : ''}</li>`; return; }
+    if (i > VL.step) { h += `<li class="todo"><b>${st.title}</b></li>`; return; }
+    const ready = !st.act || st.act(s);
+    h += `<li class="now" id="vlNow"><b>${st.title}</b><p>${vlTxt(st.say, s)}</p>`;
+    if (ready && st.parts) {
+      VL.parts = st.parts(s);
+      h += `${st.eq ? `<div class="eqline">${vlTxt(st.eq, s)}</div>` : ''}${st.ref ? `<div class="ref">${st.ref(s)}</div>` : ''}${st.pt ? ptBox() : ''}<div class="parts">${partsHTML(VL.parts, 'vl' + i, false)}</div>
+      <div class="check-row"><button type="button" class="btn primary" id="vlCheck">Check</button>${VL.tries ? '<button type="button" class="btn" id="vlShow">Show answer</button>' : ''}</div><div class="feedback" id="vlFb" role="status" aria-live="polite"></div>`;
+    } else if (!ready) h += '<p class="vl-wait">Do this on the bench ←</p>';
+    h += '</li>';
+  });
+  h += '</ol>';
+  if (VL.step >= steps.length) h += `<div class="feedback good" style="display:block"><b>Bench complete!</b> <span class="xp-pop">+15 XP</span><br>Press <b>New run</b> for new numbers${b.id === 'mix' ? ' or a different pair of chemicals' : ''}.</div>`;
+  $('vlSteps').innerHTML = h;
+  const c = $('vlCheck'); if (c) c.onclick = () => vlCheck(false);
+  const sh = $('vlShow'); if (sh) sh.onclick = () => vlCheck(true);
+  const now = $('vlNow'); if (now) now.querySelectorAll('input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); vlCheck(false); } }));
+}
+function vlCheck(reveal) {
+  const b = VL.bench, st = b.steps[VL.step], box = $('vlNow'), parts = VL.parts, fb = $('vlFb');
+  const vals = readParts(box, parts), res = gradeAll(parts, vals, false);
+  if (!reveal && res.some(r => r.empty)) { fb.className = 'feedback info'; fb.style.display = 'block'; fb.innerHTML = 'Answer every part first.'; return; }
+  markParts(box, res, parts, reveal);
+  const ok = res.every(r => r.ok);
+  if (ok || reveal) {
+    const use = parts.map((p, k) => (ok ? (p.type === 'num' ? vlNum(vals[k].val) : vals[k].val) : p.type === 'num' ? p.v : p.ok));
+    if (st.rec) st.rec(VL.s, use);
+    VL.done[VL.step] = parts.map((p, k) => (p.type === 'num' ? `${ok ? esc(vals[k].val) : p.ans} ${p.unit || ''}` : p.type === 'choice' ? p.options[ok ? +vals[k].val : p.ok] : ok ? esc(vals[k].val) : p.ans)).join(', ');
+    const first = ok && VL.tries === 0; if (ok) { P.xp += first ? 10 : 5; P.correct++; P.streak = first ? P.streak + 1 : P.streak; } else P.streak = 0;
+    P.tried++;
+    fb.className = 'feedback ' + (ok ? 'good' : 'info'); fb.style.display = 'block';
+    fb.innerHTML = `${ok ? `<b>Correct!</b> <span class="xp-pop">+${first ? 10 : 5} XP</span>` : '<b>Here’s how:</b>'}<div class="sol">${vlTxt(st.sol, VL.s)}</div><div class="next-row"><button type="button" class="btn primary" id="vlNext">Next step <span data-icon="arrow" aria-hidden="true"></span></button></div>`;
+    paintIcons(fb);
+    $('vlNext').onclick = () => { VL.step++; VL.tries = 0; if (VL.step >= b.steps.length || b.steps.slice(VL.step).every(x => x.skip && x.skip(VL.s))) vlFinish(); vlSteps(); };
+    box.querySelectorAll('input,.opt').forEach(x => (x.disabled = true)); const c = $('vlCheck'); if (c) c.remove(); const sh = $('vlShow'); if (sh) sh.remove();
+    try { window.ddTrack && window.ddTrack({ game: 'labpractical', course: '3A', mode: 'Virtual Lab', topic: `${b.title} · ${st.title}`, correct: ok }); } catch (e) {}
+  } else {
+    VL.tries++; P.tried++; P.streak = 0;
+    fb.className = 'feedback bad'; fb.style.display = 'block'; fb.innerHTML = 'Not quite. Fix the red part and check again.';
+    if (!$('vlShow')) $('vlCheck').insertAdjacentHTML('afterend', '<button type="button" class="btn" id="vlShow">Show answer</button>'), ($('vlShow').onclick = () => vlCheck(true));
+  }
+  renderStats(); save(); checkAch();
+}
+function vlFinish() { VL.step = VL.bench.steps.length; P.vlab = P.vlab || {}; P.vlab[VL.bench.id] = (P.vlab[VL.bench.id] || 0) + 1; P.xp += 15; renderStats(); save(); checkAch(); try { confetti(); } catch (e) {} const card = $('vlGrid').querySelector(`[data-vlb="${VL.bench.id}"] small:last-child`); if (card) card.textContent = ` Finished ${P.vlab[VL.bench.id]}×`; }
+
 /* ---------- modes, stats, videos, reference ---------- */
 function setMode(m) {
   state.mode = m; P.mode = m; save();
   document.querySelectorAll('#modes [data-mode]').forEach(b => { b.classList.toggle('active', b.dataset.mode === m); b.setAttribute('aria-selected', b.dataset.mode === m); });
-  $('mockView').hidden = m !== 'mock'; $('practiceView').hidden = m !== 'practice'; $('benchView').hidden = m !== 'bench';
+  $('mockView').hidden = m !== 'mock'; $('practiceView').hidden = m !== 'practice'; $('benchView').hidden = m !== 'bench'; $('vlabView').hidden = m !== 'vlab';
   if (m === 'practice') { renderLabTiles(); if (!state.q && state.sel.size) newQuestion(); }
   if (m === 'bench') renderBench();
+  if (m === 'vlab') renderVLab();
   if (m === 'mock') setVideoFor('practical1');
 }
 function renderLabset() {
@@ -2007,6 +2488,7 @@ function renderRef() {
   $('refBody').innerHTML = `<p class="small-note">On the real practical, any equation or table you need is given at the station, except the ones in “Know by heart”.</p>
   <h3>Know by heart (not given)</h3><ul><li>Density = mass ÷ volume</li><li>M₁V₁ = M₂V₂</li><li>Molarity = mol solute ÷ L solution</li><li>ΔT = final − initial; K = °C + 273.15</li><li>Record analog readings one digit past the smallest line; copy every digit on a digital display</li></ul>
   <h3>Equations usually given at the station</h3><ul><li>V = l × w × h &nbsp; · &nbsp; V<sub>cylinder</sub> = π r² h</li><li>q = m × c × ΔT &nbsp; · &nbsp; q<sub>reaction</sub> + q<sub>solution</sub> = 0 &nbsp; · &nbsp; c<sub>water</sub> = 4.184 J/g·°C</li><li>PV = nRT, R = 0.08206 L·atm/(mol·K) &nbsp; · &nbsp; P<sub>total</sub> = P<sub>gas</sub> + P<sub>water</sub> &nbsp; · &nbsp; 1 atm = 760 mmHg, 1 in Hg = 25.4 mmHg</li><li>% mass = g element ÷ g compound × 100 &nbsp; · &nbsp; % error = (experimental − accepted) ÷ accepted × 100</li><li>pH = −log[H<sub>3</sub>O<sup>+</sup>] &nbsp; · &nbsp; pOH = −log[OH<sup>−</sup>] &nbsp; · &nbsp; pH + pOH = 14 &nbsp; · &nbsp; [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup></li><li>c = λν, E = hν = hc/λ</li></ul>
+  <h3>Periodic table (Yellow Sheet)</h3><div class="pt-scroll">${PT_IMG}</div><a class="pt-full" href="${PT_SRC}" target="_blank" rel="noopener">Open full size</a>
   <h3>pH road map</h3>${phChart()}
   <h3>Solubility rules (green sheet summary)</h3>${tableHTML(sol.map(r => [r[0], r[1]]))}
   <h3>Flame test colors</h3>${flameTable()}
@@ -2028,6 +2510,7 @@ function bind() {
     const v = e.target.closest('[data-video]'); if (v) { setVideoFor(v.dataset.video, state.q && state.mode === 'practice' ? state.q.lab : null); const pl = $('player'); pl.src = pl.dataset.src; }
     const sc = e.target.closest('[data-sim]'); if (sc) { state.sim = sc.dataset.sim; renderBench(); }
     const tc = e.target.closest('[data-tcheck]'); if (tc) checkTask(+tc.dataset.tcheck);
+    const vb = e.target.closest('[data-vlb]'); if (vb) vlStart(vb.dataset.vlb);
   });
   document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('#qParts input')) { e.preventDefault(); state.done ? newQuestion() : check(); } });
   $('checkBtn').onclick = check; $('nextBtn').onclick = () => { newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} };
