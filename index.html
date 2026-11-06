@@ -219,6 +219,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 @media(max-width:760px){table.data{font-size:.95rem}table.data th,table.data td{padding:5px 7px}}
 
 /* ---------- Virtual Lab ---------- */
+.mock-hands{margin:10px 0 14px}.mock-hands .vl-st svg{max-height:380px;margin:0 auto}#vlTit svg{max-height:480px;margin:0 auto}
 .vl-row.rev{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}@media(max-width:560px){.vl-row.rev{grid-template-columns:1fr}}
 .vl-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 4px 2px}.vl-ctl .btn{min-height:44px;touch-action:none;user-select:none;-webkit-user-select:none}.vl-ctl small{font-weight:600;opacity:.75}
 .vl-count{font-weight:700;margin-right:auto}.vl-zoom svg{max-width:340px;margin:0 auto}
@@ -279,6 +280,40 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .vl-heat{animation:vlHeat 1.6s ease-in-out infinite}.vl-glow{animation:vlGlow 2s ease-in-out infinite}
 .vl-move{animation:vlMove 1.2s ease-in-out both}.vl-up{animation:vlUp 2.4s ease-in infinite both}.vl-drift{animation:vlDrift 1.4s ease-in-out infinite alternate}
 .vl-recolor{animation:vlRecolor .8s ease both}.vl-coat,.vl-ppt{animation:vlFade 1.8s ease both}.vl-swirl{animation:vlSwirl .8s ease both}.vl-paper{animation:vlPaper 2s ease both}
+/* ---------- practice calculator ---------- */
+.calc-dock{position:fixed;right:16px;bottom:16px;z-index:70;width:340px;max-height:calc(100vh - var(--topbar,72px) - 28px);overflow:auto;border-radius:24px;box-shadow:0 18px 50px #11152b55}
+.dock-head{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;background:#24282f;color:#e8ebf2;padding:8px 10px 0 16px;border-radius:24px 24px 0 0}
+.dock-head b{font-size:.9rem}.dock-head button{border:0;background:#3a3f49;color:#fff;border-radius:10px;width:40px;height:40px;font-size:1rem}
+.calc{background:linear-gradient(180deg,#24282f,#1a1d22);padding:10px 14px 14px;color:#e8ebf2;font-family:var(--font)}
+.calc-brand{display:flex;justify-content:space-between;align-items:baseline;font-size:.72rem;color:#9aa3b5;margin-bottom:6px}.calc-brand b{color:#d6dbe6;letter-spacing:.04em}
+.lcd{background:linear-gradient(180deg,#cfd8c6,#bfcab5);border-radius:10px;box-shadow:inset 0 2px 6px #0005;padding:4px 8px 6px;color:#1b2418;min-height:132px;position:relative}
+.lcd .ind{height:14px;font:700 .62rem/14px var(--font);letter-spacing:.06em}
+.scr{max-height:150px;overflow:auto;font:500 1.02rem/1.25 "Courier New",ui-monospace,monospace}
+.scr .hl{text-align:left;min-height:1.35em;display:flex;align-items:center;flex-wrap:wrap}.scr .hr{text-align:right;font-weight:700;border-bottom:1px dotted #0003;padding-bottom:2px;margin-bottom:2px}
+.scr .herr{color:#7a1020;font-weight:700;font-size:.85rem}
+.scr .cc{display:inline-block;width:2px;height:1.05em;background:#1b2418;vertical-align:middle;animation:blink 1s steps(1) infinite;margin:0 1px}@keyframes blink{50%{opacity:0}}
+.scr .slot{display:inline-block;width:.6em;height:.8em;border:1px dashed #1b241888;vertical-align:middle;margin:0 1px}
+.scr .mf{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 2px;font-size:.92em}.scr .mf>b{height:1.5px;background:#1b2418;align-self:stretch}.scr .mf>span{min-width:.7em;text-align:center;display:inline-flex;align-items:center}
+.scr sup{font-size:.7em;line-height:0;vertical-align:.55em;display:inline-flex;align-items:center}.scr .ng{font-size:.75em;vertical-align:.25em}.scr .ee{font-weight:700}
+.calc .keys{display:grid;grid-template-columns:repeat(5,1fr);gap:4px 7px;margin-top:10px}
+.kc{display:flex;flex-direction:column;align-items:stretch}.kc small{font-size:.6rem;line-height:1.1;height:12px;text-align:center;color:#62a8ff;font-weight:700;white-space:nowrap;overflow:hidden}
+.calc .keys button{border:0;border-radius:9px;min-height:38px;background:#33373f;color:#fff;font:700 .86rem var(--font);box-shadow:0 2px 0 #0008,inset 0 1px 0 #ffffff1a;padding:2px 0;display:flex;align-items:center;justify-content:center;transition:transform .08s}
+.calc .keys button.num{background:#e9ebef;color:#1d2027;font-size:1.05rem}
+.calc .keys button.k2nd{background:#2f7de1}
+.calc .keys button.kent{background:#4a505c}
+.calc .keys button.off{opacity:.4;cursor:default}
+.calc .keys button.press,.calc .keys button:active{transform:scale(.92);box-shadow:0 0 0 3px #ffd166,0 1px 0 #0008}
+.calc .keys button:focus-visible{outline:3px solid #ffd166}
+.dpad{grid-column:span 2;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,23px);gap:2px;align-self:end}
+.dpad button{min-height:0!important;height:23px;border-radius:7px!important;font-size:.7rem!important;background:#3f444e!important}
+.dpad [data-k=up]{grid-column:2;grid-row:1}.dpad [data-k=left]{grid-column:1;grid-row:1/3;height:48px!important}.dpad [data-k=right]{grid-column:3;grid-row:1/3;height:48px!important}.dpad [data-k=down]{grid-column:2;grid-row:2}
+.calc-foot{display:flex;gap:8px;margin-top:10px}.calc-foot .btn{flex:1;min-height:42px;background:#3a3f49;color:#fff;border-color:#4a505c}
+.calc-help{font-size:.72rem;color:#9aa3b5;margin-top:6px;line-height:1.35}
+@media(min-width:1000px){body.calc-open .wrap{padding-right:370px}}
+.calc-dock[hidden]{display:none}
+.cabbox>summary{color:#6a2d8f}.cabbox{background:#f8f1fd}.cabchart{display:block;width:100%;min-width:480px;height:auto}
+.lp-opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;cursor:pointer;background:#fff}.lp-opt:has(input:checked){border-color:var(--accent);background:#f3f4ff}.lp-opt input{margin-top:4px}.lp-opt small{display:block;color:var(--muted)}
+.lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;margin:6px 0 4px 30px;font-size:.92rem}.lp-grid[hidden]{display:none}.lp-grid label{display:flex;gap:6px;align-items:center}
 .ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
 .eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
@@ -345,7 +380,7 @@ html.dd-embedded{scroll-padding-top:8px}
 .coef{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:1.2rem;font-weight:800;color:#26326a;justify-content:center;background:var(--accent-soft);border-radius:12px;padding:12px}
 .coef input{width:56px!important;flex:none!important;text-align:center;min-height:46px!important;padding:6px!important}
 .check-row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}.check-row .btn.primary{min-width:180px;min-height:54px}
-.actions.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.actions.five{grid-template-columns:repeat(5,minmax(0,1fr))}.actions.six{grid-template-columns:repeat(6,minmax(0,1fr))}
 
 /* ===== mock practical ===== */
 .mock-setup{display:grid;gap:14px}
@@ -404,7 +439,7 @@ html.dd-embedded .mockbar{position:relative}
  .vpick{grid-template-columns:1fr 1fr}
  .mockbar .clock{font-size:1.35rem;min-width:90px}
  .mockbar .dots{display:none}.mockbar{gap:8px}.mockbar .st{font-size:1.05rem}
- .station{padding:12px}.actions.five{grid-template-columns:1fr 1fr}
+ .station{padding:12px}.actions.five,.actions.six{grid-template-columns:1fr 1fr}
  .part input.unit-in{flex:1 1 90px}
  .phchart{grid-template-columns:1fr}
  .simframe{aspect-ratio:3/4}
@@ -424,6 +459,7 @@ html.dd-embedded .mockbar{position:relative}
  <div class="tb-brand"><img src="assets/logo-256.webp" data-fbsrc="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%20role%3D%22img%22%20aria-label%3D%22Station%20Rotation%20logo%3A%20a%20clipboard%20answer%20sheet%20with%20green%2C%20yellow%20and%20purple%20version%20tabs%20and%20a%20stopwatch%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22bg%22%20cx%3D%2250%25%22%20cy%3D%2240%25%22%20r%3D%2265%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f6f4ff%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e4e8ff%22/%3E%3C/radialGradient%3E%3C/defs%3E%0A%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%22112%22%20height%3D%22112%22%20rx%3D%2228%22%20fill%3D%22url%28%23bg%29%22/%3E%0A%3Crect%20x%3D%2274%22%20y%3D%2226%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%237fd39b%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2246%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23ffd84d%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2266%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23b89cff%22/%3E%0A%3Crect%20x%3D%2222%22%20y%3D%2220%22%20width%3D%2260%22%20height%3D%2278%22%20rx%3D%229%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%234b57d1%22%20stroke-width%3D%224%22/%3E%0A%3Crect%20x%3D%2238%22%20y%3D%2214%22%20width%3D%2228%22%20height%3D%2212%22%20rx%3D%225%22%20fill%3D%22%234b57d1%22/%3E%0A%3Cpath%20d%3D%22M46%2036%20L46%2050%20L36%2070%20Q34%2075%2039%2075%20L65%2075%20Q70%2075%2068%2070%20L58%2050%20L58%2036%22%20fill%3D%22%23eaf4fb%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M41%2062%20L63%2062%20L68%2070%20Q70%2075%2065%2075%20L39%2075%20Q34%2075%2036%2070%20Z%22%20fill%3D%22%23a7d8f5%22/%3E%0A%3Cline%20x1%3D%2243%22%20y1%3D%2236%22%20x2%3D%2261%22%20y2%3D%2236%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cline%20x1%3D%2232%22%20y1%3D%2284%22%20x2%3D%2260%22%20y2%3D%2284%22%20stroke%3D%22%23c9cfe6%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%2288%22%20cy%3D%2290%22%20r%3D%2217%22%20fill%3D%22%23fff%22%20stroke%3D%22%23d9577f%22%20stroke-width%3D%224%22/%3E%3Crect%20x%3D%2284%22%20y%3D%2268%22%20width%3D%228%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%23d9577f%22/%3E%0A%3Cpath%20d%3D%22M88%2090%20L88%2080%20M88%2090%20L95%2094%22%20stroke%3D%22%231f2a44%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3C/svg%3E" onerror="this.onerror=null;this.src=this.dataset.fbsrc" alt="">Station Rotation</div>
  <div class="tb-xp"><span class="ico" data-icon="trophy" aria-hidden="true"></span><div><b id="rankName">Lab Rookie</b><div class="xpbar" aria-hidden="true"><span id="xpFill"></span></div><small id="xpShort">0 XP</small></div></div>
  <div class="tb-streak" title="Current streak"><span data-icon="flame" aria-hidden="true"></span><b id="streak">0</b></div>
+ <button type="button" class="tb-btn" id="calcBtn" aria-label="Open the practice calculator"><span data-icon="calc" aria-hidden="true"></span><span class="lbl">Calculator</span></button>
  <button type="button" class="tb-btn" id="refBtn" aria-label="Open the reference sheet"><span data-icon="book" aria-hidden="true"></span><span class="lbl">Reference</span></button>
 </div></header>
 
@@ -476,7 +512,7 @@ html.dd-embedded .mockbar{position:relative}
     <div class="parts" id="qParts"></div>
     <div class="check-row"><button type="button" class="btn primary" id="checkBtn">Check</button></div>
     <div class="feedback" id="feedback" role="status" aria-live="polite" tabindex="-1"></div>
-    <div class="actions five"><button type="button" class="btn" id="hintBtn"><span data-icon="bulb" aria-hidden="true"></span>Hint</button><button type="button" class="btn" id="solBtn"><span data-icon="eye" aria-hidden="true"></span>Show answer</button><button type="button" class="btn" id="refBtn2"><span data-icon="book" aria-hidden="true"></span>Reference</button><button type="button" class="btn" id="videoBtn"><span data-icon="video" aria-hidden="true"></span>Video</button><button type="button" class="btn" id="simBtn"><span data-icon="sliders" aria-hidden="true"></span>PhET sim</button></div>
+    <div class="actions six"><button type="button" class="btn" id="hintBtn"><span data-icon="bulb" aria-hidden="true"></span>Hint</button><button type="button" class="btn" id="solBtn"><span data-icon="eye" aria-hidden="true"></span>Show answer</button><button type="button" class="btn" id="refBtn2"><span data-icon="book" aria-hidden="true"></span>Reference</button><button type="button" class="btn" id="videoBtn"><span data-icon="video" aria-hidden="true"></span>Video</button><button type="button" class="btn" id="simBtn"><span data-icon="sliders" aria-hidden="true"></span>PhET sim</button><button type="button" class="btn" id="vlBtn"><span data-icon="beaker" aria-hidden="true"></span>Hands-on lab</button></div>
     <div class="detail" id="hintBox" hidden></div>
     <div class="next-row"><button type="button" id="nextBtn" class="btn primary" hidden>Next question <span data-icon="arrow" aria-hidden="true"></span></button></div>
    </div>
@@ -517,6 +553,8 @@ html.dd-embedded .mockbar{position:relative}
  <p class="foot">ItsDrDan · Fresno City College · Practice only, nothing is graded</p>
 </div>
 
+<aside class="calc-dock" id="calcDock" hidden aria-label="Practice calculator"><div class="dock-head"><b>Calculator</b><button type="button" id="calcClose" aria-label="Close calculator">✕</button></div><div id="calcMount"></div></aside>
+<dialog id="lpDialog" aria-labelledby="lpTitle"><div class="modal-head"><strong id="lpTitle">Which labs did your class do?</strong><button type="button" class="close-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button></div><div class="modal-body" id="lpBody"></div></dialog>
 <dialog id="refDialog" aria-labelledby="refTitle"><div class="modal-head"><strong id="refTitle">Reference sheet</strong><button type="button" class="close-btn" id="closeRef" aria-label="Close the reference sheet">✕</button></div>
  <div class="modal-body refsec" id="refBody"></div></dialog>
 <script>
@@ -1620,6 +1658,11 @@ const CABBAGE = [['#c8213a', 'Red', '1–2', 0], ['#e0559a', 'Pink', '3–4', 0]
 const ACIDITY = ['Acidic', 'About neutral', 'Basic'];
 const PH_ITEMS = [['Lemon juice', 2.0, 2.6], ['Vinegar', 2.4, 3.2], ['Soda', 2.5, 3.5], ['Orange juice', 3.3, 4.2], ['Coffee', 4.8, 5.4], ['Milk', 6.4, 6.8], ['Baking soda solution', 8.2, 8.6], ['Antacid', 9.2, 10.2], ['Window cleaner', 10.5, 11.5], ['Bleach', 12.2, 12.8]];
 const PH_EQ = 'pH = −log[H<sub>3</sub>O<sup>+</sup>] &nbsp;&nbsp; pOH = −log[OH<sup>−</sup>] &nbsp;&nbsp; pH + pOH = 14<br>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> &nbsp;&nbsp; [OH<sup>−</sup>] = 10<sup>−pOH</sup>';
+// Red cabbage reference chart: 14 test tubes, pH 1–14, colors match the CABBAGE table
+const cabChart = () => { let t = '<svg class="cabchart" viewBox="0 0 588 150" role="img" aria-label="Red cabbage indicator reference chart: test tubes for pH 1 to 14. pH 1 to 2 red, 3 to 4 pink, 5 to 7 purple, 8 blue, 9 to 10 blue-green, 11 to 12 green, 13 to 14 yellow.">';
+  for (let ph = 1; ph <= 14; ph++) { const x = 8 + (ph - 1) * 41, c = CABBAGE[cabIdx(ph)][0]; t += `<path d="M${x + 8} 10 L${x + 8} 96 Q${x + 8} 112 ${x + 20} 112 Q${x + 32} 112 ${x + 32} 96 L${x + 32} 10" fill="#f4f9ff" stroke="#8aa6c8" stroke-width="2"/><path d="M${x + 9} 40 L${x + 31} 40 L${x + 31} 96 Q${x + 31} 111 ${x + 20} 111 Q${x + 9} 111 ${x + 9} 96 Z" fill="${c}"/><rect x="${x + 12}" y="44" width="3" height="50" rx="1.5" fill="#fff" opacity=".55"/><line x1="${x + 5}" y1="10" x2="${x + 35}" y2="10" stroke="#8aa6c8" stroke-width="3" stroke-linecap="round"/><text x="${x + 20}" y="134" text-anchor="middle" font-size="15" font-weight="800" fill="#1f2a44">${ph}</text>`; }
+  return t + '<text x="294" y="149" text-anchor="middle" font-size="11" font-weight="700" fill="#656c83">pH</text></svg>'; };
+const cabBox = (open) => `<details class="ptbox cabbox"${open ? ' open' : ''}><summary>Reference chart: red cabbage colors</summary><div class="pt-scroll">${cabChart()}</div></details>`;
 const phChart = () => `<div class="phchart"><div><b>pH</b></div><div>↔ pH + pOH = 14 ↔</div><div><b>pOH</b></div><div>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup><br>pH = −log[H<sub>3</sub>O<sup>+</sup>]</div><div>[H<sub>3</sub>O<sup>+</sup>][OH<sup>−</sup>] = 1 × 10<sup>−14</sup></div><div>[OH<sup>−</sup>] = 10<sup>−pOH</sup><br>pOH = −log[OH<sup>−</sup>]</div></div>`;
 const K12a = {
   fromPH() {
@@ -1636,7 +1679,7 @@ const K12a = {
   },
   cabbage() {
     const k = rint(0, CABBAGE.length - 1), c = CABBAGE[k], askRange = chance(0.5);
-    return { tag: 'Red cabbage indicator', prompt: `A few drops of red cabbage juice are added to a household product and it turns <b>${c[1].toLowerCase()}</b>. ${askRange ? 'About what pH is it?' : 'Is the product acidic, about neutral, or basic?'}`, art: tubeSVG({ liquid: c[0], aria: `A test tube with ${c[1]} liquid`, level: 140 }),
+    return { tag: 'Red cabbage indicator', cab: true, prompt: `A few drops of red cabbage juice are added to a household product and it turns <b>${c[1].toLowerCase()}</b>. ${askRange ? 'About what pH is it?' : 'Is the product acidic, about neutral, or basic?'}`, art: tubeSVG({ liquid: c[0], aria: `A test tube with ${c[1]} liquid`, level: 140 }),
       parts: [askRange ? choice(CABBAGE.map(x => `pH ${x[2]}`), k) : choice(ACIDITY, c[3])], hint: 'Red cabbage: red/pink in acid → purple near neutral → blue, green, then yellow as it gets more basic.', solution: `${c[1]} → about <b>pH ${c[2]}</b> (${ACIDITY[c[3]].toLowerCase()}).`, video: 'ph', skill: 'read' };
   },
   acidMass() {
@@ -1804,6 +1847,11 @@ const STORE = 'ddLabPractical.v1';
 const VCOL = { A: 'green', B: 'yellow', C: 'purple' };
 // Dr. Dan's current lab list (his Canvas links add ?labs=dan). Update this line each semester.
 const DAN_LABS = ['0a', '1a', '3z', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '12a', '12b'];
+// Dr. Dan's Fall 2026 CHEM 3A sections (checked in Canvas). Each Canvas link can add ?sec=25784 or ?sec=25787. Update each semester.
+const SECTIONS = [
+  { key: '25784', alt: ['1', '25786'], name: 'Dr. Dan · CHEM 3A · 25784/25786', labs: ['0a', '1a', '3z', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '12a', '12b'] },
+  { key: '25787', alt: ['2', '25788'], name: 'Dr. Dan · CHEM 3A · 25787/25788 (Fri/Sat)', labs: ['0a', '1a', '3a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a', '12b'] }
+];
 const RANKS = [[0, 'Lab Rookie'], [60, 'Goggles On'], [150, 'Meniscus Reader'], [300, 'Data Cruncher'], [500, 'Station Pro'], [800, 'Practical Ace'], [1200, 'Lab Legend']];
 const ACH = [
   ['first', 'First Station', 'Get your first answer right', 'stars', P => P.correct >= 1],
@@ -1824,7 +1872,9 @@ const fresh = () => ({ xp: 0, correct: 0, tried: 0, streak: 0, best: 0, lab: {},
 function load() { try { P = Object.assign(fresh(), JSON.parse(localStorage.getItem(STORE) || '{}') || {}); } catch (e) { P = fresh(); } }
 function save() { try { P.sel = [...state.sel]; localStorage.setItem(STORE, JSON.stringify(P)); } catch (e) {} }
 function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { if (!el.dataset.painted && window.ddIcon) { el.insertAdjacentHTML('afterbegin', ico(el.dataset.icon)); el.dataset.painted = 1; } }); }
-const labSet = () => (state.setAll ? LABS.map(l => l.id) : DAN_LABS.filter(id => labById(id)));
+const labPick = () => P.labPick || { kind: 'all' };
+const labSet = () => { const k = labPick(); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
+const labPickName = () => { const k = labPick(); return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
 const labTitle = id => `Exp ${id} · ${labById(id).name}`;
 function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.ddTrack({ game: 'labpractical', course: '3A', mode, topic: `Exp ${q.lab} ${q.labName} · ${q.tag}`, correct: !!ok, tries: ok ? '' : 'slip:' + (slip || 'other'), slip: ok ? '' : (slip || 'other') }); } catch (e) {} }
 
@@ -1838,6 +1888,7 @@ function qHTML(q, opt = {}) {
   if (q.eq) t += `<div class="eqline">${q.eq}</div>`;
   if (q.art) t += `<div class="artbox">${q.art}</div>`;
   if (q.ref) t += `<div class="ref">${q.ref}</div>`;
+  if (q.cab) t += cabBox();
   if (q.pt !== false && (q.pt || /g\/mol|molar mass/i.test(`${q.prompt} ${q.hint || ''} ${q.solution || ''}`))) t += ptBox();
   if (opt.mock) q.parts.forEach(p => { if (p.type === 'choice') t += `${p.label ? `<p class="small-note"><b>${p.label}</b></p>` : ''}<ol class="chooselist" type="a">${p.options.map(o => `<li>${o}</li>`).join('')}</ol>`; });
   return t;
@@ -1872,7 +1923,7 @@ function readParts(root, parts) {
 function gradeAll(parts, vals, mock) {
   return parts.map((p, i) => {
     let spec = p;
-    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (!spec) return { score: 0, ok: false, note: 'Fill in the first box first.' }; }
+    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (!spec) return { score: 0, ok: false, note: p.type === 'num' && !p.free && p.label == null ? 'You didn’t finish the measurement at this station.' : 'Fill in the first box first.' }; }
     if (p.free) { const ok = !!parseEntry(vals[i].val); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Type the number you see.' }; }
     if (!String(vals[i].val).trim()) return { score: 0, ok: false, empty: true, note: '' };
     return gradePart(spec, vals[i].val, vals[i].unit, mock);
@@ -1900,6 +1951,7 @@ function newQuestion() {
   $('qBox').innerHTML = qHTML(q); $('qParts').innerHTML = partsHTML(q.parts, 'pq', false);
   $('feedback').className = 'feedback'; $('feedback').innerHTML = ''; $('hintBox').hidden = true; $('nextBtn').hidden = true; $('checkBtn').hidden = false;
   $('simBtn').hidden = !PHET.some(s => s.labs.includes(lab));
+  $('vlBtn').hidden = !VBENCH.some(b => b.labs.includes(lab));
   setVideoFor(q.video, lab);
 }
 function markParts(root, res, parts, reveal) {
@@ -1957,6 +2009,7 @@ function genStation() {
 function buildPractical(ver, timer) {
   const pool = shuffle(labSet()).slice(0, 9);
   const stations = pool.map(id => { const l = labById(id), kinds = shuffle(l.mock || Object.keys(l.K)); const ks = [0, 1, 2].map(i => kinds[i % kinds.length]); const v = {}; 'ABC'.split('').forEach((V, i) => { v[V] = makeQ(id, ks[i]); }); return { lab: id, title: l.name, versions: v }; });
+  let nh = 0; stations.forEach((st, k) => { if (HANDS[st.lab] && nh < 4 && Math.random() < 0.7) { stations[k] = HANDS[st.lab](); nh++; } });
   stations.splice(rint(0, stations.length), 0, genStation());
   const n = stations.length, start = rint(0, n - 1);
   mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
@@ -1964,6 +2017,7 @@ function buildPractical(ver, timer) {
 function startMock() {
   let v = document.querySelector('#vpick .vbtn.on'); v = v ? v.dataset.v : 'R'; if (v === 'R') v = pick(['A', 'B', 'C']);
   const t = document.querySelector('#timerpick .chip.on').dataset.t;
+  VL.bench = null; VL.mock = true; if ($('vlArea')) $('vlArea').innerHTML = '';
   buildPractical(v, t);
   document.body.classList.add('mock-on', 'v-' + v.toLowerCase());
   $('mockSetup').hidden = true; $('mockRun').hidden = false; $('modes').hidden = true; $('intro').hidden = true; $('labset').hidden = true; $('progressSec').hidden = true; $('videoSection').hidden = true;
@@ -1982,10 +2036,11 @@ function renderStation() {
   const vers = 'ABC'.split('').map(V => { const q = s.versions[V]; return `<section class="ver"><span class="vtag v${V.toLowerCase()}">Version ${V}</span>${qHTML(q, { mock: true })}</section>`; }).join('');
   const mine = s.versions[mock.ver];
   $('mockRun').innerHTML = mockBar(`Station ${i + 1} of ${n}`, mock.timer === 'off' ? '––:––' : '4:00') +
-    `<div class="station"><h2>Station ${i + 1} · ${s.title}${s.lab !== 'gen' ? ` <small class="tag">Exp ${s.lab}</small>` : ''}</h2>${s.shared ? `<div class="artbox">${s.shared}</div>` : ''}${vers}
+    `<div class="station"><h2>Station ${i + 1} · ${s.title}${s.lab !== 'gen' ? ` <small class="tag">Exp ${s.lab}</small>` : ''}</h2>${s.hands ? '<div class="vl-scene mock-hands" id="vlScene"></div>' : s.shared ? `<div class="artbox">${s.shared}</div>` : ''}${vers}
     <div class="sheet"><h3>Answer sheet · Station ${i + 1} · <span class="vtag v${mock.ver.toLowerCase()}">Version ${mock.ver}</span></h3><div class="parts">${partsHTML(mine.parts, 'm' + i, true, mock.answers[i])}</div>
     <p class="note-small">${mine.parts.some(p => p.type === 'num' && p.unit) ? 'Write your number, then its unit. Sig figs count. ' : ''}Short on time? Finish the math during wrap-up at the end.</p>
     <div class="check-row"><button type="button" class="btn primary" id="doneStation">${mock.pos === n - 1 ? 'Done: go to wrap-up' : 'Done: rotate to the next station'} <span data-icon="arrow" aria-hidden="true"></span></button></div></div></div>`;
+  if (s.hands) { VL.bench = s.hands.bench; VL.s = s.hands.s; VL.step = 99; VL.mock = true; VL.sel = null; VL.busy = false; vlScene(); }
   paintIcons($('mockRun'));
   $('doneStation').onclick = () => endStation();
   bindQuit();
@@ -1993,7 +2048,7 @@ function renderStation() {
   if (mock.timer === 'real') { mock.deadline = Date.now() + 240000; tick = setInterval(() => { const left = (mock.deadline - Date.now()) / 1000; const c = $('clock'); if (c) { c.textContent = fmtClock(left); c.classList.toggle('low', left < 30); } if (left <= 0) endStation(true); }, 250); }
 }
 function bindQuit() { let armed = 0; const b = $('quitMock'); if (!b) return; b.onclick = () => { if (!armed) { armed = 1; b.textContent = 'Tap again to quit'; setTimeout(() => { armed = 0; if (b) b.textContent = 'Quit'; }, 3500); return; } quitMock(); }; }
-function quitMock() { clearInterval(tick); mock = null; document.body.classList.remove('mock-on', 'v-a', 'v-b', 'v-c'); $('mockRun').hidden = true; $('mockRun').innerHTML = ''; $('mockSetup').hidden = false; $('modes').hidden = false; $('intro').hidden = false; $('labset').hidden = false; $('progressSec').hidden = false; $('videoSection').hidden = false; const r = document.querySelector('.rotate'); if (r) r.remove(); }
+function quitMock() { clearInterval(tick); mock = null; VL.mock = false; VL.bench = null; document.body.classList.remove('mock-on', 'v-a', 'v-b', 'v-c'); $('mockRun').hidden = true; $('mockRun').innerHTML = ''; $('mockSetup').hidden = false; $('modes').hidden = false; $('intro').hidden = false; $('labset').hidden = false; $('progressSec').hidden = false; $('videoSection').hidden = false; const r = document.querySelector('.rotate'); if (r) r.remove(); }
 function endStation(timeUp) {
   clearInterval(tick); saveCurrent();
   const n = mock.stations.length;
@@ -2011,7 +2066,7 @@ function endStation(timeUp) {
 }
 function startWrap() {
   clearInterval(tick); mock.phase = 'wrap';
-  const rows = mock.stations.map((s, i) => { const q = s.versions[mock.ver]; return `<div class="wrow" data-st="${i}"><details${i === 0 ? '' : ''}><summary>Station ${i + 1} · ${s.title}: show the Version ${mock.ver} question</summary>${s.shared ? `<div class="artbox">${s.shared}</div>` : ''}${qHTML(q, { mock: true })}</details><div class="parts">${partsHTML(q.parts, 'w' + i, true, mock.answers[i])}</div></div>`; }).join('');
+  const rows = mock.stations.map((s, i) => { const q = s.versions[mock.ver]; return `<div class="wrow" data-st="${i}"><details${i === 0 ? '' : ''}><summary>Station ${i + 1} · ${s.title}: show the Version ${mock.ver} question</summary>${stShared(s)}${qHTML(q, { mock: true })}</details><div class="parts">${partsHTML(q.parts, 'w' + i, true, mock.answers[i])}</div></div>`; }).join('');
   $('mockRun').innerHTML = mockBar('Wrap-up: finish your work', mock.timer === 'off' ? '––:––' : '5:00') + `<div class="station wrapup"><h2>Wrap-up</h2><p class="small-note">Finish any math and fill in blanks. Then turn in your answer sheet.</p>${rows}<div class="check-row"><button type="button" class="btn primary" id="turnIn">Turn in my answer sheet <span data-icon="check" aria-hidden="true"></span></button></div></div>`;
   paintIcons($('mockRun')); bindQuit();
   $('turnIn').onclick = turnIn;
@@ -2028,7 +2083,7 @@ function turnIn() {
     if (q.lab !== 'gen') { bumpLab(q.lab, pts >= 10); ddLog('Mock Practical', q, pts >= 10, res.find(r => !r.ok) ? (res.find(r => !r.ok).valueOk ? 'precision-or-units' : 'value') : ''); }
     if (pts >= 10) P.skill[q.skill] = (P.skill[q.skill] || 0) + 1;
     const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}</div>`; }).join('');
-    return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${s.shared ? `<div class="artbox">${s.shared}</div>` : ''}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;
+    return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${stShared(s)}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;
   }).join('');
   total = Math.round(total * 10) / 10;
   P.mocks++; P.bestMock = Math.max(P.bestMock || 0, total); P.versions[mock.ver] = 1; P.xp += Math.round(total); renderStats(); save(); checkAch();
@@ -2259,9 +2314,9 @@ const BENCH_MIX = {
   setup() { return { added: [], res: null }; },
   scene(s) {
     const shelf = Object.keys(VR).map(k => shelfBtn('r:' + k, k === 'Zn' ? VLI.slug('#b8bfcc') : VLI.dropper(VR[k].col || '#e8f4fc'), k === 'Zn' ? 'Zn(s)' : fhtml(k) + '(aq)', s.added.includes(k) || s.added.length >= 2 ? 'disabled' : '')).join('');
-    return `<div class="vl-shelf many">${shelf}</div><div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.added.length ? ': ' + s.added.map(k => fhtml(k)).join(' + ') : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div></div><div class="vl-st wide vl-popbox" id="vlPop"><div class="empty small">Add two chemicals. A particle view of the reaction pops up here.</div></div></div>`;
+    return `<div class="vl-shelf many">${shelf}</div><div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.added.length ? ': ' + s.added.map(k => fhtml(k)).join(' + ') : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div>${VL.mock && s.added.length ? '<div class="vl-ctl"><button type="button" class="btn" id="mxRinse">Rinse the tube</button></div>' : ''}</div><div class="vl-st wide vl-popbox" id="vlPop"><div class="empty small">Add two chemicals. A particle view of the reaction pops up here.</div></div></div>`;
   },
-  restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', this.pop(s)); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s) })); },
+  restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', this.pop(s)); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s), pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); const r = $('mxRinse'); if (r) r.onclick = () => { s.added = []; s.res = null; vlScene(); vlSay('Rinsed. The tube is clean and empty.'); }; },
   liq(s) { return s.added.some(k => k === 'CuSO4') ? '#8cc4ff' : '#e6f3fb'; },
   final(s) {
     const r = s.res, o = Object.assign({ level: 160, liquid: r.fade ? '#e6f3fb' : this.liq(s), aria: r.text }, r.tube || {});
@@ -2303,14 +2358,17 @@ const BENCH_MIX = {
 /* ====================== Bench 3: pH and indicator ====================== */
 const HOUSE = [['Lemon juice', 2.0, 2.4, '#fff4a8'], ['Vinegar', 2.6, 3.2, '#f6f1e3'], ['Soda', 2.6, 3.4, '#c79a6b'], ['Orange juice', 3.4, 4.2, '#ffc46b'], ['Black coffee', 4.8, 5.4, '#8a5a3a'], ['Milk', 6.4, 6.8, '#fbfbf6'], ['DI water', 6.9, 7.1, '#e6f3fb'], ['Baking soda solution', 8.0, 8.4, '#eef3f8'], ['Antacid', 9.2, 10.2, '#f2f2f6'], ['Window cleaner', 10.8, 11.8, '#a7d8f5'], ['Drain cleaner', 13.1, 13.7, '#eef3f8']];
 const cabIdx = pH => (pH < 2.5 ? 0 : pH < 4.5 ? 1 : pH < 7.5 ? 2 : pH < 8.5 ? 3 : pH < 10.5 ? 4 : pH < 12.5 ? 5 : 6);
+// pH meter: built and working, but CHEM 3A doesn't use one in Exp 12a. Set to true to turn it back on.
+const USE_PH_METER = false;
 const BENCH_PH = {
-  id: 'ph', labs: ['12a'], title: 'Red Cabbage Indicator', blurb: 'Add a household product, then the indicator, then the pH meter.',
+  id: 'ph', labs: ['12a'], title: 'Red Cabbage Indicator', blurb: 'Add a household product, then the indicator, and read the color.',
   setup() { return { item: null, pH: null, ind: false, meter: false, calc: pick(['h3o', 'oh']) }; },
+  init(s) { if (!USE_PH_METER) s.pHR = s.pH; },
   scene(s) {
     const shelf = s.item ? '' : HOUSE.map((h, i) => shelfBtn('h:' + i, VLI.bottle(h[3]), h[0])).join('');
-    return `<div class="vl-shelf many">${shelf}${s.item && !s.ind ? shelfBtn('cabbage', VLI.dropper('#8a4bb0'), 'Red cabbage juice') : ''}${s.ind && !s.meter ? shelfBtn('meter', VLI.probe(), 'pH meter') : ''}</div>
+    return `<div class="vl-shelf many">${shelf}${s.item && !s.ind ? shelfBtn('cabbage', VLI.dropper('#8a4bb0'), 'Red cabbage juice') : ''}${USE_PH_METER && s.ind && !s.meter ? shelfBtn('meter', VLI.probe(), 'pH meter') : ''}</div>
     <div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.item ? ': ' + s.item[0].toLowerCase() : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div></div>
-    <div class="vl-st wide"><div class="vl-st-label">Red cabbage color chart</div>${this.chart()}<div id="vlMeter"></div></div></div>`;
+    <div class="vl-st wide">${cabBox(true)}<div id="vlMeter"></div></div></div>`;
   },
   chart() { return `<div class="vl-cab">${CABBAGE.map(c => `<span><i style="background:${c[0]}"></i>${c[1]}<b>pH ${c[2]}</b></span>`).join('')}</div>`; },
   restore(s) {
@@ -2319,7 +2377,7 @@ const BENCH_PH = {
   },
   async drop(s, what, where) {
     if (where !== 'tube') return 'Drag it into the test tube.';
-    if (what.startsWith('h:')) { const h = HOUSE[+what.slice(2)]; s.item = h; s.pH = rnd(h[1], h[2], 2); vlScene(); await tw(900, e => vlSet('vlTube', vlTube({ level: 300 - 130 * e, liquid: h[3] }))); vlSay(`${h[0]} is in the tube. Now add the indicator.`); return true; }
+    if (what.startsWith('h:')) { const h = HOUSE[+what.slice(2)]; s.item = h; s.pH = rnd(h[1], h[2], 2); if (!USE_PH_METER) s.pHR = s.pH; vlScene(); await tw(900, e => vlSet('vlTube', vlTube({ level: 300 - 130 * e, liquid: h[3] }))); vlSay(`${h[0]} is in the tube. Now add the indicator.`); return true; }
     if (what === 'cabbage') {
       s.ind = true; vlScene(); const c = CABBAGE[cabIdx(s.pH)][0];
       vlSet('vlTube', vlTube({ level: 170, liquid: s.item[3], drops: '#8a4bb0' })); await wait(800);
@@ -2332,9 +2390,9 @@ const BENCH_PH = {
   steps: [
     { title: 'Add a product', say: 'Drag a <b>household product</b> into the test tube.', act: s => !!s.item, auto: true },
     { title: 'Add the indicator', say: 'Drag the <b>red cabbage juice</b> into the tube. About what pH is it?', act: s => s.ind, parts: s => [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], sol: s => `${CABBAGE[cabIdx(s.pH)][1]} → about <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.` },
-    { title: 'Measure the pH', say: 'Drag the <b>pH meter</b> into the tube and record the reading.', act: s => s.meter, parts: s => [num(s.pH, { dp: 2, unit: '', tol: 0.001, label: 'pH' })], rec: (s, v) => { s.pHR = v[0]; }, sol: s => `Copy the display: <b>${s.pH.toFixed(2)}</b>.` },
-    { title: 'Acid or base?', say: s => `Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. Below 7 is acidic, above 7 is basic.` },
-    { title: 'Calculate', say: s => `Use your pH to calculate <b>${s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}</b>.`, eq: PH_EQ, parts: s => { const v = s.calc === 'h3o' ? Math.pow(10, -s.pHR) : Math.pow(10, -(14 - s.pHR)); return [num(v, { sf: 2, unit: 'M', rel: 0.06, label: s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]' })]; }, sol: s => (s.calc === 'h3o' ? `[H₃O⁺] = 10<sup>−${s.pHR.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pHR), 2)} M</b>` : `pOH = 14 − ${s.pHR.toFixed(2)} = ${(14 - s.pHR).toFixed(2)}; [OH⁻] = 10<sup>−${(14 - s.pHR).toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -(14 - s.pHR)), 2)} M</b>`) + ' (2 decimal places in pH → 2 sig figs).' }
+    { title: 'Measure the pH', skip: () => !USE_PH_METER, say: 'Drag the <b>pH meter</b> into the tube and record the reading.', act: s => s.meter, parts: s => [num(s.pH, { dp: 2, unit: '', tol: 0.001, label: 'pH' })], rec: (s, v) => { s.pHR = v[0]; }, sol: s => `Copy the display: <b>${s.pH.toFixed(2)}</b>.` },
+    { title: 'Acid or base?', say: s => `${USE_PH_METER ? '' : `A pH meter in the stockroom read <b>${s.pH.toFixed(2)}</b>. `}Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. Below 7 is acidic, above 7 is basic.` },
+    { title: 'Calculate', say: s => `${USE_PH_METER ? 'Use your pH' : `The measured pH was <b>${s.pH.toFixed(2)}</b>. Use it`} to calculate <b>${s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}</b>.`, eq: PH_EQ, parts: s => { const v = s.calc === 'h3o' ? Math.pow(10, -s.pHR) : Math.pow(10, -(14 - s.pHR)); return [num(v, { sf: 2, unit: 'M', rel: 0.06, label: s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]' })]; }, sol: s => (s.calc === 'h3o' ? `[H₃O⁺] = 10<sup>−${s.pHR.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pHR), 2)} M</b>` : `pOH = 14 − ${s.pHR.toFixed(2)} = ${(14 - s.pHR).toFixed(2)}; [OH⁻] = 10<sup>−${(14 - s.pHR).toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -(14 - s.pHR)), 2)} M</b>`) + ' (2 decimal places in pH → 2 sig figs).' }
   ]
 };
 
@@ -2504,10 +2562,10 @@ const cylOnPan = `<svg viewBox="0 0 60 70" aria-hidden="true"><path d="M24 4 L38
 const BENCH_WATER = {
   id: 'water', labs: ['0a', '1a'], title: 'Water Density Challenge', blurb: 'Fill to a target line, weigh it, get water’s density as close as you can.',
   setup() { return { target: pick([5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0]), tareM: rnd(24.0, 31.0, 4), v: 0, onBal: false, tared: false, filled: false, noise: rnd(-0.0003, 0.0003, 4) }; },
-  shown(s) { if (!s.onBal) return 0; const m = s.tareM + s.v * RHO_W + (s.v ? s.noise : 0); return s.tared ? m - s.tareM : m; },
+  shown(s) { if (!s.onBal) return 0; const m = s.tareM + s.v * (s.rho || RHO_W) + (s.v ? s.noise : 0); return s.tared ? m - s.tareM : m; },
   scene(s) {
     const ctl = s.tared && !s.filled ? `<div class="vl-ctl"><button type="button" class="btn" id="wSquirt">Squirt <small>(hold)</small></button><button type="button" class="btn" id="wDrop">1 drop (pipet)</button><button type="button" class="btn" id="wOut">Pour some out</button><button type="button" class="btn primary" id="wDone">Done filling</button></div>` : '';
-    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('cyl', cylOnPan, '10 mL cylinder (empty)') : ''}<span class="vl-hint">Target: <b>${s.target.toFixed(2)} mL</b> of DI water</span></div>
+    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('cyl', cylOnPan, '10 mL cylinder (empty)') : ''}<span class="vl-hint">Target: <b>${s.target.toFixed(2)} mL</b> of ${s.salt ? 'NaCl solution' : 'DI water'}</span></div>
     <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance(this.shown(s).toFixed(4))}</div>${s.onBal ? `<div class="vl-onpan static">${cylOnPan}</div>` : ''}</div>${s.onBal && !s.tared ? '<div class="vl-ctl"><button type="button" class="btn primary" id="wTare">Press TARE</button></div>' : ''}</div>
     <div class="vl-st wide"><div class="vl-st-label">10 mL graduated cylinder (on the balance)</div><div id="vlCyl">${cylinderSVG(10, s.v)}</div>${ctl}</div></div>`;
   },
@@ -2530,12 +2588,91 @@ const BENCH_WATER = {
   steps: [
     { title: 'Tare the cylinder', say: 'Drag the <b>empty cylinder</b> onto the balance, then press <b>TARE</b>.', act: s => s.tared, auto: true },
     { title: 'Fill to the target', say: s => `Fill to <b>${s.target.toFixed(2)} mL</b>. Squirt to get close, then use single drops. Stop when the bottom of the meniscus sits on the line. Then read the volume.`, act: s => s.filled, parts: s => [num(s.v, { dp: 2, unit: 'mL', tol: 0.02, label: 'Volume of water' })], rec: (s, v) => { s.VR = v[0]; }, sol: s => `<b>${s.v.toFixed(2)} mL</b> (lines every 0.1 mL → read to 0.01 mL).` },
-    { title: 'Mass of the water', say: 'The balance was tared, so it shows only the water. Record every digit.', parts: s => [num(BENCH_WATER.shown(s), { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of water' })], rec: (s, v) => { s.mR = v[0]; }, sol: s => `<b>${BENCH_WATER.shown(s).toFixed(4)} g</b>.` },
+    { title: 'Mass of the water', say: 'The balance was tared, so it shows only the water. Record every digit.', parts: s => [num(VL.bench.shown(s), { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of water' })], rec: (s, v) => { s.mR = v[0]; }, sol: s => `<b>${VL.bench.shown(s).toFixed(4)} g</b>.` },
     { title: 'Density of water', say: 'Density = mass ÷ volume.', parts: s => { const sf = sfCount(s.VR.toFixed(2)); return [num(s.mR / s.VR, { sf, unit: 'g/mL', rel: 0.004, label: 'Density' })]; }, rec: (s, v) => { s.dR = v[0]; }, sol: s => `${s.mR.toFixed(4)} g ÷ ${s.VR.toFixed(2)} mL = <b>${sfHTML(s.mR / s.VR, sfCount(s.VR.toFixed(2)))} g/mL</b>.` },
     { title: 'How did you do?', say: s => { const hit = Math.abs(s.v - s.target), err = Math.abs(s.dR - RHO_W) / RHO_W * 100, medal = err < 0.3 && hit <= 0.05 ? ['gold', 'Gold'] : err < 0.8 && hit <= 0.15 ? ['silver', 'Silver'] : ['bronze', 'Bronze']; return `<div class="vl-score ${medal[0]}"><b>${medal[1]}</b><span>Target ${s.target.toFixed(2)} mL → you filled <b>${s.v.toFixed(2)} mL</b></span><span>Your density <b>${s.dR.toFixed(3)} g/mL</b> vs. water at 22 °C: 0.998 g/mL (about 1.00) · ${err.toFixed(1)}% off</span></div>Now think about error: which mistake would make your density come out too <b>low</b>?`; }, parts: () => [choice(['Reading the volume higher than it really is', 'Reading the volume lower than it really is', 'Forgetting to tare the empty cylinder'], 0)], sol: () => 'Density = m ÷ V. A volume that is too <b>big</b> makes the density too low. (Forgetting to tare adds the cylinder’s mass, making the density far too high.)' }
   ]
 };
 VBENCH.push(BENCH_TITRATE, BENCH_MODEL, BENCH_WATER);
+/* ====================== Bench 8: salt solution density (Exp 9a) ====================== */
+const BENCH_SALT = Object.assign({}, BENCH_WATER, {
+  id: 'salt', labs: ['9a'], title: 'Salt Solution Density', blurb: 'Weigh an exact volume of NaCl solution, then use the standard curve.',
+  setup() { const x = rnd(0.40, 2.60, 2); return { target: pick([5.0, 6.0, 7.0, 8.0, 9.0]), tareM: rnd(24.0, 31.0, 4), v: 0, onBal: false, tared: false, filled: false, noise: rnd(-0.0003, 0.0003, 4), rho: +(0.0435 * x + 0.9984).toFixed(4), salt: true }; },
+  steps: [
+    BENCH_WATER.steps[0],
+    Object.assign({}, BENCH_WATER.steps[1], { say: s => `Fill to about <b>${s.target.toFixed(2)} mL</b> of the NaCl solution, then read the volume.` }),
+    Object.assign({}, BENCH_WATER.steps[2], { title: 'Mass of the solution', say: 'The balance was tared, so it shows only the solution. Record every digit.' }),
+    Object.assign({}, BENCH_WATER.steps[3], { title: 'Density of the solution' }),
+    { title: 'Concentration from the curve', say: 'Your class standard curve for NaCl solutions is below. Solve it for x (the concentration).', ref: () => '<div class="eqline">y = 0.0435x + 0.9984 &nbsp;&nbsp; (y = density in g/mL, x = concentration in mol/L)</div>', parts: s => [num((s.dR - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.02, label: 'NaCl concentration' })], sol: s => `x = (y − 0.9984) ÷ 0.0435 = (${s.dR.toFixed(4)} − 0.9984) ÷ 0.0435 = <b>${sfHTML((s.dR - 0.9984) / 0.0435, 3)} M</b>.` }
+  ]
+});
+VBENCH.push(BENCH_SALT);
+
+/* ====================== hands-on stations for the mock practical ====================== */
+// a part graded against what the student actually did at the station
+function livePart(get, o) {
+  const p = Object.assign({ type: 'num' }, o, { dep: () => get() });
+  Object.defineProperty(p, 'ans', { get: () => { const sp = get(); return sp ? sp.ans : 'do the measurement first'; } });
+  return p;
+}
+const handQ = (lab, prompt, parts, sol, skill) => { const q = { lab, labName: labById(lab).name, kind: 'hands', tag: 'Hands-on station', prompt, parts, video: (LAB_VIDEOS[lab] || [])[0], skill }; Object.defineProperty(q, 'solution', { get: sol }); return q; };
+const HANDS = {
+  '0a'() {
+    const b = BENCH_WATER, s = b.setup(), m = () => b.shown(s), ok = () => s.v > 0.5;
+    return { lab: '0a', title: 'Lab Exploration (hands-on)', hands: { bench: b, s, snap: () => `Your cylinder: ${s.v.toFixed(2)} mL · balance: ${m().toFixed(4)} g${s.tared ? '' : ' (never tared)'}` }, versions: {
+      A: handQ('0a', `Fill the 10 mL cylinder to <b>${s.target.toFixed(2)} mL</b> with DI water. Record the volume you actually measured.`, [livePart(() => (ok() ? num(s.v, { dp: 2, unit: 'mL', tol: 0.02 }) : null), { unit: 'mL' })], () => `Your cylinder read <b>${s.v.toFixed(2)} mL</b>. Lines every 0.1 mL → read to 0.01 mL.`, 'read'),
+      B: handQ('0a', `Put the empty cylinder on the balance and <b>tare</b> it. Add about ${s.target.toFixed(0)} mL of water. Record the mass of the water.`, [livePart(() => (ok() && s.tared ? num(m(), { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `The tared balance read <b>${m().toFixed(4)} g</b>.${s.tared ? '' : ' (Tare first, or the cylinder’s mass gets counted.)'}`, 'read'),
+      C: handQ('0a', 'Measure a volume of water in the 10 mL cylinder and its mass (tare first). Calculate the density of water.', [livePart(() => (ok() && s.tared ? num(m() / s.v, { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} g ÷ ${s.v.toFixed(2)} mL = <b>${sfHTML(m() / s.v, sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc') } };
+  },
+  '1a'() {
+    const b = BENCH_DENSITY, s = b.setup(), V = () => +(s.vf - s.vi).toFixed(1);
+    return { lab: '1a', title: 'Making Measurements (hands-on)', hands: { bench: b, s, snap: () => `Metal: ${s.onBal ? s.m.toFixed(4) + ' g' : 'not weighed'} · water: ${s.poured ? s.vi.toFixed(1) : '–'} → ${s.inCyl ? s.vf.toFixed(1) : '–'} mL` }, versions: {
+      A: handQ('1a', 'Weigh the metal sample. Record its mass.', [livePart(() => (s.onBal ? num(s.m, { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `<b>${s.m.toFixed(4)} g</b>: copy every digit.`, 'read'),
+      B: handQ('1a', 'Add water to the cylinder, read it, then slide the metal in and read it again. What is the volume of the metal?', [livePart(() => (s.inCyl ? num(V(), { dp: 1, unit: 'mL', tol: 0.25 }) : null), { unit: 'mL' })], () => `${s.vf.toFixed(1)} − ${s.vi.toFixed(1)} = <b>${V().toFixed(1)} mL</b>.`, 'read'),
+      C: handQ('1a', 'Find the density of the metal by water displacement.', [livePart(() => (s.inCyl && s.onBal ? num(s.m / V(), { sf: sfCount(V().toFixed(1)), unit: 'g/mL', rel: 0.035 }) : null), { unit: 'g/mL' })], () => `${s.m.toFixed(4)} g ÷ ${V().toFixed(1)} mL = <b>${sfHTML(s.m / V(), sfCount(V().toFixed(1)))} g/mL</b>.`, 'calc') } };
+  },
+  '9a'() {
+    const b = BENCH_SALT, s = b.setup(), m = () => b.shown(s), ok = () => s.v > 0.5 && s.tared;
+    return { lab: '9a', title: 'Solutions and Dilutions (hands-on)', hands: { bench: b, s, snap: () => `NaCl solution: ${s.v.toFixed(2)} mL · ${m().toFixed(4)} g${s.tared ? '' : ' (never tared)'}` }, versions: {
+      A: handQ('9a', 'Tare the cylinder, add about 7 mL of the NaCl solution, and record the <b>mass of the solution</b>.', [livePart(() => (ok() ? num(m(), { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `<b>${m().toFixed(4)} g</b>.`, 'read'),
+      B: handQ('9a', 'Measure a volume of the NaCl solution and its mass (tare first). Calculate its <b>density</b>.', [livePart(() => (ok() ? num(m() / s.v, { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} ÷ ${s.v.toFixed(2)} = <b>${sfHTML(m() / s.v, sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc'),
+      C: handQ('9a', 'Find the density of the NaCl solution, then use the standard curve <b>y = 0.0435x + 0.9984</b> to find its concentration (mol/L).', [livePart(() => (ok() ? num((m() / s.v - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.04 }) : null), { unit: 'M' })], () => `d = ${(m() / s.v).toFixed(4)} g/mL → x = (d − 0.9984) ÷ 0.0435 = <b>${sfHTML((m() / s.v - 0.9984) / 0.0435, 3)} M</b>.`, 'calc') } };
+  },
+  '10a'() {
+    const b = BENCH_MIX, s = b.setup(), keys = Object.keys(VR), all = [];
+    for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) all.push([keys[i], keys[j], mixResult(keys[i], keys[j])]);
+    const ppt = pick(all.filter(x => x[2].kind === 'ppt')), other = pick(all.filter(x => x[2].kind === 'gas' || x[2].kind === 'neutral' || x[2].kind === 'redox')), third = pick(all.filter(x => x !== ppt && x !== other && x[2].kind !== 'none'));
+    const nm = x => `${fhtml(x[0])} and ${fhtml(x[1])}`;
+    return { lab: '10a', title: 'Types of Reactions (hands-on)', hands: { bench: b, s, snap: () => `A: ${nm(ppt)} · B: ${nm(other)} · C: ${nm(third)}` }, versions: {
+      A: handQ('10a', `Mix <b>${nm(ppt)}</b> in the test tube. What is the formula of the precipitate?`, [{ type: 'formula', accept: [ppt[2].ppt, ppt[2].ppt + '(s)', ...(ppt[2].ppt === 'Ag2O' ? ['AgOH'] : [])], ans: fhtml(ppt[2].ppt) }], () => ppt[2].text, 'concept'),
+      B: handQ('10a', `Mix <b>${nm(other)}</b> in the test tube. What type of reaction is it?`, [choice(TYPE5, other[2].type)], () => `${other[2].text} → <b>${TYPE5[other[2].type]}</b>.`, 'concept'),
+      C: handQ('10a', `Mix <b>${nm(third)}</b> in the test tube. What do you observe?`, [choice(OBS6, third[2].obs)], () => third[2].text, 'concept') } };
+  },
+  '12a'() {
+    const b = BENCH_PH, s = b.setup(), h = pick(HOUSE.filter(x => cabIdx((x[1] + x[2]) / 2) !== 2 && cabIdx(x[1]) === cabIdx(x[2]))); s.item = h; s.pH = rnd(h[1], h[2], 2); s.pHR = s.pH;
+    return { lab: '12a', title: 'pH of Household Items (hands-on)', hands: { bench: b, s, snap: () => `${h[0]}: indicator turns ${CABBAGE[cabIdx(s.pH)][1].toLowerCase()} (pH ${s.pH.toFixed(2)})` }, versions: {
+      A: Object.assign(handQ('12a', `Add red cabbage juice to the ${h[0].toLowerCase()}. About what is its pH?`, [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], () => `${CABBAGE[cabIdx(s.pH)][1]} → <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.`, 'read'), { cab: true }),
+      B: Object.assign(handQ('12a', `Add red cabbage juice to the ${h[0].toLowerCase()}. Is it acidic, about neutral, or basic?`, [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], () => `${CABBAGE[cabIdx(s.pH)][1]} → pH ${CABBAGE[cabIdx(s.pH)][2]} → <b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>.`, 'concept'), { cab: true }),
+      C: handQ('12a', `The pH of the ${h[0].toLowerCase()} was measured as <b>${s.pH.toFixed(2)}</b>. Calculate [H<sub>3</sub>O<sup>+</sup>].`, [num(Math.pow(10, -s.pH), { sf: 2, unit: 'M', rel: 0.06 })], () => `10<sup>−${s.pH.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pH), 2)} M</b>.`, 'calc') } };
+  },
+  '12b'() {
+    const b = BENCH_TITRATE, s = b.setup(); Object.assign(s, { soda: true, flask: true, ind: true }); s.v = +(s.ve - rnd(0.45, 1.0, 2)).toFixed(2);
+    const fin = () => (s.done ? num(s.v, { dp: 2, unit: 'mL', tol: 0.02 }) : null);
+    return { lab: '12b', title: 'Citric Acid in Soda (hands-on)', hands: { bench: b, s, snap: () => `Initial ${s.vi.toFixed(2)} mL · ${s.done ? 'stopped at ' + s.v.toFixed(2) + ' mL' : 'never reached the endpoint'}` }, versions: {
+      A: handQ('12b', 'The titration was started for you. Finish it drop by drop: stop at the first light pink that stays. Record the <b>final</b> buret reading.', [livePart(fin, { unit: 'mL' })], () => `<b>${s.v.toFixed(2)} mL</b>.`, 'read'),
+      B: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b>. Finish the titration (first light pink that stays). What volume of NaOH was used?`, [livePart(() => (s.done ? num(s.v - s.vi, { dp: 2, unit: 'mL', tol: 0.03 }) : null), { unit: 'mL' })], () => `${s.v.toFixed(2)} − ${s.vi.toFixed(2)} = <b>${(s.v - s.vi).toFixed(2)} mL</b>.`, 'calc'),
+      C: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b> and the NaOH is <b>${s.Mb.toFixed(4)} M</b>. Finish the titration. How many moles of NaOH were used?`, [livePart(() => (s.done ? num(s.Mb * (s.v - s.vi) / 1000, { sf: Math.min(4, sfCount((s.v - s.vi).toFixed(2))), unit: 'mol', rel: 0.006 }) : null), { unit: 'mol' })], () => `${s.Mb.toFixed(4)} M × ${((s.v - s.vi) / 1000).toFixed(5)} L = <b>${sfHTML(s.Mb * (s.v - s.vi) / 1000, Math.min(4, sfCount((s.v - s.vi).toFixed(2))))} mol</b>.`, 'calc') } };
+  },
+  '6a'() {
+    const b = BENCH_MODEL, s = b.setup(), m = s.m;
+    return { lab: '6a', title: 'Molecular Modeling (hands-on)', hands: { bench: b, s, snap: () => `${m[0]}: ${GEO_NAMES[m[3]].toLowerCase()}` }, versions: {
+      A: handQ('6a', `How many total valence electrons are in <b>${fhtml(m[0])}</b>?`, [num(m[4], { unit: '', tol: 0, ans: String(m[4]) })], () => `<b>${m[4]}</b>.`, 'calc'),
+      B: handQ('6a', `Build the Lewis structure of <b>${fhtml(m[0])}</b>. What is its molecular shape?`, [geoChoice(m[3])], () => `<b>${GEO_NAMES[m[3]]}</b>.`, 'concept'),
+      C: handQ('6a', `Build the Lewis structure of <b>${fhtml(m[0])}</b>. About what is the bond angle?`, [choice(ANGLES, m[6])], () => `<b>${ANGLES[m[6]]}</b>.`, 'concept') } };
+  }
+};
+const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${s.hands.snap()}</p></div>` : s.shared ? `<div class="artbox">${s.shared}</div>` : '');
+
 
 
 /* ---------- engine ---------- */
@@ -2546,7 +2683,7 @@ function renderVLab() {
   if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
   vlRenderAll();
 }
-function vlStart(id) { VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+function vlStart(id) { VL.mock = false; VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
 function vlRenderAll() {
   const b = VL.bench;
   $('vlArea').innerHTML = `<div class="vl-head"><h3 class="play-title">${b.title}</h3><button type="button" class="btn" id="vlNew">New run <span data-icon="arrow" aria-hidden="true"></span></button></div><div class="vl-wrap"><div class="vl-scene" id="vlScene"></div><div class="vl-steps" id="vlSteps"></div></div>`;
@@ -2589,12 +2726,13 @@ async function vlDrop(what, where) {
 }
 const vlTxt = (x, s) => (typeof x === 'function' ? x(s) : x || '');
 function vlSteps() {
+  if (!$('vlSteps')) return;
   const b = VL.bench, s = VL.s, steps = b.steps;
   // skip steps that don't apply, auto-advance steps that only need an action
   while (VL.step < steps.length) { const st = steps[VL.step]; if (st.skip && st.skip(s)) { VL.step++; continue; } if (st.auto && st.act(s)) { VL.step++; continue; } break; }
   let h = '<ol class="vl-list">';
   steps.forEach((st, i) => {
-    if (st.skip && i <= VL.step && st.skip(s)) return;
+    let sk = false; try { sk = !!(st.skip && st.skip(s)); } catch (e) {} if (sk) return;
     if (i < VL.step) { h += `<li class="done"><b>${st.title}</b>${VL.done[i] ? `<span>${VL.done[i]}</span>` : ''}</li>`; return; }
     if (i > VL.step) { h += `<li class="todo"><b>${st.title}</b></li>`; return; }
     const ready = !st.act || st.act(s);
@@ -2640,6 +2778,161 @@ function vlCheck(reveal) {
 }
 function vlFinish() { VL.step = VL.bench.steps.length; P.vlab = P.vlab || {}; P.vlab[VL.bench.id] = (P.vlab[VL.bench.id] || 0) + 1; P.xp += 15; renderStats(); save(); checkAch(); try { confetti(); } catch (e) {} const card = $('vlGrid').querySelector(`[data-vlb="${VL.bench.id}"] small:last-child`); if (card) card.textContent = ` Finished ${P.vlab[VL.bench.id]}×`; }
 
+/* ===================== TI-36X Pro-style calculator =====================
+   A practice calculator with the keys this game needs. MathPrint-style entry:
+   fraction template, exponent template (x^□, eˣ/10ˣ), multi-tap ln/log and eˣ/10ˣ,
+   EE, (−) negation, x², √ (2nd), x⁻¹ (2nd), π, ans, toggle (fraction ↔ decimal). */
+const Calc=(()=>{
+/* ---------- entry model ----------
+   list of tokens: {t:'c',v} char/operator, {t:'f',v:'ln'|'log'|'√'} function with "(",
+   {t:'frac',n:[],d:[]}, {t:'pow',e:[]} (superscript on the thing before it), {t:'base',b:'e'|'10',e:[]} */
+let entry=[],frames=[{list:entry,i:0}],hist=[],ans=0,second=false,last=null,lastTok=null,fresh=true,showFrac=false,err=null;
+const top=()=>frames[frames.length-1];
+const slotsOf=t=>t.t==='frac'?['n','d']:t.t==='pow'||t.t==='base'?['e']:[];
+function reset(){entry=[];frames=[{list:entry,i:0}];err=null}
+function ins(tok){const f=top();f.list.splice(f.i,0,tok);f.i++;const s=slotsOf(tok);if(s.length)frames.push({list:tok[s[0]],i:0,tok,slot:s[0],at:f.i-1});return tok}
+function exitRight(){if(frames.length<2)return false;const fr=frames.pop();top().i=fr.at+1;return true}
+function exitLeft(){if(frames.length<2)return false;const fr=frames.pop();top().i=fr.at;return true}
+function right(){const f=top();if(f.i<f.list.length){const t=f.list[f.i],s=slotsOf(t);if(s.length){frames.push({list:t[s[0]],i:0,tok:t,slot:s[0],at:f.i})}else f.i++}
+ else{const fr=top();if(fr.tok&&fr.tok.t==='frac'&&fr.slot==='n'){fr.slot='d';fr.list=fr.tok.d;fr.i=0}else exitRight()}}
+function left(){const f=top();if(f.i>0){const t=f.list[f.i-1],s=slotsOf(t);if(s.length){const sl=s[s.length-1];frames.push({list:t[sl],i:t[sl].length,tok:t,slot:sl,at:f.i-1})}else f.i--}
+ else{const fr=top();if(fr.tok&&fr.tok.t==='frac'&&fr.slot==='d'){fr.slot='n';fr.list=fr.tok.n;fr.i=fr.list.length}else exitLeft()}}
+function vert(dir){for(let k=frames.length-1;k>0;k--){const fr=frames[k];if(fr.tok.t==='frac'){const want=dir>0?'d':'n';if(fr.slot!==want){frames.length=k+1;fr.slot=want;fr.list=fr.tok[want];fr.i=Math.min(fr.i,fr.list.length)}return}}}
+function del(){const f=top();if(f.i>0){f.list.splice(f.i-1,1);f.i--}else if(frames.length>1){const fr=frames.pop();const p=top();
+ const empty=slotsOf(fr.tok).every(s=>!fr.tok[s].length);if(empty){p.list.splice(fr.at,1);p.i=fr.at}else p.i=fr.at}}
+
+/* ---------- evaluate ---------- */
+class CalcErr extends Error{}
+function lex(list){const out=[];let i=0;
+ while(i<list.length){const t=list[i];
+  if(t.t==='c'&&/[0-9.]/.test(t.v)){let s='';while(i<list.length&&list[i].t==='c'&&/[0-9.]/.test(list[i].v)){s+=list[i].v;i++}
+   if(i<list.length&&list[i].t==='c'&&list[i].v==='E'){i++;let sg='';if(i<list.length&&list[i].t==='c'&&list[i].v==='⁻'){sg='-';i++}let ex='';while(i<list.length&&list[i].t==='c'&&/[0-9]/.test(list[i].v)){ex+=list[i].v;i++}if(!ex)throw new CalcErr('SYNTAX');s+='e'+sg+ex}
+   if((s.match(/\./g)||[]).length>1||s==='.')throw new CalcErr('SYNTAX');out.push({k:'val',v:parseFloat(s)});continue}
+  if(t.t==='c'&&t.v==='E'){i++;let sg='';if(i<list.length&&list[i].t==='c'&&list[i].v==='⁻'){sg='-';i++}let ex='';while(i<list.length&&list[i].t==='c'&&/[0-9]/.test(list[i].v)){ex+=list[i].v;i++}if(!ex)throw new CalcErr('SYNTAX');out.push({k:'val',v:parseFloat('1e'+sg+ex)});continue}
+  i++;
+  if(t.t==='c'){const v=t.v;
+   if('+−×÷'.includes(v))out.push({k:'op',v});else if(v==='(')out.push({k:'lp'});else if(v===')')out.push({k:'rp'});
+   else if(v==='⁻')out.push({k:'neg'});else if(v==='²'||v==='⁻¹')out.push({k:'post',v});
+   else if(v==='π')out.push({k:'val',v:Math.PI});else if(v==='ans')out.push({k:'val',v:ans});else throw new CalcErr('SYNTAX')}
+  else if(t.t==='f')out.push({k:'fn',v:t.v});
+  else if(t.t==='frac'){const n=value(t.n),d=value(t.d);if(d===0)throw new CalcErr('DIVIDE BY 0');out.push({k:'val',v:n/d})}
+  else if(t.t==='pow')out.push({k:'powt',v:value(t.e)});
+  else if(t.t==='base')out.push({k:'val',v:Math.pow(t.b==='e'?Math.E:10,value(t.e))})}
+ return out}
+function value(list){if(!list.length)throw new CalcErr('SYNTAX');return parseTokens(lex(list))}
+function parseTokens(T){let i=0;const pk=()=>T[i];
+ const startsPrimary=t=>t&&(t.k==='val'||t.k==='lp'||t.k==='fn'||t.k==='neg');
+ function add(){let v=mul();while(pk()&&pk().k==='op'&&(pk().v==='+'||pk().v==='−')){const o=T[i++].v,r=mul();v=o==='+'?v+r:v-r}return v}
+ function mul(){let v=neg();for(;;){const t=pk();if(t&&t.k==='op'&&(t.v==='×'||t.v==='÷')){i++;const r=neg();if(t.v==='÷'){if(r===0)throw new CalcErr('DIVIDE BY 0');v/=r}else v*=r}
+   else if(startsPrimary(t)&&t.k!=='neg'){v*=neg()}else break}return v}
+ function neg(){if(pk()&&pk().k==='neg'){i++;return-neg()}return post()}
+ function post(){let v=prim();for(;;){const t=pk();if(!t)break;if(t.k==='post'){i++;v=t.v==='²'?v*v:(v===0?(()=>{throw new CalcErr('DIVIDE BY 0')})():1/v)}else if(t.k==='powt'){i++;v=Math.pow(v,t.v)}else break}return v}
+ function prim(){const t=T[i++];if(!t)throw new CalcErr('SYNTAX');
+  if(t.k==='val')return t.v;
+  if(t.k==='lp'){const v=add();if(pk()&&pk().k==='rp')i++;return v}
+  if(t.k==='fn'){const x=add();if(pk()&&pk().k==='rp')i++;if(t.v==='√'){if(x<0)throw new CalcErr('DOMAIN');return Math.sqrt(x)}if(x<=0)throw new CalcErr('DOMAIN');return t.v==='ln'?Math.log(x):Math.log10(x)}
+  throw new CalcErr('SYNTAX')}
+ const v=add();if(i<T.length){if(T[i].k==='rp'){throw new CalcErr('SYNTAX')}throw new CalcErr('SYNTAX')}return v}
+function evaluate(list){const v=value(list);if(!isFinite(v)||isNaN(v))throw new CalcErr('OVERFLOW');return v}
+
+/* ---------- formatting ---------- */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function fmt(x){if(x===0)return'0';const a=Math.abs(x);
+ if(a>=1e10||a<1e-3){let[m,e]=x.toExponential(9).split('e');m=m.replace(/\.?0+$/,'');return m.replace('-','⁻')+'×10'+String(+e).split('').map(c=>SUP[c]).join('')}
+ let s=String(+x.toPrecision(10));if(/e/.test(s))s=x.toFixed(10).replace(/\.?0+$/,'');return s.replace('-','⁻')}
+function plainE(x){if(x===0)return'0';const a=Math.abs(x);if(a>=1e10||a<1e-3){let[m,e]=x.toExponential(9).split('e');return m.replace(/\.?0+$/,'')+'E'+(+e)}return String(+x.toPrecision(10))}
+function frac(x){if(!isFinite(x)||Number.isInteger(x))return null;for(let d=2;d<=1000;d++){const n=Math.round(x*d);if(Math.abs(n/d-x)<1e-12*Math.max(1,Math.abs(x)))return[n,d]}return null}
+
+/* ---------- rendering ---------- */
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function rList(list,cur){let h='';list.forEach((t,k)=>{if(cur&&cur.list===list&&cur.i===k)h+='<i class="cc"></i>';h+=rTok(t,cur)});
+ if(cur&&cur.list===list&&cur.i===list.length)h+='<i class="cc"></i>';if(!list.length&&!(cur&&cur.list===list))h='<span class="slot"></span>';return h}
+function rTok(t,cur){if(t.t==='c'){const m={'⁻':'<span class="ng">-</span>','E':'<span class="ee">E</span>','²':'<sup>2</sup>','⁻¹':'<sup>-1</sup>','ans':'ans'};return m[t.v]!=null?m[t.v]:esc(t.v)}
+ if(t.t==='f')return t.v+'(';
+ if(t.t==='frac')return'<span class="mf"><span>'+rList(t.n,cur)+'</span><b></b><span>'+rList(t.d,cur)+'</span></span>';
+ if(t.t==='pow')return'<sup class="ms">'+rList(t.e,cur)+'</sup>';
+ return(t.b==='e'?'e':'10')+'<sup class="ms">'+rList(t.e,cur)+'</sup>'}
+function rFrac(f){return'<span class="mf"><span>'+(f[0]<0?'⁻':'')+Math.abs(f[0])+'</span><b></b><span>'+f[1]+'</span></span>'}
+
+/* ---------- keys ---------- */
+const OPS={add:'+',sub:'−',mul:'×',div:'÷'};
+function press(k){
+ if(k==='second'){second=!second;draw();return}
+ const s2=second;second=false;
+ if(err&&k!=='clear'&&k!=='del'&&k!=='left'&&k!=='right'){err=null}
+ const prevLast=last;last=k;
+ // after enter: operator keys start with ans
+ if(fresh&&!entry.length&&hist.length&&(OPS[k]||k==='sq'&&!s2||k==='pow'||(k==='pow'&&s2))){ins({t:'c',v:'ans'})}
+ if(k!=='toggle')showFrac=false;
+ if(/^[0-9]$/.test(k)){ins({t:'c',v:k})}
+ else if(k==='dot')ins({t:'c',v:'.'});
+ else if(OPS[k])ins({t:'c',v:OPS[k]});
+ else if(k==='lp')ins({t:'c',v:'('});else if(k==='rp')ins({t:'c',v:')'});
+ else if(k==='neg'){if(s2)ins({t:'c',v:'ans'});else ins({t:'c',v:'⁻'})}
+ else if(k==='ee')ins({t:'c',v:'E'});
+ else if(k==='pi')ins({t:'c',v:'π'});
+ else if(k==='sq'){if(s2)lastTok=ins({t:'f',v:'√'});else ins({t:'c',v:'²'})}
+ else if(k==='pow'){if(s2)ins({t:'c',v:'⁻¹'});else ins({t:'pow',e:[]})}
+ else if(k==='lnlog'){const f=top();if(prevLast==='lnlog'&&lastTok&&f.list[f.i-1]===lastTok&&lastTok.t==='f'){lastTok.v=lastTok.v==='ln'?'log':'ln'}else lastTok=ins({t:'f',v:'ln'})}
+ else if(k==='expk'){const f=top();if(prevLast==='expk'&&lastTok&&f.tok===lastTok&&!lastTok.e.length){lastTok.b=lastTok.b==='e'?'10':'e'}else lastTok=ins({t:'base',b:'e',e:[]})}
+ else if(k==='frac'){const f=top(),prev=f.list[f.i-1];
+  /* typing a number first then □/□ puts that number on top, like MathPrint */
+  let n=[];if(!s2){let j=f.i;while(j>0&&f.list[j-1].t==='c'&&/[0-9.]/.test(f.list[j-1].v))j--;if(j<f.i){n=f.list.splice(j,f.i-j);f.i=j}}
+  const t={t:'frac',n,d:[]};f.list.splice(f.i,0,t);f.i++;frames.push(n.length?{list:t.d,i:0,tok:t,slot:'d',at:f.i-1}:{list:t.n,i:0,tok:t,slot:'n',at:f.i-1})}
+ else if(k==='right')right();else if(k==='left')left();else if(k==='down')vert(1);else if(k==='up')vert(-1);
+ else if(k==='del'){del()}
+ else if(k==='clear'){if(entry.length||err)reset();else hist=[];showFrac=false}
+ else if(k==='toggle'){if(!entry.length&&hist.length){showFrac=!showFrac}}
+ else if(k==='enter'){enter();return}
+ else if(k==='mode'){err='Mode menu is not included here.'}
+ fresh=false;draw()}
+function enter(){if(!entry.length){if(hist.length){entry=JSON.parse(JSON.stringify(hist[hist.length-1].entry));}else{draw();return}}
+ try{const v=evaluate(entry);ans=v;hist.push({entry,v,html:rList(entry,null)});if(hist.length>12)hist.shift();reset();fresh=true;showFrac=false}
+ catch(e){err=e instanceof CalcErr?e.message+' ERROR':'SYNTAX ERROR'}draw()}
+
+/* ---------- UI ---------- */
+let root=null,screen=null,onAns=null,playing=false;
+const KEYS=[ // [id, label, 2nd label, class]; null = arrow pad spot
+ ['second','2nd','','k2nd'],['mode','mode','quit',''],['del','delete','insert',''],null,
+ ['lnlog','ln/log','',''],['expk','eˣ/10ˣ','',''],['frac',null,'Un/d',''],['toggle','◂ ▸','',''],['clear','clear','',''],
+ ['sq','x²','√',''],['pow','x<sup>□</sup>','x⁻¹',''],['lp','(','',''],['rp',')','',''],['div','÷','',''],
+ ['ee','EE','',''],['7','7','','num'],['8','8','','num'],['9','9','','num'],['mul','×','',''],
+ ['pi','π','',''],['4','4','','num'],['5','5','','num'],['6','6','','num'],['sub','−','',''],
+ ['sto','sto→','','off'],['1','1','','num'],['2','2','','num'],['3','3','','num'],['add','+','',''],
+ ['on','on','off','off'],['0','0','','num'],['dot','.','','num'],['neg','(−)','ans',''],['enter','enter','','kent']];
+const FRAC_ICON='<svg viewBox="0 0 12 20" width="13" height="21" aria-hidden="true"><rect x="1.5" y="1" width="9" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><line x1=".5" y1="10" x2="11.5" y2="10" stroke="currentColor" stroke-width="1.6"/><rect x="1.5" y="12" width="9" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+const NAMES={second:'2nd',del:'delete',lnlog:'ln / log',expk:'e to the x / 10 to the x',frac:'fraction',toggle:'toggle',clear:'clear',pi:'pi',pow:'power',sq:'x squared',lp:'open parenthesis',rp:'close parenthesis',ee:'EE',div:'divide',neg:'negative',mul:'times',sub:'minus',add:'plus',dot:'decimal point',enter:'enter',left:'left',right:'right',up:'up',down:'down',mode:'mode'};
+function mount(el,cb){root=el;onAns=cb;
+ const pad='<div class="dpad" role="group" aria-label="Arrow keys"><button type="button" data-k="up" aria-label="up">▲</button><button type="button" data-k="left" aria-label="left">◀</button><button type="button" data-k="right" aria-label="right">▶</button><button type="button" data-k="down" aria-label="down">▼</button></div>';
+ let keys='';KEYS.forEach(k=>{if(k===null){keys+=pad;return}
+  const lab=k[0]==='frac'?FRAC_ICON:k[1];keys+='<div class="kc"><small>'+(k[2]||'&nbsp;')+'</small><button type="button" class="'+k[3]+'" data-k="'+k[0]+'" aria-label="'+(NAMES[k[0]]||k[0])+'"'+(k[3]==='off'?' disabled title="Not used in this game"':'')+'>'+lab+'</button></div>'});
+ el.innerHTML='<div class="calc"><div class="calc-brand"><b>Practice calculator</b><span>TI-36X Pro-style keys</span></div><div class="lcd" aria-live="polite"><div class="ind" id="cInd"></div><div class="scr" id="cScr"></div></div><div class="keys">'+keys+'</div>'+
+  '<div class="calc-foot"><button type="button" class="btn" id="cUse">↧ Put ans in my answer</button></div></div>';
+ screen=el.querySelector('#cScr');
+ el.querySelectorAll('[data-k]').forEach(b=>b.addEventListener('click',()=>{if(!playing)press(b.dataset.k)}));
+ el.querySelector('#cUse').onclick=()=>{if(onAns&&hist.length)onAns(plainE(ans))};
+ el.addEventListener('keydown',e=>{const m={'+':'add','-':'sub','*':'mul','/':'div','(':'lp',')':'rp','.':'dot','Enter':'enter','=':'enter','Backspace':'del','ArrowLeft':'left','ArrowRight':'right','ArrowUp':'up','ArrowDown':'down','^':'pow','Escape':'clear','e':'ee','E':'ee'};
+  const k=/^[0-9]$/.test(e.key)?e.key:m[e.key];if(k&&!playing&&!e.ctrlKey&&!e.metaKey){e.preventDefault();press(k);flash(k)}});
+ draw()}
+function draw(){if(!screen)return;const ind=root.querySelector('#cInd');ind.textContent=second?'2ND':'';
+ let h='';hist.slice(-2).forEach((r,k,arr)=>{const res=k===arr.length-1&&showFrac&&frac(r.v)?rFrac(frac(r.v)):fmt(r.v);h+='<div class="hl">'+r.html+'</div><div class="hr">'+res+'</div>'});
+ h+='<div class="hl cur">'+rList(entry,top())+'</div>';if(err)h+='<div class="herr">'+esc(err)+'</div>';screen.innerHTML=h;screen.scrollTop=screen.scrollHeight}
+function flash(k){if(!root)return;const b=root.querySelector('[data-k="'+k+'"]');if(!b)return;b.classList.add('press');setTimeout(()=>b.classList.remove('press'),220)}
+async function play(seq,ms=340){if(playing)return;playing=true;second=false;reset();draw();
+ for(const k of seq){flash(k);press(k);await new Promise(r=>setTimeout(r,ms))}playing=false;return ans}
+function clearAll(){reset();hist=[];second=false;showFrac=false;draw()}
+return{mount,press,play,evaluate,fmt,plainE,clearAll,get ans(){return ans},get hist(){return hist},get entry(){return entry},_t:{ins,reset}}})();
+
+/* ---------- practice calculator (from Algebra Trainer) ---------- */
+let calcMounted = false, lastBox = null;
+document.addEventListener('focusin', e => { const t = e.target; if (t.matches && t.matches('input[data-pi]') && !t.closest('#calcDock')) lastBox = t; });
+function openCalc(focus) {
+  const d = $('calcDock');
+  if (!calcMounted) { Calc.mount($('calcMount'), v => { const a = lastBox && document.body.contains(lastBox) && !lastBox.disabled ? lastBox : null; if (a) { a.value = v; a.dispatchEvent(new Event('input', { bubbles: true })); if (window.innerWidth <= 640) closeCalc(); a.focus({ preventScroll: true }); a.scrollIntoView({ block: 'center', behavior: 'smooth' }); } else toast('Tap an answer box first, then press <b>Put ans in my answer</b>.', 'stars'); }); calcMounted = true; }
+  d.hidden = false; document.body.classList.add('calc-open'); if (focus) { const b = d.querySelector('[data-k="7"]'); if (b) b.focus({ preventScroll: true }); }
+}
+function closeCalc() { $('calcDock').hidden = true; document.body.classList.remove('calc-open'); }
+
 /* ---------- modes, stats, videos, reference ---------- */
 function setMode(m) {
   state.mode = m; P.mode = m; save();
@@ -2651,10 +2944,34 @@ function setMode(m) {
   if (m === 'mock') setVideoFor('practical1');
 }
 function renderLabset() {
-  const n = labSet().length;
-  $('labset').innerHTML = state.setAll ? `<span class="pill">All ${n} CHEM 3A labs</span>${location.search.includes('labs=') ? '<button type="button" class="link-btn" id="setToggle">Show only my class’s labs</button>' : ''}`
-    : `<span class="pill">Your class’s ${n} labs</span><button type="button" class="link-btn" id="setToggle">Show all CHEM 3A labs</button>`;
-  const b = $('setToggle'); if (b) b.onclick = () => { state.setAll = !state.setAll; renderLabset(); if (state.mode === 'practice') { renderLabTiles(); newQuestion(); } if (state.mode === 'bench') renderBench(); };
+  const n = labSet().length, k = labPick();
+  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'In Dr. Dan’s class? Pick your section. Not? Choose your labs' : 'Change labs'}</button>`;
+  $('setToggle').onclick = openLabPicker;
+}
+function applyLabPick(pick) {
+  P.labPick = pick; state.sel = new Set(labSet()); save(); renderLabset();
+  if (state.mode === 'practice') { renderLabTiles(); newQuestion(); } if (state.mode === 'bench') renderBench(); if (state.mode === 'vlab') renderVLab();
+}
+function openLabPicker() {
+  const k = labPick(), custom = new Set(k.custom || []);
+  const opt = (val, title, sub) => `<label class="lp-opt"><input type="radio" name="lp" value="${val}" ${val === (k.kind === 'sec' ? 'sec:' + k.sec : k.kind) ? 'checked' : ''}><span><b>${title}</b><small>${sub}</small></span></label>`;
+  $('lpBody').innerHTML = `<p class="small-note">Your choice is saved on this device, so you only pick once.</p>
+    ${SECTIONS.map(x => opt('sec:' + x.key, esc(x.name), `${x.labs.length} labs`)).join('')}
+    ${opt('all', 'All CHEM 3A labs', 'Every lab in the game, old and new')}
+    ${opt('custom', 'I don’t have Dr. Dan: let me choose my labs', 'Check the labs your class did')}
+    <div class="lp-grid" id="lpGrid">${LABS.map(l => `<label><input type="checkbox" value="${l.id}" ${custom.has(l.id) ? 'checked' : ''}> <b>Exp ${l.id}</b> ${esc(l.name)}</label>`).join('')}</div>
+    <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb"></p>`;
+  const grid = $('lpGrid'), sync = () => { grid.hidden = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value !== 'custom'; };
+  $('lpBody').querySelectorAll('input[name=lp]').forEach(r => (r.onchange = sync)); sync();
+  grid.addEventListener('change', () => { const c = document.querySelector('#lpBody input[value=custom]'); if (c) c.checked = true; });
+  $('lpSave').onclick = () => {
+    const v = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value;
+    if (!v) return;
+    if (v === 'custom') { const ids = [...grid.querySelectorAll('input:checked')].map(x => x.value); if (!ids.length) { const f = $('lpFb'); f.className = 'feedback bad'; f.style.display = 'block'; f.textContent = 'Check at least one lab.'; return; } applyLabPick({ kind: 'custom', custom: ids }); }
+    else if (v.startsWith('sec:')) applyLabPick({ kind: 'sec', sec: v.slice(4) }); else applyLabPick({ kind: v });
+    $('lpDialog').close();
+  };
+  try { $('lpDialog').showModal(); } catch (e) { $('lpDialog').setAttribute('open', ''); }
 }
 const rankOf = xp => { let r = RANKS[0]; RANKS.forEach(x => { if (xp >= x[0]) r = x; }); return r; };
 function renderStats() {
@@ -2692,11 +3009,12 @@ function renderRef() {
   <h3>Solubility rules (green sheet summary)</h3>${tableHTML(sol.map(r => [r[0], r[1]]))}
   <h3>Flame test colors</h3>${flameTable()}
   <h3>Vapor pressure of water</h3>${vpTable()}
-  <h3>Red cabbage indicator</h3><table class="data small"><tr><th>Color</th><th>About pH</th></tr>${CABBAGE.map(c => `<tr><td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:${c[0]};vertical-align:-2px"></span> ${c[1]}</td><td>${c[2]}</td></tr>`).join('')}</table>`;
+  <h3>Red cabbage indicator</h3><div class="pt-scroll">${cabChart()}</div>`;
 }
 function openRef() { renderRef(); try { $('refDialog').showModal(); } catch (e) { $('refDialog').setAttribute('open', ''); } }
 
 function bind() {
+  $('calcBtn').onclick = () => { $('calcDock').hidden ? openCalc(true) : closeCalc(); }; $('calcClose').onclick = closeCalc;
   $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
   $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => x.classList.toggle('on', x === b)); });
   $('timerpick').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#timerpick .chip').forEach(x => x.classList.toggle('on', x === b)); });
@@ -2718,6 +3036,7 @@ function bind() {
   $('skipBtn').onclick = () => newQuestion();
   $('hintBtn').onclick = () => { if (!state.q) return; state.helped = true; const h = $('hintBox'); h.hidden = false; h.innerHTML = `<b>Hint:</b> ${state.q.hint}`; };
   $('solBtn').onclick = showSolution;
+  $('vlBtn').onclick = () => { const b = VBENCH.find(x => x.labs.includes(state.q.lab)); if (b) { setMode('vlab'); vlStart(b.id); } };
   $('simBtn').onclick = () => { const s = PHET.find(x => x.labs.includes(state.q.lab)); if (s) { state.sim = s.id; setMode('bench'); try { $('benchView').scrollIntoView({ block: 'start' }); } catch (e) {} } };
   $('refBtn').onclick = openRef; $('refBtn2').onclick = openRef; $('closeRef').onclick = () => $('refDialog').close();
   $('refDialog').addEventListener('click', e => { if (e.target === $('refDialog')) $('refDialog').close(); });
@@ -2730,7 +3049,11 @@ function init() {
   load();
   let sp; try { sp = new URLSearchParams(location.search); } catch (e) { sp = new Map(); }
   const ls = (sp.get('labs') || '').toLowerCase();
-  state.setAll = !['dan', 'class', 'current', 'fcc'].includes(ls);
+  const sec = (sp.get('sec') || sp.get('section') || '').trim();
+  const secHit = SECTIONS.find(x => x.key === sec || (x.alt || []).includes(sec));
+  if (sec && secHit) P.labPick = { kind: 'sec', sec: secHit.key };
+  else if (['dan', 'class', 'current', 'fcc'].includes(ls) && !P.labPick) P.labPick = { kind: 'dan' };
+  save();
   state.sel = new Set((P.sel || []).filter(id => labSet().includes(id)));
   if (!state.sel.size) state.sel = new Set(labSet());
   bind(); renderLabset(); renderStats(); renderRef();
