@@ -302,6 +302,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .calc .keys button.k2nd{background:#2f7de1}
 .calc .keys button.kent{background:#4a505c}
 .calc .keys button.off{opacity:.4;cursor:default}
+.calc .keys button.lit{background:#ffd166;color:#1d2027;box-shadow:0 0 0 3px #ffd16688}
 .calc .keys button.press,.calc .keys button:active{transform:scale(.92);box-shadow:0 0 0 3px #ffd166,0 1px 0 #0008}
 .calc .keys button:focus-visible{outline:3px solid #ffd166}
 .dpad{grid-column:span 2;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,23px);gap:2px;align-self:end}
@@ -314,6 +315,13 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .cabbox>summary{color:#6a2d8f}.cabbox{background:#f8f1fd}.cabchart{display:block;width:100%;min-width:480px;height:auto}
 .lp-opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;cursor:pointer;background:#fff}.lp-opt:has(input:checked){border-color:var(--accent);background:#f3f4ff}.lp-opt input{margin-top:4px}.lp-opt small{display:block;color:var(--muted)}
 .lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;margin:6px 0 4px 30px;font-size:.92rem}.lp-grid[hidden]{display:none}.lp-grid label{display:flex;gap:6px;align-items:center}
+.simframe{position:relative}.sim-shield{position:absolute;inset:0;z-index:2;border:0;background:linear-gradient(transparent 70%,#1f2a4455);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px}.sim-shield span{background:#1f2a44e6;color:#fff;border-radius:999px;padding:9px 18px;font-weight:800;box-shadow:0 6px 18px #0004}
+.sim-release{position:absolute;top:8px;right:8px;z-index:3;display:none;border:0;border-radius:999px;background:#1f2a44e6;color:#fff;font-weight:800;padding:7px 14px;cursor:pointer}.simframe.live .sim-shield{display:none}.simframe.live .sim-release{display:block}
+body.compact .howto{display:none}body.compact .intro{margin-bottom:4px;gap:10px}body.compact .intro img{width:48px;height:48px}body.compact .intro .lede,body.compact .intro .eyebrow{display:none}body.compact .intro h1{font-size:1.5rem}
+body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}body.compact .mode-switch button{min-height:0;padding:6px 10px;gap:8px;border-radius:14px}body.compact .mode-switch small{display:none}body.compact .mode-switch b{font-size:1rem}body.compact .ms-ico,body.compact .ms-ico:has(.ms-pic){width:38px;height:38px}
+@media(max-width:760px){body.compact .mode-switch{grid-template-columns:1fr 1fr}}
+.cats.labs.mini{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.cats.labs.mini .cat{min-height:0;padding:7px 30px 7px 10px;flex-direction:column;align-items:flex-start;text-align:left;gap:0;border-radius:12px}.cats.labs.mini .cat img,.cats.labs.mini .cat small,.cats.labs.mini .cat .oldtag{display:none}.cats.labs.mini .cat b{font-size:.88rem;line-height:1.2}.cats.labs.mini .cat .labno{font-size:.68rem}
+.simgrid.mini{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}.simgrid.mini .simcard{padding:7px 10px;border-radius:12px}.simgrid.mini .simcard small{display:none}.simgrid.mini .simcard b{font-size:.92rem}.simgrid.mini .simcard .labno{font-size:.66rem}
 .ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
 .eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
@@ -499,7 +507,7 @@ html.dd-embedded .mockbar{position:relative}
  <!-- ===== Practice ===== -->
  <section id="practiceView" hidden>
   <section class="chooser">
-   <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button></h2>
+   <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button><button type="button" class="link-btn" id="bigTiles" hidden>Show big tiles</button></h2>
    <div class="cats labs" id="labTiles"></div>
    <div class="pick-actions"><button type="button" class="btn" id="allLabs">Select all</button><button type="button" class="btn" id="noLabs">Clear</button></div>
   </section>
@@ -1934,7 +1942,7 @@ const partAns = p => (p.type === 'choice' ? p.options[p.ok] : p.ans != null ? p.
 /* ---------- practice mode ---------- */
 function renderLabTiles() {
   const set = labSet();
-  $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="${BADGE(l.badge)}" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur ? '' : '<span class="oldtag">earlier manual</span>'}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
+  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="${BADGE(l.badge)}" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur ? '' : '<span class="oldtag">earlier manual</span>'}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
 }
 function toggleLab(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderLabTiles(); save(); if (!state.q || state.done || !state.sel.has(state.q.lab)) newQuestion(); }
 function newQuestion() {
@@ -1965,6 +1973,7 @@ function markParts(root, res, parts, reveal) {
   });
 }
 function check() {
+  if (!state.mini) { state.mini = true; renderLabTiles(); }
   const q = state.q; if (!q || state.done) return;
   const vals = readParts($('qParts'), q.parts), res = gradeAll(q.parts, vals, false);
   if (res.some(r => r.empty)) { const fb = $('feedback'); fb.className = 'feedback info'; fb.innerHTML = 'Answer every part first.'; return; }
@@ -2103,11 +2112,13 @@ function turnIn() {
 /* ---------- PhET bench ---------- */
 function renderBench() {
   const set = labSet(), sims = PHET.filter(s => s.labs.some(l => set.includes(l)));
-  $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small><small> ${s.tasks.filter((t, i) => P.benchDone[s.id + i]).length}/${s.tasks.length} tasks</small></button>`).join('');
+  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small><small> ${s.tasks.filter((t, i) => P.benchDone[s.id + i]).length}/${s.tasks.length} tasks</small></button>`).join('');
   if (!state.sim || !sims.some(s => s.id === state.sim)) { $('simArea').innerHTML = '<div class="empty">Pick a simulation to open it here.</div>'; return; }
   const s = PHET.find(x => x.id === state.sim), scr0 = (s.tasks.find(t => t.scr) || {}).scr;
-  $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note">${scr0 ? `Opens right on the <b>${s.screens[scr0]}</b> screen. ` : ''}<a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open the simulation full screen ↗</a></p>` +
+  $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note">${scr0 ? `Opens right on the <b>${s.screens[scr0]}</b> screen. ` : ''}<a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open the simulation full screen ↗</a></p>` +
     s.tasks.map((t, i) => `<div class="task${P.benchDone[s.id + i] ? ' done' : ''}" data-task="${i}"><p class="tq">Task ${i + 1}. ${t.q}</p>${t.scr && Object.keys(s.screens).length > 1 ? `<button type="button" class="btn small" data-tscreen="${t.scr}">Open the ${s.screens[t.scr]} screen</button>` : ''}<div class="parts">${partsHTML(t.parts, `b${s.id}${i}`, false)}</div><div class="check-row"><button type="button" class="btn primary" data-tcheck="${i}">Check</button></div><div class="feedback"></div></div>`).join('');
+  const sf = $('simArea').querySelector('.simframe');
+  if (sf) { sf.querySelector('.sim-shield').onclick = () => sf.classList.add('live'); sf.querySelector('.sim-release').onclick = () => sf.classList.remove('live'); sf.addEventListener('mouseleave', () => sf.classList.remove('live')); }
   paintIcons($('simArea'));
 }
 function checkTask(i) {
@@ -2679,7 +2690,7 @@ const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${s.
 function renderVLab() {
   const set = labSet(), list = VBENCH.filter(b => b.labs.some(l => set.includes(l)));
   P.vlab = P.vlab || {};
-  $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
+  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
   if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
   vlRenderAll();
 }
@@ -2872,7 +2883,7 @@ function press(k){
  else if(k==='ee')ins({t:'c',v:'E'});
  else if(k==='pi')ins({t:'c',v:'π'});
  else if(k==='sq'){if(s2)lastTok=ins({t:'f',v:'√'});else ins({t:'c',v:'²'})}
- else if(k==='pow'){if(s2)ins({t:'c',v:'⁻¹'});else ins({t:'pow',e:[]})}
+ else if(k==='pow'){if(s2)ins({t:'c',v:'⁻¹'});else{const fr=top();if(fr.tok&&fr.tok.t==='pow'){if(!fr.tok.e.length){frames.pop();const pf=top();pf.list.splice(fr.at,1);pf.i=fr.at}else exitRight()}else ins({t:'pow',e:[]})}}
  else if(k==='lnlog'){const f=top();if(prevLast==='lnlog'&&lastTok&&f.list[f.i-1]===lastTok&&lastTok.t==='f'){lastTok.v=lastTok.v==='ln'?'log':'ln'}else lastTok=ins({t:'f',v:'ln'})}
  else if(k==='expk'){const f=top();if(prevLast==='expk'&&lastTok&&f.tok===lastTok&&!lastTok.e.length){lastTok.b=lastTok.b==='e'?'10':'e'}else lastTok=ins({t:'base',b:'e',e:[]})}
  else if(k==='frac'){const f=top(),prev=f.list[f.i-1];
@@ -2914,7 +2925,7 @@ function mount(el,cb){root=el;onAns=cb;
  el.addEventListener('keydown',e=>{const m={'+':'add','-':'sub','*':'mul','/':'div','(':'lp',')':'rp','.':'dot','Enter':'enter','=':'enter','Backspace':'del','ArrowLeft':'left','ArrowRight':'right','ArrowUp':'up','ArrowDown':'down','^':'pow','Escape':'clear','e':'ee','E':'ee'};
   const k=/^[0-9]$/.test(e.key)?e.key:m[e.key];if(k&&!playing&&!e.ctrlKey&&!e.metaKey){e.preventDefault();press(k);flash(k)}});
  draw()}
-function draw(){if(!screen)return;const ind=root.querySelector('#cInd');ind.textContent=second?'2ND':'';
+function draw(){if(!screen)return;const ind=root.querySelector('#cInd');const fr0=top(),inPow=!!(fr0&&fr0.tok&&fr0.tok.t==='pow');ind.textContent=(second?'2ND ':'')+(inPow?'EXPONENT':'');const pk=root.querySelector('[data-k="pow"]');if(pk)pk.classList.toggle('lit',inPow);
  let h='';hist.slice(-2).forEach((r,k,arr)=>{const res=k===arr.length-1&&showFrac&&frac(r.v)?rFrac(frac(r.v)):fmt(r.v);h+='<div class="hl">'+r.html+'</div><div class="hr">'+res+'</div>'});
  h+='<div class="hl cur">'+rList(entry,top())+'</div>';if(err)h+='<div class="herr">'+esc(err)+'</div>';screen.innerHTML=h;screen.scrollTop=screen.scrollHeight}
 function flash(k){if(!root)return;const b=root.querySelector('[data-k="'+k+'"]');if(!b)return;b.classList.add('press');setTimeout(()=>b.classList.remove('press'),220)}
@@ -2963,10 +2974,11 @@ function setMode(m) {
   if (m === 'vlab') renderVLab();
   if (m === 'mock') setVideoFor('practical1');
 }
+function setCompact(on) { P.compact = !!on; document.body.classList.toggle('compact', !!on); save(); renderLabset(); }
 function renderLabset() {
   const n = labSet().length, k = labPick();
-  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'In Dr. Dan’s class? Pick your section. Not? Choose your labs' : 'Change labs'}</button>`;
-  $('setToggle').onclick = openLabPicker;
+  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'In Dr. Dan’s class? Pick your section. Not? Choose your labs' : 'Change labs'}</button>${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
+  $('setToggle').onclick = openLabPicker; const hb = $('howBtn'); if (hb) hb.onclick = () => setCompact(false);
 }
 function applyLabPick(pick) {
   P.labPick = pick; state.sel = new Set(labSet()); save(); renderLabset();
@@ -3036,13 +3048,13 @@ function openRef() { renderRef(); try { $('refDialog').showModal(); } catch (e) 
 function bind() {
   const sb = $('smartBtn'), sbTxt = () => { sb.textContent = SMART ? 'Turn off' : 'Turn on'; }; sbTxt(); sb.onclick = () => { SMART = !SMART; try { localStorage.setItem('sr-smart', SMART ? '1' : '0'); } catch (e) {} sbTxt(); toast(SMART ? 'Smart typing on: H2O → H₂O, 1.5E4 → 1.5×10⁴' : 'Smart typing off: what you type stays as typed.', 'stars'); };
   $('calcBtn').onclick = () => { $('calcDock').hidden ? openCalc(true) : closeCalc(); }; $('calcClose').onclick = closeCalc;
-  $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
+  $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) { setMode(b.dataset.mode); setCompact(true); const v = { mock: 'mockView', practice: 'practiceView', bench: 'benchView', vlab: 'vlabView' }[b.dataset.mode]; try { $(v).scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) {} } });
   $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => x.classList.toggle('on', x === b)); });
   $('timerpick').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#timerpick .chip').forEach(x => x.classList.toggle('on', x === b)); });
   $('mockStart').onclick = startMock;
   $('labTiles').addEventListener('click', e => { const b = e.target.closest('[data-lab]'); if (b) toggleLab(b.dataset.lab); });
   $('allLabs').onclick = () => { state.sel = new Set(labSet()); renderLabTiles(); save(); newQuestion(); };
-  $('goQ').onclick = () => { if (!state.sel.size) { const t = $('labTiles'); t.classList.add('nudge'); setTimeout(() => t.classList.remove('nudge'), 700); return; } if (!state.q) newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} const i = $('qParts').querySelector('input'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 500); };
+  $('goQ').onclick = () => { if (state.sel.size) { state.mini = true; renderLabTiles(); } if (!state.sel.size) { const t = $('labTiles'); t.classList.add('nudge'); setTimeout(() => t.classList.remove('nudge'), 700); return; } if (!state.q) newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} const i = $('qParts').querySelector('input'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 500); };
   $('noLabs').onclick = () => { state.sel.clear(); renderLabTiles(); save(); newQuestion(); };
   document.addEventListener('click', e => {
     const o = e.target.closest('.opt'); if (o && !o.disabled) { const grp = o.parentElement; grp.querySelectorAll('.opt').forEach(x => { x.classList.toggle('sel', x === o); x.classList.remove('right', 'wrong'); x.setAttribute('aria-checked', x === o); }); const part = o.closest('.part'); if (part) { part.classList.remove('good', 'bad'); part.querySelector('.pnote').innerHTML = ''; } }
@@ -3077,6 +3089,7 @@ function init() {
   save();
   state.sel = new Set((P.sel || []).filter(id => labSet().includes(id)));
   if (!state.sel.size) state.sel = new Set(labSet());
+  document.body.classList.toggle('compact', !!P.compact);
   bind(); renderLabset(); renderStats(); renderRef();
   const m = (sp.get('mode') || '').toLowerCase();
   setMode(['mock', 'practice', 'bench'].includes(m) ? m : (P.mode || 'mock'));
