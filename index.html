@@ -212,6 +212,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 @media(max-width:760px){.cats{grid-template-columns:1fr 1fr;gap:9px}.cat{min-height:150px;padding:12px 8px}.cat img{width:64px;height:64px}.cat b{font-size:1.02rem}.chip-row>span{min-width:100%}.lab-pair{grid-template-columns:1fr}}
 @media(max-width:760px){table.data{font-size:.95rem}table.data th,table.data td{padding:5px 7px}}
 
+.eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
 
 /* mascot */
@@ -707,31 +708,48 @@ function zoomScale(o) {
   return t;
 }
 
+// glass shine: a soft white streak down the left side of glassware
+const shine = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w / 2}" fill="#fff" opacity=".75"/>`;
+// concave meniscus surface: lowest point exactly at yv
+const menPath = (x1, x2, yv, d, yBottom) => `<path d="M${x1} ${yv - d} Q${(x1 + x2) / 2} ${yv + d} ${x2} ${yv - d} L${x2} ${yBottom} L${x1} ${yBottom} Z" fill="${LAB.liquid}"/><path d="M${x1} ${yv - d} Q${(x1 + x2) / 2} ${yv + d} ${x2} ${yv - d}" fill="none" stroke="${LAB.liquidLine}" stroke-width="2"/>`;
 // Full instruments (left side). Each returns {svg, y or x of the level} so the zoom link can point at it.
 function fullCylinder(cap, value) {
   const yTop = 56, yBot = 352, x1 = 86, x2 = 124, yOf = v => yBot - (v / cap) * (yBot - yTop), yv = yOf(value);
-  let t = `<path d="M${x1 - 6} 40 L${x2 + 10} 40 L${x2 + 2} 50 L${x2} 50 L${x2} ${yBot + 8} L${x1} ${yBot + 8} L${x1} 50 Z" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-  t += `<rect x="${x1}" y="${yv}" width="${x2 - x1}" height="${yBot + 8 - yv}" fill="${LAB.liquid}"/><line x1="${x1}" y1="${yv}" x2="${x2}" y2="${yv}" stroke="${LAB.liquidLine}" stroke-width="2"/>`;
-  t += `<path d="M${x1 - 26} ${yBot + 8} L${x2 + 26} ${yBot + 8} L${x2 + 34} ${yBot + 22} L${x1 - 34} ${yBot + 22} Z" fill="#dfe8f5" stroke="${LAB.glassLine}" stroke-width="2"/>`;
+  // base (hexagonal foot seen from the side)
+  let t = `<path d="M${x1 - 36} ${yBot + 24} L${x1 - 26} ${yBot + 8} L${x2 + 26} ${yBot + 8} L${x2 + 36} ${yBot + 24} Z" fill="#e3ebf6" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linejoin="round"/><rect x="${x1 - 36}" y="${yBot + 24}" width="${x2 - x1 + 72}" height="6" rx="2" fill="#c6d3e6" stroke="${LAB.glassLine}" stroke-width="2"/>`;
+  // tube with a pour spout and a rolled rim
+  t += `<path d="M${x1} 48 L${x1} ${yBot + 8} L${x2} ${yBot + 8} L${x2} 48" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
+  t += menPath(x1 + 1.5, x2 - 1.5, yv, 3, yBot + 7);
+  t += `<path d="M${x1 - 10} 38 Q${x1 - 4} 40 ${x1} 48 M${x1 - 10} 38 L${x2 + 3} 42 Q${x2 + 5} 46 ${x2} 48" fill="none" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linecap="round"/>`;
+  t += shine(x1 + 4, 58, 5, yBot - 70);
   const step = cap / 10;
-  for (let i = 1; i <= 10; i++) { const y = yOf(i * step); t += `<line x1="${x1}" y1="${y}" x2="${x1 + 12}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.6"/>`; if (i % 2 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${+(i * step).toFixed(1)}</text>`; }
-  t += `<text x="${(x1 + x2) / 2}" y="${yBot + 42}" text-anchor="middle" font-size="13" font-weight="800" fill="${LAB.navy}">${cap} mL</text>`;
+  for (let i = 1; i <= 10; i++) { const y = yOf(i * step); t += `<line x1="${x1 + 10}" y1="${y}" x2="${x1 + 24}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.6"/>`; if (i % 2 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${+(i * step).toFixed(1)}</text>`; }
+  for (let i = 1; i <= 10; i++) { const y = yOf((i - 0.5) * step); t += `<line x1="${x1 + 10}" y1="${y}" x2="${x1 + 18}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.1"/>`; }
+  t += `<text x="${(x1 + x2) / 2}" y="${yBot + 50}" text-anchor="middle" font-size="13" font-weight="800" fill="${LAB.navy}">${cap} mL</text>`;
   return { svg: t, x: x2, y: yv };
 }
 function fullBuret(value) {
-  const yTop = 40, yBot = 330, x1 = 96, x2 = 114, yOf = v => yTop + (v / 50) * (yBot - yTop), yv = yOf(value);
-  let t = `<rect x="${x1}" y="${yTop - 22}" width="${x2 - x1}" height="${yBot - yTop + 44}" rx="3" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-  t += `<rect x="${x1}" y="${yv}" width="${x2 - x1}" height="${yBot + 22 - yv}" fill="${LAB.liquid}"/>`;
-  t += `<rect x="${x1 - 14}" y="${yBot + 22}" width="${x2 - x1 + 28}" height="12" rx="4" fill="#9bb0cf"/><path d="M${x1 + 4} ${yBot + 34} L${x2 - 4} ${yBot + 34} L${(x1 + x2) / 2 + 2} ${yBot + 62} L${(x1 + x2) / 2 - 2} ${yBot + 62} Z" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2"/>`;
-  for (let v = 0; v <= 50; v += 5) { const y = yOf(v); t += `<line x1="${x1}" y1="${y}" x2="${x1 + 9}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.5"/>`; if (v % 10 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${v}</text>`; }
+  const yTop = 40, yBot = 330, x1 = 96, x2 = 114, yOf = v => yTop + (v / 50) * (yBot - yTop), yv = yOf(value), xm = (x1 + x2) / 2;
+  let t = `<path d="M${x1} ${yTop - 24} L${x1} ${yBot + 18} Q${x1} ${yBot + 26} ${xm - 3} ${yBot + 28} L${xm + 3} ${yBot + 28} Q${x2} ${yBot + 26} ${x2} ${yBot + 18} L${x2} ${yTop - 24}" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
+  t += menPath(x1 + 1.5, x2 - 1.5, yv, 2.5, yBot + 18);
+  t += `<line x1="${x1 - 3}" y1="${yTop - 24}" x2="${x2 + 3}" y2="${yTop - 24}" stroke="${LAB.glassLine}" stroke-width="3" stroke-linecap="round"/>`;
+  t += shine(x1 + 3, yTop - 18, 3.5, yBot - yTop + 30);
+  // stopcock: liquid-filled stem, valve barrel and a PTFE handle
+  t += `<rect x="${xm - 3}" y="${yBot + 26}" width="6" height="16" fill="${LAB.liquid}" stroke="${LAB.glassLine}" stroke-width="1.8"/>`;
+  t += `<rect x="${xm - 20}" y="${yBot + 40}" width="40" height="13" rx="6.5" fill="#e8eef7" stroke="${LAB.glassLine}" stroke-width="2"/>`;
+  t += `<rect x="${xm + 18}" y="${yBot + 37}" width="30" height="19" rx="4" fill="#f7f8fb" stroke="#8b93a8" stroke-width="2"/><rect x="${xm - 5}" y="${yBot + 42}" width="10" height="9" rx="2" fill="#f7f8fb" stroke="#8b93a8" stroke-width="1.6"/>`;
+  t += `<path d="M${xm - 3} ${yBot + 53} L${xm + 3} ${yBot + 53} L${xm + 1} ${yBot + 76} L${xm - 1} ${yBot + 76} Z" fill="${LAB.liquid}" stroke="${LAB.glassLine}" stroke-width="1.8"/>`;
+  for (let v = 0; v <= 50; v += 1) { const y = yOf(v), big = v % 5 === 0; t += `<line x1="${x1 + 2}" y1="${y}" x2="${x1 + (big ? 11 : 6)}" y2="${y}" stroke="${LAB.navy}" stroke-width="${big ? 1.5 : .8}"/>`; if (v % 10 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${v}</text>`; }
   t += `<text x="${x2 + 8}" y="${yTop - 6}" font-size="12" font-weight="800" fill="${LAB.navy}">0 at top</text>`;
   return { svg: t, x: x2, y: yv };
 }
 function fullThermo(min, max, value) {
-  const yTop = 40, yBot = 320, x1 = 98, x2 = 112, yOf = v => yBot - (v - min) / (max - min) * (yBot - yTop), yv = yOf(value);
-  let t = `<rect x="${x1}" y="${yTop - 16}" width="${x2 - x1}" height="${yBot - yTop + 40}" rx="7" fill="#fbfdff" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-  t += `<circle cx="${(x1 + x2) / 2}" cy="${yBot + 36}" r="17" fill="${LAB.red}" stroke="#b02f45" stroke-width="2"/><rect x="${x1 + 4}" y="${yv}" width="${x2 - x1 - 8}" height="${yBot + 30 - yv}" fill="${LAB.red}"/>`;
-  for (let v = Math.ceil(min / 10) * 10; v <= max; v += 10) { const y = yOf(v); t += `<line x1="${x1}" y1="${y}" x2="${x1 + 7}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.5"/>`; if (v % 20 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${v}</text>`; }
+  const yTop = 40, yBot = 320, x1 = 98, x2 = 112, xm = (x1 + x2) / 2, yOf = v => yBot - (v - min) / (max - min) * (yBot - yTop), yv = yOf(value);
+  let t = `<path d="M${x1} ${yTop - 10} Q${x1} ${yTop - 20} ${xm} ${yTop - 20} Q${x2} ${yTop - 20} ${x2} ${yTop - 10} L${x2} ${yBot + 22} L${x1} ${yBot + 22} Z" fill="#fbfdff" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
+  t += `<circle cx="${xm}" cy="${yBot + 36}" r="16" fill="${LAB.red}" stroke="#b02f45" stroke-width="2.5"/><circle cx="${xm - 5}" cy="${yBot + 31}" r="4.5" fill="#fff" opacity=".6"/>`;
+  t += `<rect x="${xm - 2.5}" y="${yv}" width="5" height="${yBot + 24 - yv}" fill="${LAB.red}"/>`;
+  t += shine(x1 + 2, yTop - 10, 2.5, yBot - yTop + 26);
+  for (let v = Math.ceil(min / 2) * 2; v <= max; v += 2) { const y = yOf(v), big = v % 10 === 0; t += `<line x1="${x1}" y1="${y}" x2="${x1 + (big ? 7 : 4)}" y2="${y}" stroke="${LAB.navy}" stroke-width="${big ? 1.5 : .8}"/>`; if (v % 20 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${v}</text>`; }
   t += `<text x="${x2 + 6}" y="${yTop}" font-size="12" font-weight="800" fill="${LAB.navy}">°C</text>`;
   return { svg: t, x: x2, y: yv };
 }
@@ -772,20 +790,29 @@ function rulerSVG2(L) {
   return t + '</svg>';
 }
 function volumetricSVG(kind, cap, tol) {
+  const cid = 'vc' + Math.random().toString(36).slice(2, 7);
   let t = `<svg class="art lab" viewBox="0 0 600 380" role="img" aria-label="A volumetric ${kind} filled exactly to its line">`;
   if (kind === 'pipet') {
-    t += `<rect x="290" y="20" width="20" height="120" rx="4" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-    t += `<ellipse cx="300" cy="200" rx="38" ry="62" fill="${LAB.liquid}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-    t += `<rect x="291" y="95" width="18" height="47" fill="${LAB.liquid}"/><path d="M291 262 L309 262 L302 360 L298 360 Z" fill="${LAB.liquid}" stroke="${LAB.glassLine}" stroke-width="2"/>`;
-    t += `<line x1="282" y1="95" x2="318" y2="95" stroke="${LAB.navy}" stroke-width="3"/><text x="326" y="100" font-size="15" font-weight="800" fill="${LAB.navy}">fill line</text>`;
-    t += `<text x="300" y="196" text-anchor="middle" font-size="16" font-weight="800" fill="${LAB.navy}">${cap} mL</text><text x="300" y="216" text-anchor="middle" font-size="13" font-weight="800" fill="${LAB.navy}">±${tol} mL</text>`;
-    t += `<text x="360" y="240" font-size="14" font-weight="700" fill="#656c83">Class A, TD 20 °C</text>`;
+    // long stem, bulb, tapered tip; filled to the line on the upper stem
+    const body = 'M292 14 L308 14 L308 130 Q340 150 340 200 Q340 248 306 266 L304 336 L301 362 L299 362 L296 336 L294 266 Q260 248 260 200 Q260 150 292 130 Z';
+    t += `<path d="${body}" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    t += `<clipPath id="${cid}"><path d="${body}"/></clipPath><g clip-path="url(#${cid})"><rect x="250" y="120" width="100" height="250" fill="${LAB.liquid}"/>${menPath(290, 310, 92, 2.5, 370)}</g>`;
+    t += `<path d="${body}" fill="none" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    t += shine(295, 20, 3.5, 100) + `<path d="M270 178 Q272 156 288 146" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".75"/>`;
+    t += `<line x1="284" y1="92" x2="316" y2="92" stroke="${LAB.navy}" stroke-width="3"/><text x="326" y="97" font-size="15" font-weight="800" fill="${LAB.navy}">fill line</text>`;
+    t += `<text x="300" y="198" text-anchor="middle" font-size="16" font-weight="800" fill="${LAB.navy}">${cap} mL</text><text x="300" y="218" text-anchor="middle" font-size="13" font-weight="800" fill="${LAB.navy}">±${tol} mL</text>`;
+    t += `<text x="352" y="246" font-size="14" font-weight="700" fill="#656c83">Class A, TD 20 °C</text>`;
   } else {
-    t += `<rect x="285" y="20" width="30" height="150" rx="4" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-    t += `<circle cx="300" cy="262" r="92" fill="${LAB.liquid}" stroke="${LAB.glassLine}" stroke-width="2.5"/><rect x="286" y="80" width="28" height="100" fill="${LAB.liquid}"/>`;
-    t += `<line x1="276" y1="80" x2="324" y2="80" stroke="${LAB.navy}" stroke-width="3"/><text x="332" y="86" font-size="15" font-weight="800" fill="${LAB.navy}">fill line</text>`;
-    t += `<text x="300" y="262" text-anchor="middle" font-size="20" font-weight="800" fill="${LAB.navy}">${cap} mL</text><text x="300" y="286" text-anchor="middle" font-size="15" font-weight="800" fill="${LAB.navy}">±${tol} mL</text>`;
-    t += `<text x="410" y="200" font-size="14" font-weight="700" fill="#656c83">Class A, TC 20 °C</text>`;
+    // pear-shaped flask with a flat bottom, long neck, stopper
+    const body = 'M288 40 L312 40 L312 168 Q312 182 330 192 Q392 222 392 290 Q392 348 372 352 L228 352 Q208 348 208 290 Q208 222 270 192 Q288 182 288 168 Z';
+    t += `<path d="${body}" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    t += `<clipPath id="${cid}"><path d="${body}"/></clipPath><g clip-path="url(#${cid})"><rect x="200" y="160" width="200" height="200" fill="${LAB.liquid}"/>${menPath(286, 314, 92, 3, 360)}</g>`;
+    t += `<path d="${body}" fill="none" stroke="${LAB.glassLine}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    t += `<rect x="283" y="14" width="34" height="28" rx="5" fill="#f2c94c" stroke="#b8902a" stroke-width="2"/>`;
+    t += shine(292, 46, 4, 118) + `<path d="M226 300 Q226 248 262 220" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".7"/>`;
+    t += `<line x1="276" y1="92" x2="324" y2="92" stroke="${LAB.navy}" stroke-width="3"/><text x="332" y="98" font-size="15" font-weight="800" fill="${LAB.navy}">fill line</text>`;
+    t += `<text x="300" y="286" text-anchor="middle" font-size="20" font-weight="800" fill="${LAB.navy}">${cap} mL</text><text x="300" y="310" text-anchor="middle" font-size="15" font-weight="800" fill="${LAB.navy}">±${tol} mL</text>`;
+    t += `<text x="404" y="230" font-size="14" font-weight="700" fill="#656c83">Class A, TC 20 °C</text>`;
   }
   return t + '</svg>';
 }
@@ -835,7 +862,9 @@ const EQUIP = [
   ['utilityclamp', 'Utility clamp', 'holds a flask or test tube on a ring stand', 'support', `<rect x="10" y="94" width="90" height="12" rx="5" fill="#c9cfe0" ${EQ_S}/><path d="M98 88 L120 88 Q150 60 176 70 L182 82 Q156 78 132 100 Q156 122 182 118 L176 130 Q150 140 120 112 L98 112 Z" fill="#9fb0ff" ${EQ_S}/><rect x="170" y="62" width="16" height="24" rx="6" fill="#f9a8c0" ${EQ_S}/><rect x="170" y="114" width="16" height="24" rx="6" fill="#f9a8c0" ${EQ_S}/><path d="M128 76 L128 46 M116 46 L140 46" ${EQ_S} stroke-width="5"/>`],
   ['clampholder', 'Clamp holder', 'attaches a clamp to the ring stand rod', 'support', `<rect x="66" y="66" width="68" height="68" rx="8" fill="#9fb0ff" ${EQ_S}/><circle cx="100" cy="100" r="12" fill="#fff" ${EQ_S}/><path d="M134 84 L170 84 M170 74 L170 94" ${EQ_S} stroke-width="5"/><path d="M84 66 L84 30 M74 30 L94 30" ${EQ_S} stroke-width="5"/><rect x="94" y="140" width="12" height="60" fill="#c9cfe0" ${EQ_S}/>`]
 ];
-const eqSVG = e => `<svg class="art equip" viewBox="0 0 200 220" role="img" aria-label="A piece of lab equipment">${e[4]}</svg>`;
+// Equipment picture: uses assets/equip/<id>.webp when it exists, otherwise the built-in drawing
+const eqPic = (e, aria = 'A piece of lab equipment') => `<span class="eqpic"><img class="art equip" src="assets/equip/${e[0]}.webp" alt="${aria}" onerror="this.parentNode.classList.add('noimg')"><svg class="art equip" viewBox="0 0 200 220" role="img" aria-label="${aria}">${e[4]}</svg></span>`;
+const eqSVG = e => eqPic(e);
 
 /* ===================== Drawings made for the lab practical ===================== */
 // Test tube: liquid color, optional precipitate, bubbles, metal pellets, gas pop
@@ -849,7 +878,7 @@ function tubeSVG(o = {}) {
   if (o.pellets) t += `<ellipse cx="100" cy="258" rx="10" ry="7" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/><ellipse cx="121" cy="262" rx="9" ry="6" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/>`;
   if (o.coat) t += `<ellipse cx="100" cy="258" rx="11" ry="8" fill="none" stroke="${o.coat}" stroke-width="4"/><ellipse cx="121" cy="262" rx="10" ry="7" fill="none" stroke="${o.coat}" stroke-width="4"/>`;
   if (o.bubbles) t += Array.from({ length: o.bubbles }, () => { const x = rint(88, 132), y = rint((o.level || 120) + 8, 250); return `<circle cx="${x}" cy="${y}" r="${rnd(2.5, 5.5, 1)}" fill="#fff" stroke="#7aa3c8" stroke-width="1.2"/>`; }).join('');
-  t += `</g><path d="M82 30 L82 240 Q82 274 110 274 Q138 274 138 240 L138 30" fill="none" stroke="#8aa6c8" stroke-width="3"/><line x1="74" y1="30" x2="146" y2="30" stroke="#8aa6c8" stroke-width="4" stroke-linecap="round"/>`;
+  t += `<line x1="82" y1="${o.level || 120}" x2="138" y2="${o.level || 120}" stroke="#000" stroke-opacity=".12" stroke-width="3"/></g><path d="M82 30 L82 240 Q82 274 110 274 Q138 274 138 240 L138 30" fill="none" stroke="#8aa6c8" stroke-width="3"/><path d="M75 30 L82 30 M138 30 L145 30" fill="none" stroke="#8aa6c8" stroke-width="4" stroke-linecap="round"/>${shine(89, 40, 6, 200)}`;
   if (o.steam) t += `<path d="M98 22 Q92 10 100 0 M120 22 Q114 10 122 0" fill="none" stroke="#b9c4d6" stroke-width="3" stroke-linecap="round"/>`;
   if (o.paper) t += `<rect x="96" y="-2" width="28" height="22" rx="3" fill="${o.paper}" stroke="#2f4d70" stroke-width="1.5"/>`;
   if (o.label) t += `<text x="110" y="296" text-anchor="middle" font-size="15" font-weight="800" fill="#4f5a74">${o.label}</text>`;
@@ -858,11 +887,15 @@ function tubeSVG(o = {}) {
 // Bunsen burner flame with a colored flame (flame test)
 function flameSVG(color, aria) {
   return `<svg class="art tube" viewBox="0 0 220 300" role="img" aria-label="${esc(aria || 'A flame test')}">
-  <path d="M110 30 Q150 90 138 150 Q130 190 110 196 Q90 190 82 150 Q70 90 110 30 Z" fill="${color}" opacity=".9"/>
-  <path d="M110 92 Q128 130 120 168 Q114 186 110 188 Q106 186 100 168 Q92 130 110 92 Z" fill="#fff" opacity=".35"/>
-  <path d="M110 140 Q120 160 116 182 Q110 190 104 182 Q100 160 110 140 Z" fill="#7fa8f5"/>
-  <line x1="40" y1="120" x2="104" y2="150" stroke="#9aa9c2" stroke-width="5" stroke-linecap="round"/><ellipse cx="104" cy="151" rx="9" ry="6" fill="#f3e3b4" stroke="#b49a4a" stroke-width="2"/>
-  <rect x="100" y="196" width="20" height="70" fill="#c9cfe0" stroke="#2f4d70" stroke-width="3"/><path d="M72 290 L148 290 L140 266 L80 266 Z" fill="#dfe5ef" stroke="#2f4d70" stroke-width="3"/></svg>`;
+  <path d="M110 24 Q154 88 140 146 Q132 180 110 186 Q88 180 80 146 Q66 88 110 24 Z" fill="${color}" opacity=".88"/>
+  <path d="M110 70 Q136 116 128 152 Q122 176 110 178 Q98 176 92 152 Q84 116 110 70 Z" fill="${color}" opacity=".9"/>
+  <path d="M110 120 Q124 146 119 168 Q114 178 110 178 Q106 178 101 168 Q96 146 110 120 Z" fill="#8fb4ff" opacity=".9"/>
+  <line x1="34" y1="112" x2="102" y2="146" stroke="#9aa9c2" stroke-width="4" stroke-linecap="round"/><line x1="18" y1="104" x2="38" y2="114" stroke="#c97a3d" stroke-width="9" stroke-linecap="round"/>
+  <ellipse cx="103" cy="147" rx="8" ry="5.5" fill="none" stroke="#9aa9c2" stroke-width="3"/><ellipse cx="103" cy="147" rx="5" ry="3" fill="#f3e3b4"/>
+  <rect x="99" y="186" width="22" height="62" rx="2" fill="#c9cfe0" stroke="#2f4d70" stroke-width="3"/><rect x="103" y="190" width="4" height="54" fill="#fff" opacity=".7"/>
+  <rect x="95" y="232" width="30" height="14" rx="3" fill="#9aa9c2" stroke="#2f4d70" stroke-width="2.5"/><rect x="104" y="235" width="12" height="8" fill="#2f4d70" opacity=".6"/>
+  <path d="M70 290 L150 290 L144 270 Q140 258 110 258 Q80 258 76 270 Z" fill="#dfe5ef" stroke="#2f4d70" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M150 276 L186 276 Q196 276 196 286" fill="none" stroke="#e6a23c" stroke-width="8" stroke-linecap="round"/><rect x="138" y="270" width="16" height="12" rx="3" fill="#c9cfe0" stroke="#2f4d70" stroke-width="2.5"/></svg>`;
 }
 // Ball-and-stick model in 2D perspective
 const GEOMS = {
@@ -902,11 +935,17 @@ function curveSVG(m, b, pts, mark) {
 }
 // Gas collection tube (eudiometer): upside down in a beaker, 0 mL at the top, gas trapped above the water
 function fullEudiometer(value) {
-  const yTop = 40, yBot = 320, x1 = 96, x2 = 120, yOf = v => yTop + (v / 50) * (yBot - yTop), yv = yOf(value);
-  let t = `<path d="M30 250 L30 372 Q30 380 38 380 L178 380 Q186 380 186 372 L186 250" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/><rect x="32" y="290" width="152" height="88" fill="${LAB.liquid}" opacity=".8"/>`;
+  const yTop = 40, yBot = 320, x1 = 96, x2 = 120, yOf = v => yTop + (v / 50) * (yBot - yTop), yv = yOf(value), bx1 = 40, bx2 = 176;
+  // beaker of water behind the tube
+  let t = `<path d="M${bx1 - 8} 262 Q${bx1} 262 ${bx1} 270 L${bx1} 372 Q${bx1} 380 ${bx1 + 8} 380 L${bx2 - 8} 380 Q${bx2} 380 ${bx2} 372 L${bx2} 262" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
+  t += `<path d="M${bx1 + 1.5} 300 L${bx2 - 1.5} 300 L${bx2 - 1.5} 372 Q${bx2 - 1.5} 378.5 ${bx2 - 8} 378.5 L${bx1 + 8} 378.5 Q${bx1 + 1.5} 378.5 ${bx1 + 1.5} 372 Z" fill="${LAB.liquid}" opacity=".85"/><line x1="${bx1 + 1.5}" y1="300" x2="${bx2 - 1.5}" y2="300" stroke="${LAB.liquidLine}" stroke-width="2"/>`;
+  // tube: closed rounded top, open bottom under water with a stopper
   t += `<path d="M${x1} ${yTop - 12} Q${x1} ${yTop - 22} ${(x1 + x2) / 2} ${yTop - 22} Q${x2} ${yTop - 22} ${x2} ${yTop - 12} L${x2} ${yBot + 40} L${x1} ${yBot + 40} Z" fill="#fbfdff" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
-  t += `<rect x="${x1 + 2}" y="${yv}" width="${x2 - x1 - 4}" height="${yBot + 38 - yv}" fill="${LAB.liquid}"/><rect x="${x1 - 2}" y="${yBot + 34}" width="${x2 - x1 + 4}" height="16" rx="3" fill="#3b4252"/>`;
-  for (let v = 0; v <= 50; v += 5) { const y = yOf(v); t += `<line x1="${x1}" y1="${y}" x2="${x1 + 9}" y2="${y}" stroke="${LAB.navy}" stroke-width="1.5"/>`; if (v % 10 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}">${v}</text>`; }
+  // inside an inverted tube the meniscus is still concave (lowest in the middle)
+  t += menPath(x1 + 1.5, x2 - 1.5, yv, 3, yBot + 38);
+  t += `<rect x="${x1 - 2}" y="${yBot + 34}" width="${x2 - x1 + 4}" height="16" rx="3" fill="#3b4252"/>`;
+  t += shine(x1 + 3, yTop - 14, 4, yBot - yTop + 44);
+  for (let v = 0; v <= 50; v += 1) { const y = yOf(v), big = v % 5 === 0; t += `<line x1="${x1 + 2}" y1="${y}" x2="${x1 + (big ? 11 : 6)}" y2="${y}" stroke="${LAB.navy}" stroke-width="${big ? 1.5 : .8}"/>`; if (v % 10 === 0) t += `<text x="${x1 - 6}" y="${y + 4}" text-anchor="end" font-size="12" font-weight="700" fill="${LAB.navy}" paint-order="stroke" stroke="#fff" stroke-width="3">${v}</text>`; }
   t += `<text x="${x2 + 8}" y="${yTop + 6}" font-size="12" font-weight="800" fill="${LAB.navy}">H₂ gas</text>`;
   return { svg: t, x: x2, y: yv };
 }
@@ -949,7 +988,7 @@ const tableHTML = (rows, head) => `<table class="data">${head ? `<tr>${head.map(
 const sfMin = (...xs) => Math.min(...xs.map(sfCount));
 const EQ_ALL = EQUIP.map(e => [...e, EQ_SYN[e[0]] || [e[1]]]).concat(EQUIP_MORE);
 const eqById = id => EQ_ALL.find(e => e[0] === id);
-const eqDraw = (e, tag) => `<figure class="eq-fig"><svg class="art equip" viewBox="0 0 200 220" role="img" aria-label="A piece of lab equipment${tag ? ' labeled ' + tag : ''}">${e[4]}</svg>${tag ? `<figcaption class="vtag v${tag.toLowerCase()}">${tag}</figcaption>` : ''}</figure>`;
+const eqDraw = (e, tag) => `<figure class="eq-fig">${eqPic(e, 'A piece of lab equipment' + (tag ? ' labeled ' + tag : ''))}${tag ? `<figcaption class="vtag v${tag.toLowerCase()}">${tag}</figcaption>` : ''}</figure>`;
 
 /* ---------------- Exp 0a: Lab Exploration ---------------- */
 const K0a = {
@@ -1480,19 +1519,20 @@ const K11a = {
 /* ---------------- Exp 12a: pH of Household Items ---------------- */
 const CABBAGE = [['#c8213a', 'Red', '1–2', 0], ['#e0559a', 'Pink', '3–4', 0], ['#8a4bb0', 'Purple', '5–7', 1], ['#3d6fd6', 'Blue', '8', 2], ['#20a99c', 'Blue-green', '9–10', 2], ['#4bb54b', 'Green', '11–12', 2], ['#e8cf2f', 'Yellow', '13–14', 2]];
 const ACIDITY = ['Acidic', 'About neutral', 'Basic'];
-const PH_ITEMS = ['Vinegar', 'Lemon juice', 'Soda', 'Coffee', 'Milk', 'Baking soda solution', 'Window cleaner', 'Antacid', 'Shampoo', 'Bleach'];
+const PH_ITEMS = [['Lemon juice', 2.0, 2.6], ['Vinegar', 2.4, 3.2], ['Soda', 2.5, 3.5], ['Orange juice', 3.3, 4.2], ['Coffee', 4.8, 5.4], ['Milk', 6.4, 6.8], ['Baking soda solution', 8.2, 8.6], ['Antacid', 9.2, 10.2], ['Window cleaner', 10.5, 11.5], ['Bleach', 12.2, 12.8]];
+const PH_EQ = 'pH = −log[H<sub>3</sub>O<sup>+</sup>] &nbsp;&nbsp; pOH = −log[OH<sup>−</sup>] &nbsp;&nbsp; pH + pOH = 14<br>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> &nbsp;&nbsp; [OH<sup>−</sup>] = 10<sup>−pOH</sup>';
 const phChart = () => `<div class="phchart"><div><b>pH</b></div><div>↔ pH + pOH = 14 ↔</div><div><b>pOH</b></div><div>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup><br>pH = −log[H<sub>3</sub>O<sup>+</sup>]</div><div>[H<sub>3</sub>O<sup>+</sup>][OH<sup>−</sup>] = 1 × 10<sup>−14</sup></div><div>[OH<sup>−</sup>] = 10<sup>−pOH</sup><br>pOH = −log[OH<sup>−</sup>]</div></div>`;
 const K12a = {
   fromPH() {
-    const d = pick([1, 2, 2]), pH = d === 1 ? rnd(1.5, 12.5, 1) : rnd(1.5, 12.8, 2), item = pick(PH_ITEMS), want = pick(['h3o', 'poh', 'oh']), pOH = 14 - pH;
+    const d = pick([1, 2, 2]), itm = pick(PH_ITEMS), pH = rnd(itm[1], itm[2], d), item = itm[0], want = pick(['h3o', 'poh', 'oh']), pOH = 14 - pH;
     const v = want === 'h3o' ? Math.pow(10, -pH) : want === 'oh' ? Math.pow(10, -pOH) : pOH, label = { h3o: '[H<sub>3</sub>O<sup>+</sup>]', oh: '[OH<sup>−</sup>]', poh: 'pOH' }[want];
-    return { tag: `pH → ${want === 'poh' ? 'pOH' : want === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}`, prompt: `The pH of <b>${item.toLowerCase()}</b> was measured as <b>${pH.toFixed(d)}</b>. Calculate ${label}.`, ref: phChart(),
+    return { tag: `pH → ${want === 'poh' ? 'pOH' : want === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}`, prompt: `The pH of <b>${item.toLowerCase()}</b> was measured as <b>${pH.toFixed(d)}</b>. Calculate ${label}.`, eq: PH_EQ,
       parts: [want === 'poh' ? num(pOH, { dp: d, unit: '', tol: 0.006 }) : num(v, { sf: d, unit: 'M', rel: 0.06 })], hint: want === 'poh' ? 'pOH = 14 − pH. Keep the same decimal places.' : `${want === 'h3o' ? '[H₃O⁺] = 10^(−pH)' : 'Find pOH = 14 − pH, then [OH⁻] = 10^(−pOH)'}. The number of decimal places in pH = the number of sig figs in the concentration.`,
       solution: want === 'poh' ? `14 − ${pH.toFixed(d)} = <b>${pOH.toFixed(d)}</b>.` : want === 'h3o' ? `10<sup>−${pH.toFixed(d)}</sup> = <b>${sfHTML(v, d)} M</b> (${d} decimal place${d > 1 ? 's' : ''} in pH → ${d} sig fig${d > 1 ? 's' : ''}).` : `pOH = ${pOH.toFixed(d)}; 10<sup>−${pOH.toFixed(d)}</sup> = <b>${sfHTML(v, d)} M</b>.`, video: 'ph', skill: 'calc' };
   },
   toPH() {
     const sf = pick([2, 3]), e = rint(2, 11), coef = rnd(1.1, 9.8, sf - 1), c = coef * Math.pow(10, -e), base = chance(0.4), pH = base ? 14 + Math.log10(c) : -Math.log10(c);
-    return { tag: 'Concentration → pH', prompt: `A solution has ${base ? '[OH<sup>−</sup>]' : '[H<sub>3</sub>O<sup>+</sup>]'} = <b>${coef.toFixed(sf - 1)} × 10<sup>−${e}</sup> M</b>. What is its pH?`, ref: phChart(),
+    return { tag: 'Concentration → pH', prompt: `A solution has ${base ? '[OH<sup>−</sup>]' : '[H<sub>3</sub>O<sup>+</sup>]'} = <b>${coef.toFixed(sf - 1)} × 10<sup>−${e}</sup> M</b>. What is its pH?`, eq: PH_EQ,
       parts: [num(pH, { dp: sf, unit: '', tol: 0.006 })], hint: `${base ? 'pOH = −log[OH⁻], then pH = 14 − pOH.' : 'pH = −log[H₃O⁺].'} ${sf} sig figs in the concentration → ${sf} decimal places in the pH.`, solution: `${base ? `pOH = −log(${coef.toFixed(sf - 1)} × 10⁻${e}) = ${(-Math.log10(c)).toFixed(sf)}; pH = 14 − ${(-Math.log10(c)).toFixed(sf)} = ` : `pH = −log(${coef.toFixed(sf - 1)} × 10⁻${e}) = `}<b>${pH.toFixed(sf)}</b>.`, video: 'ph', skill: 'calc' };
   },
   cabbage() {
@@ -1502,16 +1542,13 @@ const K12a = {
   },
   acidMass() {
     const g = rnd(0.8, 3.5, 2), V = pick([0.250, 0.500, 0.750]), M = g / 36.46 / V, pH = -Math.log10(M), sf = Math.min(3, sfCount(g.toFixed(2)));
-    return { tag: 'pH of a strong acid', prompt: `<b>${g.toFixed(2)} g HCl</b> is dissolved in water to make <b>${V.toFixed(3)} L</b> of solution. What is the pH?`, ref: phChart(),
+    return { tag: 'pH of a strong acid', prompt: `<b>${g.toFixed(2)} g HCl</b> is dissolved in water to make <b>${V.toFixed(3)} L</b> of solution. What is the pH?`, eq: PH_EQ,
       parts: [num(pH, { dp: sf, unit: '', tol: 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf)} M. pH = −log(${sfStr(M, sf)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
   },
   baseMass() {
     const g = rnd(2.0, 6.0, 2), V = pick([0.500, 0.750, 1.00]), M = g / 121.64 / V, oh = 2 * M, pOH = -Math.log10(oh), pH = 14 - pOH, sf = 3;
-    return { tag: 'pH of a strong base', prompt: `<b>${g.toFixed(2)} g Sr(OH)<sub>2</sub></b> is dissolved to make <b>${V.toFixed(V < 1 ? 3 : 2)} L</b> of solution. What is the pH?`, ref: phChart(),
+    return { tag: 'pH of a strong base', prompt: `<b>${g.toFixed(2)} g Sr(OH)<sub>2</sub></b> is dissolved to make <b>${V.toFixed(V < 1 ? 3 : 2)} L</b> of solution. What is the pH?`, eq: PH_EQ,
       parts: [num(pH, { dp: sf, unit: '', tol: 0.006, slip: x => Math.abs(x - (14 + Math.log10(M))) < 0.01 ? 'Each Sr(OH)₂ releases <b>2</b> OH⁻. Double the molarity first.' : '' })], hint: 'Sr(OH)₂ = 121.64 g/mol, and each one gives 2 OH⁻. Find pOH, then pH = 14 − pOH.', solution: `${g.toFixed(2)} ÷ 121.64 ÷ ${V.toFixed(V < 1 ? 3 : 2)} = ${sfStr(M, 3)} M Sr(OH)₂ → [OH⁻] = ${sfStr(oh, 3)} M. pOH = ${pOH.toFixed(3)}, pH = <b>${pH.toFixed(3)}</b>.`, video: 'acidbase', skill: 'calc' };
-  },
-  indicator() {
-    return { tag: 'The indicator', prompt: 'What molecule in red cabbage juice changes color with pH?', parts: [textPart(['anthocyanin', 'anthocyanins', 'anthocyanin molecule', 'anthocyanin molecules'], { ans: 'Anthocyanin' })], hint: 'It’s the same pigment that colors flowers and berries. It starts with “antho-”.', solution: '<b>Anthocyanin</b>, a water-soluble pigment.', video: 'ph', skill: 'concept' };
   }
 };
 
@@ -1969,7 +2006,7 @@ function renderRef() {
   const sol = [['Soluble', 'Na⁺, K⁺, NH₄⁺ (Group 1), NO₃⁻, C₂H₃O₂⁻: always soluble'], ['Soluble', 'Cl⁻, Br⁻, I⁻: except with Ag⁺, Pb²⁺, Hg₂²⁺'], ['Soluble', 'SO₄²⁻: except with Ca²⁺, Sr²⁺, Ba²⁺, Pb²⁺'], ['Insoluble', 'OH⁻: except Group 1, NH₄⁺ (Ca²⁺, Sr²⁺, Ba²⁺ slightly)'], ['Insoluble', 'CO₃²⁻, PO₄³⁻, S²⁻: except Group 1 and NH₄⁺']];
   $('refBody').innerHTML = `<p class="small-note">On the real practical, any equation or table you need is given at the station, except the ones in “Know by heart”.</p>
   <h3>Know by heart (not given)</h3><ul><li>Density = mass ÷ volume</li><li>M₁V₁ = M₂V₂</li><li>Molarity = mol solute ÷ L solution</li><li>ΔT = final − initial; K = °C + 273.15</li><li>Record analog readings one digit past the smallest line; copy every digit on a digital display</li></ul>
-  <h3>Equations usually given at the station</h3><ul><li>V = l × w × h &nbsp; · &nbsp; V<sub>cylinder</sub> = π r² h</li><li>q = m × c × ΔT &nbsp; · &nbsp; q<sub>reaction</sub> + q<sub>solution</sub> = 0 &nbsp; · &nbsp; c<sub>water</sub> = 4.184 J/g·°C</li><li>PV = nRT, R = 0.08206 L·atm/(mol·K) &nbsp; · &nbsp; P<sub>total</sub> = P<sub>gas</sub> + P<sub>water</sub> &nbsp; · &nbsp; 1 atm = 760 mmHg, 1 in Hg = 25.4 mmHg</li><li>% mass = g element ÷ g compound × 100 &nbsp; · &nbsp; % error = (experimental − accepted) ÷ accepted × 100</li><li>c = λν, E = hν = hc/λ</li></ul>
+  <h3>Equations usually given at the station</h3><ul><li>V = l × w × h &nbsp; · &nbsp; V<sub>cylinder</sub> = π r² h</li><li>q = m × c × ΔT &nbsp; · &nbsp; q<sub>reaction</sub> + q<sub>solution</sub> = 0 &nbsp; · &nbsp; c<sub>water</sub> = 4.184 J/g·°C</li><li>PV = nRT, R = 0.08206 L·atm/(mol·K) &nbsp; · &nbsp; P<sub>total</sub> = P<sub>gas</sub> + P<sub>water</sub> &nbsp; · &nbsp; 1 atm = 760 mmHg, 1 in Hg = 25.4 mmHg</li><li>% mass = g element ÷ g compound × 100 &nbsp; · &nbsp; % error = (experimental − accepted) ÷ accepted × 100</li><li>pH = −log[H<sub>3</sub>O<sup>+</sup>] &nbsp; · &nbsp; pOH = −log[OH<sup>−</sup>] &nbsp; · &nbsp; pH + pOH = 14 &nbsp; · &nbsp; [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup></li><li>c = λν, E = hν = hc/λ</li></ul>
   <h3>pH road map</h3>${phChart()}
   <h3>Solubility rules (green sheet summary)</h3>${tableHTML(sol.map(r => [r[0], r[1]]))}
   <h3>Flame test colors</h3>${flameTable()}

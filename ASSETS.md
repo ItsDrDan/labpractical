@@ -1,6 +1,9 @@
 # Station Rotation: art
 
-The glassware, instruments, flames, test tubes and molecule models are drawn by the game's code (their markings have to be exact). Don't make those.
+The instruments students read (graduated cylinder, buret, thermometer, eudiometer, volumetric fill lines, balance), flames, test tubes and molecule models are drawn by the game's code (their markings have to be exact). Don't make those.
+
+## Equipment pictures (`assets/equip/<id>.webp`, 1024 × 1024 transparent)
+Used by "Name that equipment" and "What is it for?". If a file is missing, the game shows its built-in drawing. IDs: thermometer, testtube, beaker, watchglass, gradcyl, erlenmeyer, volflask, transferpipet, volpipet, pipetbulb, buret, buretclamp, bunsen, funnel, washbottle, tongs, scoopula, ringstand, utilityclamp, clampholder, crucible, claytriangle, wiregauze, eudiometer, calorimeter, filterflask, buchner. No text or labels in any picture.
 
 Until an image exists, the game uses its built-in clipboard logo and brand-kit badges. Drop files in with the exact names below and the game picks them up. No code changes needed.
 
