@@ -188,6 +188,11 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 
 /* chooser (v4) */
 .chooser{margin:6px 0 16px}
+.howto{list-style:none;counter-reset:h;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px;padding:0}
+.howto li{counter-increment:h;display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.95rem;line-height:1.35;box-shadow:var(--shadow)}
+.howto li::before{content:counter(h);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.9rem}
+@media(max-width:760px){.howto{grid-template-columns:1fr}}
+.goq{margin-left:auto}.goq[hidden]{display:none}
 .pick-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px;font-size:1.2rem;font-weight:600}.pick-title small{font-family:var(--font);font-weight:700;color:var(--faint);font-size:.88rem}
 .pick-title.small{font-size:1.05rem;margin-top:14px}
 .stepnum{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:.9rem;flex:none}
@@ -214,6 +219,12 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 @media(max-width:760px){table.data{font-size:.95rem}table.data th,table.data td{padding:5px 7px}}
 
 /* ---------- Virtual Lab ---------- */
+.vl-row.rev{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}@media(max-width:560px){.vl-row.rev{grid-template-columns:1fr}}
+.vl-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 4px 2px}.vl-ctl .btn{min-height:44px;touch-action:none;user-select:none;-webkit-user-select:none}.vl-ctl small{font-weight:600;opacity:.75}
+.vl-count{font-weight:700;margin-right:auto}.vl-zoom svg{max-width:340px;margin:0 auto}
+#vlLewis .lw-hit{cursor:pointer;outline:none}#vlLewis .lw-hit:hover circle,#vlLewis .lw-hit:focus circle{stroke:var(--accent)}#vlLewis .lw-hit:focus-visible line[stroke=transparent]{stroke:#4b57d126}#vlLewis.locked{pointer-events:none}
+.vl-onpan.static{pointer-events:none}
+.vl-score{display:grid;gap:2px;padding:10px 12px;border-radius:12px;margin:4px 0 10px;font-size:.92rem}.vl-score b:first-child{font-size:1.15rem}.vl-score.gold{background:#fff4c2;border:1px solid #e6c34a}.vl-score.silver{background:#eef1f6;border:1px solid #b9c2d3}.vl-score.bronze{background:#fbe6d6;border:1px solid #d9a47a}
 .vl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .vl-wrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:start}
 @media(max-width:900px){.vl-wrap{grid-template-columns:1fr}}
@@ -247,6 +258,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .vl-list li.now{border:2px solid var(--accent);box-shadow:0 0 0 3px #4b57d11a}.vl-list li.now p{margin:4px 0 8px}
 .vl-wait{font-weight:800;color:var(--accent)}
 .vl-list .feedback{display:block}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.nudge{animation:nudge .35s 2}
 @keyframes vlPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes vlBub{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(var(--by));opacity:0}}
 @keyframes vlFall{0%{transform:translateY(0);opacity:1}100%{transform:translateY(var(--fy));opacity:.2}}
@@ -417,6 +429,11 @@ html.dd-embedded .mockbar{position:relative}
 
 <div class="wrap">
  <section class="intro" id="intro"><img class="intro-logo" src="assets/logo-256.webp" data-fbsrc="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%20role%3D%22img%22%20aria-label%3D%22Station%20Rotation%20logo%3A%20a%20clipboard%20answer%20sheet%20with%20green%2C%20yellow%20and%20purple%20version%20tabs%20and%20a%20stopwatch%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22bg%22%20cx%3D%2250%25%22%20cy%3D%2240%25%22%20r%3D%2265%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f6f4ff%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e4e8ff%22/%3E%3C/radialGradient%3E%3C/defs%3E%0A%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%22112%22%20height%3D%22112%22%20rx%3D%2228%22%20fill%3D%22url%28%23bg%29%22/%3E%0A%3Crect%20x%3D%2274%22%20y%3D%2226%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%237fd39b%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2246%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23ffd84d%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2266%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23b89cff%22/%3E%0A%3Crect%20x%3D%2222%22%20y%3D%2220%22%20width%3D%2260%22%20height%3D%2278%22%20rx%3D%229%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%234b57d1%22%20stroke-width%3D%224%22/%3E%0A%3Crect%20x%3D%2238%22%20y%3D%2214%22%20width%3D%2228%22%20height%3D%2212%22%20rx%3D%225%22%20fill%3D%22%234b57d1%22/%3E%0A%3Cpath%20d%3D%22M46%2036%20L46%2050%20L36%2070%20Q34%2075%2039%2075%20L65%2075%20Q70%2075%2068%2070%20L58%2050%20L58%2036%22%20fill%3D%22%23eaf4fb%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M41%2062%20L63%2062%20L68%2070%20Q70%2075%2065%2075%20L39%2075%20Q34%2075%2036%2070%20Z%22%20fill%3D%22%23a7d8f5%22/%3E%0A%3Cline%20x1%3D%2243%22%20y1%3D%2236%22%20x2%3D%2261%22%20y2%3D%2236%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cline%20x1%3D%2232%22%20y1%3D%2284%22%20x2%3D%2260%22%20y2%3D%2284%22%20stroke%3D%22%23c9cfe6%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%2288%22%20cy%3D%2290%22%20r%3D%2217%22%20fill%3D%22%23fff%22%20stroke%3D%22%23d9577f%22%20stroke-width%3D%224%22/%3E%3Crect%20x%3D%2284%22%20y%3D%2268%22%20width%3D%228%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%23d9577f%22/%3E%0A%3Cpath%20d%3D%22M88%2090%20L88%2080%20M88%2090%20L95%2094%22%20stroke%3D%22%231f2a44%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3C/svg%3E" onerror="this.onerror=null;this.src=this.dataset.fbsrc" alt="Station Rotation logo"><div><p class="eyebrow">CHEM 3A · Lab Practical</p><h1>Station Rotation</h1><p class="lede">Get ready for the lab practical: read the glassware, crunch the data, name the equipment.</p></div></section>
+ <ol class="howto" aria-label="How to use this game">
+  <li><span><b>Pick a mode</b> below.</span></li>
+  <li><span><b>Answer</b> with a number, unit and the right sig figs. Type 3.2E-5 for 3.2 × 10⁻⁵.</span></li>
+  <li><span><b>Stuck?</b> Tap <b>Hint</b>, <b>Show answer</b>, or <b>Reference</b> (top right).</span></li>
+ </ol>
  <p class="labset" id="labset"></p>
  <div class="mode-switch" id="modes" role="tablist" aria-label="Choose a mode">
   <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>10 timed stations. Follow your version color.</small></span></button>
@@ -446,7 +463,7 @@ html.dd-embedded .mockbar{position:relative}
  <!-- ===== Practice ===== -->
  <section id="practiceView" hidden>
   <section class="chooser">
-   <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small></h2>
+   <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button></h2>
    <div class="cats labs" id="labTiles"></div>
    <div class="pick-actions"><button type="button" class="btn" id="allLabs">Select all</button><button type="button" class="btn" id="noLabs">Clear</button></div>
   </section>
@@ -973,17 +990,32 @@ const GEOMS = {
   tetrahedral: { pts: [[0, -1, 0], [0.94, 0.33, 0], [-0.47, 0.33, 0.82], [-0.47, 0.33, -0.82]], lp: [] }
 };
 function modelSVG(geom, center, outer, aria) {
-  const g = GEOMS[geom], cx = 150, cy = 120, R = 82;
-  const proj = p => [cx + (p[0] + p[2] * 0.35) * R, cy + (p[1] - p[2] * 0.18) * R, p[2]];
-  const col = { C: '#3b4252', O: '#e2475f', N: '#4b78d1', H: '#f4f6fb', Cl: '#5cb85c', F: '#9fd86b', S: '#f0c419', P: '#f39c3d', Si: '#c8a27a', B: '#f6b8c6', Br: '#a0522d' };
-  const items = g.pts.map((p, i) => ({ p: proj(p), el: outer[i] }));
-  let t = `<svg class="art model" viewBox="0 0 300 240" role="img" aria-label="${esc(aria || 'A molecular model')}">`;
-  items.filter(a => a.p[2] < 0).forEach(a => { t += `<line x1="${cx}" y1="${cy}" x2="${a.p[0]}" y2="${a.p[1]}" stroke="#9aa1b4" stroke-width="9" stroke-linecap="round"/>`; });
-  (g.lp || []).forEach(l => { const q = proj(l); t += `<ellipse cx="${(cx + q[0]) / 2 + (q[0] - cx) * 0.15}" cy="${(cy + q[1]) / 2 + (q[1] - cy) * 0.15}" rx="16" ry="26" transform="rotate(${Math.atan2(q[1] - cy, q[0] - cx) * 180 / Math.PI + 90} ${(cx + q[0]) / 2} ${(cy + q[1]) / 2})" fill="#eef0fe" stroke="#9fb0ff" stroke-width="2" stroke-dasharray="4 3"/>`; });
-  items.filter(a => a.p[2] < 0).forEach(a => { t += ball(a.p[0], a.p[1], a.el, 0.85); });
-  t += ball(cx, cy, center, 1.15);
-  items.filter(a => a.p[2] >= 0).forEach(a => { t += `<line x1="${cx}" y1="${cy}" x2="${a.p[0]}" y2="${a.p[1]}" stroke="#7d8496" stroke-width="10" stroke-linecap="round"/>`; t += ball(a.p[0], a.p[1], a.el, 1); });
-  function ball(x, y, el, s) { const r = (el === 'H' ? 15 : 22) * s, c = col[el] || '#c9cfe0'; return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#2f4d70" stroke-width="2.5"/><circle cx="${x - r * 0.35}" cy="${y - r * 0.35}" r="${r * 0.28}" fill="#fff" opacity=".45"/><text x="${x}" y="${y + 6}" text-anchor="middle" font-size="${el.length > 1 ? 14 : 17}" font-weight="800" fill="${el === 'H' || el === 'S' || el === 'F' || el === 'B' ? '#1f2a44' : '#fff'}">${el}</text>`; }
+  const g = GEOMS[geom], cx = 150, cy = 122, R = 92;
+  const yaw = geom === 'tetrahedral' ? -0.12 : 0, tilt = geom === 'trigonalpyramidal' ? 0.22 : 0.6; // turn, then look from slightly above
+  const view = p => { const x1 = p[0] * Math.cos(yaw) + p[2] * Math.sin(yaw), z1 = -p[0] * Math.sin(yaw) + p[2] * Math.cos(yaw); return [x1, p[1] * Math.cos(tilt) + z1 * Math.sin(tilt), -p[1] * Math.sin(tilt) + z1 * Math.cos(tilt)]; };
+  const col = { C: '#3b4252', O: '#e2475f', N: '#4b78d1', H: '#f4f6fb', Cl: '#5cb85c', F: '#9fd86b', S: '#f0c419', P: '#f39c3d', Si: '#c8a27a', B: '#f6b8c6', Br: '#a0522d', Be: '#c7e3a8', I: '#8e5bb5' };
+  const dark = el => !(el === 'H' || el === 'S' || el === 'F' || el === 'B' || el === 'Be');
+  const rad = el => (el === 'H' ? 15 : 21), Rc = rad(center) + 6;
+  const items = [];
+  g.pts.forEach((p, i) => { const v = view(p); items.push({ kind: 'atom', el: outer[i], x: cx + v[0] * R, y: cy + v[1] * R, z: v[2] }); });
+  (g.lp || []).forEach(p => { const v = view(p); items.push({ kind: 'lp', x: v[0], y: v[1], z: v[2] }); });
+  const ball = (x, y, el, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${col[el] || '#c9cfe0'}" stroke="#2f4d70" stroke-width="2.5"/><ellipse cx="${x - r * 0.35}" cy="${y - r * 0.4}" rx="${r * 0.32}" ry="${r * 0.22}" fill="#fff" opacity=".5"/><text x="${x}" y="${y + r * 0.3}" text-anchor="middle" font-size="${Math.round(r * (el.length > 1 ? 0.78 : 0.9))}" font-weight="800" fill="${dark(el) ? '#fff' : '#1f2a44'}">${el}</text>`;
+  const bond = (a, fromEdge) => {
+    const dx = a.x - cx, dy = a.y - cy, d = Math.hypot(dx, dy) || 1, s0 = fromEdge ? Math.min(Rc - 4, d) / d : 0;
+    const x0 = cx + dx * s0, y0 = cy + dy * s0, op = a.z < -0.2 ? 0.75 : 1;
+    return `<g opacity="${op}"><line x1="${x0}" y1="${y0}" x2="${a.x}" y2="${a.y}" stroke="#6f778c" stroke-width="11" stroke-linecap="round"/><line x1="${x0}" y1="${y0}" x2="${a.x}" y2="${a.y}" stroke="#b9bfcc" stroke-width="3.5" stroke-linecap="round" opacity=".9"/></g>`;
+  };
+  const lobe = l => {
+    const d = Math.hypot(l.x, l.y) || 1, ux = l.x / d, uy = l.y / d, ang = Math.atan2(uy, ux) * 180 / Math.PI;
+    const len = 30 + 12 * d, mx = cx + ux * (Rc + len * 0.55), my = cy + uy * (Rc + len * 0.55);
+    return `<g opacity="${l.z < -0.2 ? 0.7 : 0.95}"><ellipse cx="${mx}" cy="${my}" rx="${len * 0.62}" ry="17" transform="rotate(${ang} ${mx} ${my})" fill="#dfe4ff" stroke="#7d8fe0" stroke-width="2"/><circle cx="${mx - uy * 6}" cy="${my + ux * 6}" r="3.4" fill="#3d4fb8"/><circle cx="${mx + uy * 6}" cy="${my - ux * 6}" r="3.4" fill="#3d4fb8"/></g>`;
+  };
+  let t = `<svg class="art model" viewBox="0 0 300 250" role="img" aria-label="${esc(aria || 'A molecular model')}">`;
+  const back = items.filter(i => i.z < -0.05).sort((a, b) => a.z - b.z), front = items.filter(i => i.z >= -0.05).sort((a, b) => a.z - b.z);
+  back.forEach(i => { if (i.kind === 'lp') t += lobe(i); else t += bond(i, false) + ball(i.x, i.y, i.el, rad(i.el) * (1 + i.z * 0.12)); });
+  front.filter(i => i.kind === 'atom').forEach(i => { t += bond(i, true); });
+  t += ball(cx, cy, center, Rc);
+  front.forEach(i => { if (i.kind === 'lp') t += lobe(i); else t += ball(i.x, i.y, i.el, rad(i.el) * (1 + i.z * 0.12)); });
   return t + `</svg>`;
 }
 // Standard curve: density vs concentration with best-fit line
@@ -2344,6 +2376,167 @@ const BENCH_GAS = {
 };
 
 const VBENCH = [BENCH_DENSITY, BENCH_MIX, BENCH_PH, BENCH_GAS];
+/* ====================== Bench 5: titration (Exp 12b) ====================== */
+function titrationSVG(v, s) {
+  const b = fullBuret(v), base = s.flask ? (s.v >= s.ve + 0.35 ? '#e0559a' : s.v >= s.ve ? '#f9c6dc' : '#eef6fb') : null;
+  const flash = s.flash ? `<ellipse cx="110" cy="492" rx="${16 + 20 * s.flash}" ry="7" fill="#e85aa3" opacity="${(0.25 + 0.6 * s.flash).toFixed(2)}"/>` : '';
+  const fl = 'M100 418 L120 418 L120 446 L162 508 Q166 516 156 516 L64 516 Q54 516 58 508 L100 446 Z';
+  let t = `<svg viewBox="0 0 220 530" role="img" aria-label="A buret over an Erlenmeyer flask">`;
+  t += `<rect x="150" y="10" width="8" height="500" fill="#c9cfe0"/><rect x="118" y="120" width="34" height="8" rx="3" fill="#9aa9c2"/>`;
+  t += b.svg;
+  if (s.dripping) t += `<circle class="vl-drop" cx="105" cy="${330 + 78}" r="3.5" fill="#cfe6f8" style="--dy:70px"/>`;
+  t += `<defs><clipPath id="tfl"><path d="${fl}"/></clipPath></defs><path d="${fl}" fill="${LAB.glass}" stroke="${LAB.glassLine}" stroke-width="2.5"/>`;
+  if (base) t += `<g clip-path="url(#tfl)"><rect x="50" y="480" width="120" height="40" fill="${base}"/>${flash}</g>`;
+  t += `<path d="M66 508 Q72 492 84 482" fill="none" stroke="#fff" stroke-width="4" opacity=".7" stroke-linecap="round"/>`;
+  return t + '</svg>';
+}
+const buretZoom = v => `<svg viewBox="0 0 340 340" role="img" aria-label="Zoomed-in view of the buret meniscus. The numbers increase going down.">${zoomScale({ cx: 170, cy: 170, R: 150, minor: 0.1, label: 1, value: v, fill: 'liquid', topDown: true, min: 0, max: 50, unit: 'mL' })}</svg>`;
+const BENCH_TITRATE = {
+  id: 'titrate', labs: ['12b'], title: 'Titrate the Soda', blurb: 'Drip NaOH into soda until the first light pink that stays.',
+  setup() { const vi = offLine(0.4, 3.6, 2), vb = rnd(6.5, 12.5, 2), Mb = rnd(0.0960, 0.1040, 4); return { vi, v: vi, ve: +(vi + vb).toFixed(2), Mb, soda: false, flask: false, ind: false, done: false, flash: 0 }; },
+  scene(s) {
+    const ctl = s.ind && VL.step >= 3 && !s.done ? `<div class="vl-ctl"><button type="button" class="btn" id="tFast">Open stopcock <small>(hold)</small></button><button type="button" class="btn" id="tDrop">Add 1 drop</button><button type="button" class="btn primary" id="tStop">Light pink stays: stop</button></div>` : '';
+    return `<div class="vl-shelf">${!s.soda ? shelfBtn('soda', VLI.bottle('#e8f1e3', 'SODA'), '10.00 mL soda (pipet)') : ''}${s.soda && !s.ind ? shelfBtn('phen', VLI.dropper('#f7f7fb'), 'Phenol­phthalein') : ''}<span class="vl-hint">NaOH: <b>${s.Mb.toFixed(4)} M</b> (standardized)</span></div>
+    <div class="vl-row"><div class="vl-st" data-drop="flask" tabindex="0" role="button" aria-label="Erlenmeyer flask under the buret"><div class="vl-st-label">Buret and flask</div><div id="vlTit">${titrationSVG(s.v, s)}</div></div>
+    <div class="vl-st wide"><div class="vl-st-label">Buret, zoomed in</div><div id="vlBZ" class="vl-zoom">${buretZoom(s.v)}</div>${ctl}</div></div>`;
+  },
+  draw(s) { vlSet('vlTit', titrationSVG(s.v, s)); vlSet('vlBZ', buretZoom(s.v)); },
+  restore(s) {
+    this.draw(s);
+    const fast = $('tFast'), drop = $('tDrop'), stop = $('tStop'); if (!fast) return;
+    const add = dv => {
+      if (s.done) return; s.v = +(Math.min(50, s.v + dv)).toFixed(3);
+      const d = s.ve - s.v; s.flash = d > 0 && d < 1.6 ? Math.max(0.15, 1 - d / 1.6) : 0;
+      this.draw(s); clearTimeout(s.ft); if (s.flash) s.ft = setTimeout(() => { s.flash = 0; this.draw(s); }, 350 + 900 * s.flash);
+      if (s.v >= s.ve + 0.35) vlSay('Dark pink: you went past the endpoint. Real chemists would redo it, but you can still record and finish.', 'bad');
+      else if (s.v >= s.ve) vlSay('A light pink that stays! Stop now.', 'good');
+      else if (d < 1.6) vlSay('Pink flashes that fade when you swirl: you are close. Go one drop at a time.');
+    };
+    let timer = null;
+    const start = e => { e.preventDefault(); if (timer || s.done) return; s.dripping = true; timer = setInterval(() => add(0.07), 60); };
+    const end = () => { if (timer) { clearInterval(timer); timer = null; s.dripping = false; this.draw(s); } };
+    fast.addEventListener('pointerdown', start); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => fast.addEventListener(ev, end));
+    fast.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') add(0.5); });
+    drop.onclick = () => { s.dripping = true; add(0.05); setTimeout(() => { s.dripping = false; this.draw(s); }, 450); };
+    stop.onclick = () => { if (s.v < s.ve) { vlSay('Still colorless after swirling. Keep adding NaOH.', 'bad'); return; } end(); s.done = true; vlScene(); vlSteps(); };
+  },
+  async drop(s, what, where) {
+    if (where !== 'flask') return 'That goes in the Erlenmeyer flask under the buret.';
+    if (what === 'soda') { s.soda = true; s.flask = true; vlScene(); vlSay('10.00 mL of soda is in the flask (a volumetric pipet delivers one exact volume).'); return true; }
+    if (what === 'phen') { s.ind = true; vlScene(); vlSay('Two drops of phenolphthalein: colorless in acid, pink in base.', 'good'); return true; }
+    return 'That doesn’t go there.';
+  },
+  steps: [
+    { title: 'Add the soda', say: 'Drag the <b>10.00 mL soda</b> into the flask.', act: s => s.soda, auto: true },
+    { title: 'Add the indicator', say: 'Drag the <b>phenolphthalein</b> into the flask.', act: s => s.ind, auto: true },
+    { title: 'Initial buret reading', say: 'Read the buret before you start. The numbers increase going down.', parts: s => [num(s.vi, { dp: 2, unit: 'mL', tol: 0.02, label: 'Initial reading' })], rec: (s, v) => { s.viR = v[0]; }, sol: s => `Lines every 0.1 mL → read to 0.01 mL: <b>${s.vi.toFixed(2)} mL</b>.` },
+    { title: 'Titrate', say: 'Hold <b>Open stopcock</b> to add NaOH fast. When pink flashes start, switch to <b>Add 1 drop</b>. Stop at the first light pink that stays. Then read the buret.', act: s => s.done, parts: s => [num(s.v, { dp: 2, unit: 'mL', tol: 0.02, label: 'Final reading' })], rec: (s, v) => { s.vfR = v[0]; }, sol: s => `<b>${s.v.toFixed(2)} mL</b>.` },
+    { title: 'Volume of NaOH used', say: 'Volume used = final − initial.', parts: s => [num(s.vfR - s.viR, { dp: 2, unit: 'mL', tol: 0.006, label: 'NaOH used' })], rec: (s, v) => { s.VR = v[0]; }, sol: s => `${s.vfR.toFixed(2)} − ${s.viR.toFixed(2)} = <b>${(s.vfR - s.viR).toFixed(2)} mL</b>.` },
+    { title: 'Moles of NaOH', say: 'mol = M × L.', parts: s => [num(s.Mb * s.VR / 1000, { sf: Math.min(4, sfCount(s.VR.toFixed(2))), unit: 'mol', rel: 0.004, label: 'mol NaOH', slip: x => (Math.abs(x - s.Mb * s.VR) < s.Mb * s.VR * 0.01 ? 'Convert mL to L first.' : '') })], rec: (s, v) => { s.nR = v[0]; }, sol: s => `${s.Mb.toFixed(4)} M × ${(s.VR / 1000).toFixed(5)} L = <b>${sfHTML(s.Mb * s.VR / 1000, Math.min(4, sfCount(s.VR.toFixed(2))))} mol</b>.` },
+    { title: 'Citric acid in the soda', say: 'Each citric acid reacts with 3 NaOH. Then divide by the 0.01000 L of soda.', ref: () => RXN_CIT, parts: s => { const sf = Math.min(4, sfCount(s.VR.toFixed(2))), C = s.nR / 3 / 0.01; return [num(C, { sf, unit: 'M', rel: 0.006, label: 'Molarity of citric acid', slip: x => (Math.abs(x - C * 3) < C * 0.05 ? 'Divide mol NaOH by <b>3</b> first.' : '') })]; }, sol: s => { const sf = Math.min(4, sfCount(s.VR.toFixed(2))), C = s.nR / 3 / 0.01, over = s.v - s.ve; return `${sfStr(s.nR, sf)} mol ÷ 3 ÷ 0.01000 L = <b>${sfHTML(C, sf)} M</b>.<br>${over > 0.3 ? `You stopped ${over.toFixed(2)} mL past the endpoint, so this answer is a little high. Try again with single drops!` : 'Nice endpoint: right at the first lasting pink.'}`; } }
+  ]
+};
+
+/* ====================== Bench 6: build a model (Exp 6a) ====================== */
+const GVE = { H: 1, C: 4, Si: 4, N: 5, P: 5, O: 6, S: 6, F: 7, Cl: 7 };
+GEOMS.bent120 = { pts: [[-0.87, 0.5, 0], [0.87, 0.5, 0]], lp: [[0, -1, 0]] };
+const shapeOf = (n, lp) => ({ '2,0': 'linear', '2,1': 'bent120', '2,2': 'bent', '3,0': 'trigonalplanar', '3,1': 'trigonalpyramidal', '4,0': 'tetrahedral' }[n + ',' + lp]);
+function lewisSVG(s) {
+  const m = s.m, n = m[2].length, cx = 170, cy = 140, L = 92;
+  const angs = { 2: [180, 0], 3: [-90, 150, 30], 4: [-90, 0, 90, 180] }[n];
+  const pos = angs.map(a => [cx + L * Math.cos(a * Math.PI / 180), cy + L * Math.sin(a * Math.PI / 180)]);
+  const pair = (x, y, a, r) => { const ux = Math.cos(a), uy = Math.sin(a), px = x + ux * r, py = y + uy * r; return `<circle cx="${px - uy * 6}" cy="${py + ux * 6}" r="4" fill="#1f2a44"/><circle cx="${px + uy * 6}" cy="${py - ux * 6}" r="4" fill="#1f2a44"/>`; };
+  const freeDirs = (taken, k) => { const c = []; for (let d = 0; d < 360; d += 45) c.push(d); return c.map(d => [d, Math.min(...taken.map(t => Math.abs(((d - t + 540) % 360) - 180)))]).sort((a, b) => a[1] - b[1]).reverse().reduce((acc, [d]) => { if (acc.length < k && acc.every(x => Math.abs(((d - x + 540) % 360) - 180) >= 90)) acc.push(d); return acc; }, []); };
+  let t = `<svg viewBox="0 0 340 280" role="img" aria-label="Lewis structure builder for ${m[0]}">`;
+  pos.forEach((p, i) => {
+    const o = s.bo[i], dx = p[0] - cx, dy = p[1] - cy, d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d, x0 = cx + ux * 20, y0 = cy + uy * 20, x1 = p[0] - ux * 20, y1 = p[1] - uy * 20;
+    const lines = Array.from({ length: o }, (_, k) => { const off = (k - (o - 1) / 2) * 7; return `<line x1="${x0 - uy * off}" y1="${y0 + ux * off}" x2="${x1 - uy * off}" y2="${y1 + ux * off}" stroke="#1f2a44" stroke-width="3.5" stroke-linecap="round"/>`; }).join('');
+    t += `<g class="lw-hit" data-bond="${i}" tabindex="0" role="button" aria-label="Bond ${i + 1}: ${['', 'single', 'double', 'triple'][o]}. Tap to change."><line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="transparent" stroke-width="26"/>${lines}</g>`;
+  });
+  const atom = (x, y, el, lps, taken, key) => { const dirs = freeDirs(taken, lps); return `<g class="lw-hit" data-atom="${key}" tabindex="0" role="button" aria-label="${el} with ${lps} lone pairs. Tap to add a lone pair."><circle cx="${x}" cy="${y}" r="24" fill="#fff" stroke="#cdd3ee" stroke-width="2"/><text x="${x}" y="${y + 9}" text-anchor="middle" font-size="26" font-weight="800" fill="#1f2a44">${el}</text>${dirs.map(d => pair(x, y, d * Math.PI / 180, 30)).join('')}</g>`; };
+  t += atom(cx, cy, m[1], s.lp[0], angs, 'c');
+  pos.forEach((p, i) => { t += atom(p[0], p[1], m[2][i], s.lp[i + 1], [(angs[i] + 180) % 360], i); });
+  return t + '</svg>';
+}
+function lewisCheck(s) {
+  const m = s.m, used = 2 * s.bo.reduce((a, b) => a + b, 0) + 2 * s.lp.reduce((a, b) => a + b, 0);
+  if (used !== m[4]) return `You used <b>${used}</b> electrons. ${m[0]} has <b>${m[4]}</b>.`;
+  const els = [m[1], ...m[2]], bondE = k => (k === 0 ? s.bo.reduce((a, b) => a + b, 0) : s.bo[k - 1]);
+  for (let k = 0; k < els.length; k++) { const el = els[k], tot = 2 * bondE(k) + 2 * s.lp[k], need = el === 'H' ? 2 : 8; if (tot !== need) return `<b>${el}</b> has ${tot} electrons around it. It needs ${need}${el === 'H' ? ' (a duet)' : ' (an octet)'}.`; }
+  for (let k = 0; k < els.length; k++) { const fc = GVE[els[k]] - 2 * s.lp[k] - bondE(k); if (fc !== 0) return `Close! Every atom has an octet, but <b>${els[k]}</b> has a formal charge of ${fc > 0 ? '+' : ''}${fc}. Try moving a double bond.`; }
+  return '';
+}
+const BENCH_MODEL = {
+  id: 'model', labs: ['6a'], title: 'Build a Model', blurb: 'Build the Lewis structure, then see its 3D shape.',
+  setup() { const m = pick(MOLS); return { m, bo: m[2].map(() => 1), lp: [0, ...m[2].map(() => 0)], built: false }; },
+  used(s) { return 2 * s.bo.reduce((a, b) => a + b, 0) + 2 * s.lp.reduce((a, b) => a + b, 0); },
+  scene(s) {
+    const g = s.built ? s.m[3] : null;
+    return `<div class="vl-row rev"><div class="vl-st"><div class="vl-st-label">Lewis structure of <b>${fhtml(s.m[0])}</b> ${!s.built ? '· tap a bond to change it, tap an atom to add a lone pair' : ''}</div><div id="vlLewis" class="${s.built ? 'locked' : ''}">${lewisSVG(s)}</div>
+    ${!s.built && VL.step >= 1 ? `<div class="vl-ctl"><span class="vl-count" id="vlCount">Electrons used: <b>${this.used(s)}</b> of ${s.m[4]}</span><button type="button" class="btn" id="lwReset">Reset</button><button type="button" class="btn primary" id="lwCheck">Check my structure</button></div>` : ''}</div>
+    <div class="vl-st"><div class="vl-st-label">3D model</div><div id="vlModel">${g ? modelSVG(g, s.m[1], s.m[2], `A 3D model of ${s.m[0]}`) : '<div class="empty small">Finish the Lewis structure to see the 3D shape.</div>'}</div></div></div>`;
+  },
+  restore(s) {
+    const box = $('vlLewis'); if (!box || s.built || VL.step < 1) return;
+    const redraw = () => { box.innerHTML = lewisSVG(s); const c = $('vlCount'); if (c) c.innerHTML = `Electrons used: <b>${this.used(s)}</b> of ${s.m[4]}`; };
+    box.addEventListener('click', e => {
+      const b = e.target.closest('[data-bond]'), a = e.target.closest('[data-atom]');
+      if (b) { const i = +b.dataset.bond; s.bo[i] = s.bo[i] % 3 + 1; redraw(); }
+      else if (a) { const k = a.dataset.atom === 'c' ? 0 : +a.dataset.atom + 1; s.lp[k] = (s.lp[k] + 1) % 4; redraw(); }
+    });
+    box.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.lw-hit')) { e.preventDefault(); e.target.closest('.lw-hit').dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
+    $('lwReset').onclick = () => { s.bo = s.m[2].map(() => 1); s.lp = [0, ...s.m[2].map(() => 0)]; redraw(); };
+    $('lwCheck').onclick = () => { const err = lewisCheck(s); if (err) { vlSay(err, 'bad'); return; } s.built = true; vlScene(); vlSay('That’s the Lewis structure! Here is its 3D shape.', 'good'); vlSteps(); };
+  },
+  async drop() { return 'Tap the bonds and atoms in the Lewis structure.'; },
+  steps: [
+    { title: 'Count valence electrons', say: s => `How many valence electrons does <b>${fhtml(s.m[0])}</b> have?`, ref: () => '<p class="small-note">H = 1 · C, Si = 4 · N, P = 5 · O, S = 6 · F, Cl = 7</p>', parts: s => [num(s.m[4], { unit: '', tol: 0, ans: String(s.m[4]), label: 'Valence electrons' })], sol: s => `${[s.m[1], ...s.m[2]].map(e => `${e} ${GVE[e]}`).join(' + ')} = <b>${s.m[4]}</b>.` },
+    { title: 'Build the Lewis structure', say: 'Tap a <b>bond</b> to make it single → double → triple. Tap an <b>atom</b> to add lone pairs. Use every electron, give every atom an octet (H gets 2).', act: s => s.built, auto: true },
+    { title: 'Electron groups', say: 'How many electron groups (bonded atoms + lone pairs) are around the central atom? A double or triple bond counts as one group.', parts: s => [num(s.m[2].length + s.m[5], { unit: '', tol: 0, ans: String(s.m[2].length + s.m[5]), label: 'Electron groups' })], sol: s => `${s.m[2].length} bonded atoms + ${s.m[5]} lone pair${s.m[5] === 1 ? '' : 's'} = <b>${s.m[2].length + s.m[5]}</b>.` },
+    { title: 'Molecular shape', say: 'Name the shape of the molecule (look at the atoms, not the lone pairs).', parts: s => [geoChoice(s.m[3])], sol: s => `<b>${GEO_NAMES[s.m[3]]}</b>.` },
+    { title: 'Bond angle', say: 'About what is the bond angle?', parts: s => [choice(ANGLES, s.m[6])], sol: s => `<b>${ANGLES[s.m[6]]}</b>${s.m[5] ? '. Lone pairs push the bonds a little closer together.' : '.'}` }
+  ]
+};
+
+/* ====================== Bench 7: water density challenge (Exp 0a/1a) ====================== */
+const RHO_W = 0.99777; // g/mL at 22 °C
+const cylOnPan = `<svg viewBox="0 0 60 70" aria-hidden="true"><path d="M24 4 L38 4 L38 58 L24 58 Z" fill="#f4f9ff" stroke="#8aa6c8" stroke-width="2.5"/><path d="M14 58 L48 58 L52 66 L10 66 Z" fill="#e3ebf6" stroke="#8aa6c8" stroke-width="2"/></svg>`;
+const BENCH_WATER = {
+  id: 'water', labs: ['0a', '1a'], title: 'Water Density Challenge', blurb: 'Fill to a target line, weigh it, get water’s density as close as you can.',
+  setup() { return { target: pick([5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0]), tareM: rnd(24.0, 31.0, 4), v: 0, onBal: false, tared: false, filled: false, noise: rnd(-0.0003, 0.0003, 4) }; },
+  shown(s) { if (!s.onBal) return 0; const m = s.tareM + s.v * RHO_W + (s.v ? s.noise : 0); return s.tared ? m - s.tareM : m; },
+  scene(s) {
+    const ctl = s.tared && !s.filled ? `<div class="vl-ctl"><button type="button" class="btn" id="wSquirt">Squirt <small>(hold)</small></button><button type="button" class="btn" id="wDrop">1 drop (pipet)</button><button type="button" class="btn" id="wOut">Pour some out</button><button type="button" class="btn primary" id="wDone">Done filling</button></div>` : '';
+    return `<div class="vl-shelf">${!s.onBal ? shelfBtn('cyl', cylOnPan, '10 mL cylinder (empty)') : ''}<span class="vl-hint">Target: <b>${s.target.toFixed(2)} mL</b> of DI water</span></div>
+    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Balance"><div class="vl-st-label">Balance</div><div class="vl-bal"><div id="vlBal">${vlBalance(this.shown(s).toFixed(4))}</div>${s.onBal ? `<div class="vl-onpan static">${cylOnPan}</div>` : ''}</div>${s.onBal && !s.tared ? '<div class="vl-ctl"><button type="button" class="btn primary" id="wTare">Press TARE</button></div>' : ''}</div>
+    <div class="vl-st wide"><div class="vl-st-label">10 mL graduated cylinder (on the balance)</div><div id="vlCyl">${cylinderSVG(10, s.v)}</div>${ctl}</div></div>`;
+  },
+  draw(s) { vlSet('vlCyl', cylinderSVG(10, s.v)); vlSet('vlBal', vlBalance(this.shown(s).toFixed(4))); },
+  restore(s) {
+    this.draw(s);
+    const tare = $('wTare'); if (tare) tare.onclick = () => { s.tared = true; vlScene(); vlSay('Tared: the balance now ignores the cylinder’s mass.', 'good'); vlSteps(); };
+    const sq = $('wSquirt'); if (!sq) return;
+    const add = dv => { s.v = +Math.max(0, Math.min(10.4, s.v + dv)).toFixed(3); this.draw(s); if (s.v > 10) vlSay('Past the top line! Pour some out.', 'bad'); else vlSay(''); };
+    let timer = null; const end = () => { clearInterval(timer); timer = null; };
+    sq.addEventListener('pointerdown', e => { e.preventDefault(); if (!timer) timer = setInterval(() => add(0.09), 60); }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => sq.addEventListener(ev, end));
+    sq.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') add(0.5); });
+    $('wDrop').onclick = () => add(0.04); $('wOut').onclick = () => add(-0.35);
+    $('wDone').onclick = () => { if (s.v < 1) { vlSay('Add some water first.', 'bad'); return; } s.filled = true; vlScene(); vlSteps(); };
+  },
+  async drop(s, what, where) {
+    if (what === 'cyl' && where === 'balance') { s.onBal = true; vlScene(); await vlWeigh('vlBal', this.shown(s), 4); vlSay('That’s the mass of the empty cylinder. Press TARE to zero it.'); return true; }
+    return 'Put the cylinder on the balance.';
+  },
+  steps: [
+    { title: 'Tare the cylinder', say: 'Drag the <b>empty cylinder</b> onto the balance, then press <b>TARE</b>.', act: s => s.tared, auto: true },
+    { title: 'Fill to the target', say: s => `Fill to <b>${s.target.toFixed(2)} mL</b>. Squirt to get close, then use single drops. Stop when the bottom of the meniscus sits on the line. Then read the volume.`, act: s => s.filled, parts: s => [num(s.v, { dp: 2, unit: 'mL', tol: 0.02, label: 'Volume of water' })], rec: (s, v) => { s.VR = v[0]; }, sol: s => `<b>${s.v.toFixed(2)} mL</b> (lines every 0.1 mL → read to 0.01 mL).` },
+    { title: 'Mass of the water', say: 'The balance was tared, so it shows only the water. Record every digit.', parts: s => [num(BENCH_WATER.shown(s), { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of water' })], rec: (s, v) => { s.mR = v[0]; }, sol: s => `<b>${BENCH_WATER.shown(s).toFixed(4)} g</b>.` },
+    { title: 'Density of water', say: 'Density = mass ÷ volume.', parts: s => { const sf = sfCount(s.VR.toFixed(2)); return [num(s.mR / s.VR, { sf, unit: 'g/mL', rel: 0.004, label: 'Density' })]; }, rec: (s, v) => { s.dR = v[0]; }, sol: s => `${s.mR.toFixed(4)} g ÷ ${s.VR.toFixed(2)} mL = <b>${sfHTML(s.mR / s.VR, sfCount(s.VR.toFixed(2)))} g/mL</b>.` },
+    { title: 'How did you do?', say: s => { const hit = Math.abs(s.v - s.target), err = Math.abs(s.dR - RHO_W) / RHO_W * 100, medal = err < 0.3 && hit <= 0.05 ? ['gold', 'Gold'] : err < 0.8 && hit <= 0.15 ? ['silver', 'Silver'] : ['bronze', 'Bronze']; return `<div class="vl-score ${medal[0]}"><b>${medal[1]}</b><span>Target ${s.target.toFixed(2)} mL → you filled <b>${s.v.toFixed(2)} mL</b></span><span>Your density <b>${s.dR.toFixed(3)} g/mL</b> vs. water at 22 °C: 0.998 g/mL (about 1.00) · ${err.toFixed(1)}% off</span></div>Now think about error: which mistake would make your density come out too <b>low</b>?`; }, parts: () => [choice(['Reading the volume higher than it really is', 'Reading the volume lower than it really is', 'Forgetting to tare the empty cylinder'], 0)], sol: () => 'Density = m ÷ V. A volume that is too <b>big</b> makes the density too low. (Forgetting to tare adds the cylinder’s mass, making the density far too high.)' }
+  ]
+};
+VBENCH.push(BENCH_TITRATE, BENCH_MODEL, BENCH_WATER);
+
 
 /* ---------- engine ---------- */
 function renderVLab() {
@@ -2435,7 +2628,7 @@ function vlCheck(reveal) {
     fb.className = 'feedback ' + (ok ? 'good' : 'info'); fb.style.display = 'block';
     fb.innerHTML = `${ok ? `<b>Correct!</b> <span class="xp-pop">+${first ? 10 : 5} XP</span>` : '<b>Here’s how:</b>'}<div class="sol">${vlTxt(st.sol, VL.s)}</div><div class="next-row"><button type="button" class="btn primary" id="vlNext">Next step <span data-icon="arrow" aria-hidden="true"></span></button></div>`;
     paintIcons(fb);
-    $('vlNext').onclick = () => { VL.step++; VL.tries = 0; if (VL.step >= b.steps.length || b.steps.slice(VL.step).every(x => x.skip && x.skip(VL.s))) vlFinish(); vlSteps(); };
+    $('vlNext').onclick = () => { VL.step++; VL.tries = 0; vlScene(); if (VL.step >= b.steps.length || b.steps.slice(VL.step).every(x => x.skip && x.skip(VL.s))) vlFinish(); vlSteps(); };
     box.querySelectorAll('input,.opt').forEach(x => (x.disabled = true)); const c = $('vlCheck'); if (c) c.remove(); const sh = $('vlShow'); if (sh) sh.remove();
     try { window.ddTrack && window.ddTrack({ game: 'labpractical', course: '3A', mode: 'Virtual Lab', topic: `${b.title} · ${st.title}`, correct: ok }); } catch (e) {}
   } else {
@@ -2510,6 +2703,7 @@ function bind() {
   $('mockStart').onclick = startMock;
   $('labTiles').addEventListener('click', e => { const b = e.target.closest('[data-lab]'); if (b) toggleLab(b.dataset.lab); });
   $('allLabs').onclick = () => { state.sel = new Set(labSet()); renderLabTiles(); save(); newQuestion(); };
+  $('goQ').onclick = () => { if (!state.sel.size) { const t = $('labTiles'); t.classList.add('nudge'); setTimeout(() => t.classList.remove('nudge'), 700); return; } if (!state.q) newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} const i = $('qParts').querySelector('input'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 500); };
   $('noLabs').onclick = () => { state.sel.clear(); renderLabTiles(); save(); newQuestion(); };
   document.addEventListener('click', e => {
     const o = e.target.closest('.opt'); if (o && !o.disabled) { const grp = o.parentElement; grp.querySelectorAll('.opt').forEach(x => { x.classList.toggle('sel', x === o); x.classList.remove('right', 'wrong'); x.setAttribute('aria-checked', x === o); }); const part = o.closest('.part'); if (part) { part.classList.remove('good', 'bad'); part.querySelector('.pnote').innerHTML = ''; } }
