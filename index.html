@@ -1638,12 +1638,12 @@ const K11a = {
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
     return { tag: 'Theoretical yield', prompt: `A student starts with <b>${al.toFixed(4)} g of aluminum</b>. Every 1 mol of Al makes 1 mol of alum. What is the theoretical yield of alum?`,
-      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.39 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.39 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
+      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.37 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.37 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
   },
   percentYield() {
     const th = rnd(9, 18, 2), act = +(th * rnd(0.55, 1.12, 3)).toFixed(2), py = act / th * 100;
@@ -1715,8 +1715,8 @@ const K12b = {
   citric() {
     const Mb = rnd(0.09001, 0.11499, 5), Vi = offLine(0.5, 4, 2), Vf = +(Vi + rnd(5, 13, 2)).toFixed(2), Vb = Vf - Vi, C = Mb * Vb / 1000 / 3 / 0.01000;
     return { tag: 'Molarity of citric acid', prompt: `A 10.00 mL soda sample was titrated with <b>${Mb.toFixed(5)} M NaOH</b>. The buret went from <b>${Vi.toFixed(2)} mL</b> to <b>${Vf.toFixed(2)} mL</b>. What is the molarity of citric acid in the soda?`, art: RXN_CIT, eq: 'Molarity (M) = mol solute ÷ L solution',
-      parts: [num(C, { sf: 4, unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
-      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, 4)} M</b>.`, video: 'titration', skill: 'calc' };
+      parts: [num(C, { sf: Math.min(4, sfCount(Vb.toFixed(2))), unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
+      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, Math.min(4, sfCount(Vb.toFixed(2))))} M</b>.`, video: 'titration', skill: 'calc' };
   },
   terms() {
     const q = pick([['In this titration, which chemical is the <b>titrant</b> (the one with a known molarity, added from the buret)?', 'NaOH (sodium hydroxide)', ['Citric acid', 'Oxalic acid', 'Phenolphthalein'], 'The <b>titrant</b> is NaOH: it goes in the buret and its molarity is known.'],
