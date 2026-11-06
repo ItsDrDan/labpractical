@@ -323,6 +323,10 @@ body.compact .howto{display:none}body.compact .intro{margin-bottom:4px;gap:10px}
 body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}body.compact .mode-switch button{min-height:0;padding:6px 10px;gap:8px;border-radius:14px}body.compact .mode-switch small{display:none}body.compact .mode-switch b{font-size:1rem}body.compact .ms-ico,body.compact .ms-ico:has(.ms-pic){width:38px;height:38px}
 @media(max-width:760px){body.compact .mode-switch{grid-template-columns:1fr 1fr}}
 .cats.labs.mini{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.cats.labs.mini .cat{min-height:0;padding:7px 30px 7px 10px;flex-direction:column;align-items:flex-start;text-align:left;gap:0;border-radius:12px}.cats.labs.mini .cat img,.cats.labs.mini .cat small,.cats.labs.mini .cat .oldtag{display:none}.cats.labs.mini .cat b{font-size:.88rem;line-height:1.2}.cats.labs.mini .cat .labno{font-size:.68rem}
+.simcard{position:relative;overflow:hidden}.sc-pic{float:right;width:64px;height:64px;object-fit:contain;margin:-2px -4px 4px 8px;filter:drop-shadow(0 3px 4px #4b57d122)}.simgrid.mini .sc-pic{width:30px;height:30px;margin:-3px -4px 0 6px}
+.lvlpick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 2px}.lvlpick>span{font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}.lvlpick .chip{flex-direction:column;align-items:flex-start;gap:0;min-height:0;padding:7px 16px;line-height:1.15}.lvlpick .chip small{font-weight:600;font-size:.72rem;color:var(--muted)}.lvlpick .chip.on{border-color:var(--accent);background:#eef0ff;box-shadow:0 0 0 3px #4b57d122}
+.start-row{display:flex;justify-content:center;margin-top:8px}#mockStart{min-height:72px;min-width:min(420px,100%);padding:0 36px;font-size:1.35rem;border-radius:18px;box-shadow:0 10px 24px #6a5cf055}#mockStart:hover{transform:translateY(-1px)}
+.score .pct{font-size:.6em;margin-left:8px;opacity:.75}
 .simgrid.mini{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}.simgrid.mini .simcard{padding:7px 10px;border-radius:12px}.simgrid.mini .simcard small{display:none}.simgrid.mini .simcard b{font-size:.92rem}.simgrid.mini .simcard .labno{font-size:.66rem}
 .rrow .bd{display:block;color:#656c83;font-weight:700}
 .ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
@@ -539,7 +543,7 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
  </ol>
  <p class="labset" id="labset"></p>
  <div class="mode-switch" id="modes" role="tablist" aria-label="Choose a mode">
-  <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>10 timed stations. Follow your version color.</small></span></button>
+  <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>One timed station per lab + 2 lab-skills stations. Follow your version color.</small></span></button>
   <button type="button" data-mode="practice" role="tab"><span class="ms-ico" data-icon="flask" aria-hidden="true"><img class="ms-pic" src="assets/modes/practice.webp" alt="" onerror="this.remove()"></span><span><b>Practice by Lab</b><small>Pick labs. No timer, hints on.</small></span></button>
   <button type="button" data-mode="bench" role="tab"><span class="ms-ico" data-icon="sliders" aria-hidden="true"><img class="ms-pic" src="assets/modes/phet.webp" alt="" onerror="this.remove()"></span><span><b>PhET Lab Bench</b><small>Hands-on simulations with tasks.</small></span></button>
   <button type="button" data-mode="vlab" role="tab"><span class="ms-ico" data-icon="beaker" aria-hidden="true"><img class="ms-pic" src="assets/modes/vlab.webp" alt="" onerror="this.remove()"></span><span><b>Virtual Lab</b><small>Weigh, pour, mix and measure, then do the math.</small></span></button>
@@ -557,8 +561,8 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
    </div>
    <h2 class="pick-title" style="margin:4px 0 0"><span class="stepnum">2</span>Timer</h2>
    <div class="timerpick" id="timerpick"><button type="button" class="chip on" data-t="real">Real: 4 min per station + 1 min to rotate</button><button type="button" class="chip" data-t="off">No timer</button></div>
-   <ul class="rules-mini"><li>Every station shows Versions A, B and C. <b>Only answer your version.</b></li><li>When time is up, pens down and rotate. You get time at the end to finish your work.</li><li>Answers are free response: numbers, units and sig figs all count.</li></ul>
-   <div><button type="button" class="btn primary" id="mockStart">Start the practical <span data-icon="arrow" aria-hidden="true"></span></button></div>
+   <ul class="rules-mini"><li>Every station shows Versions A, B and C. <b>Only answer your version.</b></li><li>When time is up, pens down and rotate. You get time at the end to finish your work.</li><li>One station from each of your labs, plus 2 general stations: equipment names and measurements.</li><li>Answers are free response: numbers, units and sig figs all count.</li></ul>
+   <div class="start-row"><button type="button" class="btn primary" id="mockStart">Start the practical <span data-icon="arrow" aria-hidden="true"></span></button></div>
   </div>
   <div id="mockRun" hidden></div>
  </section>
@@ -568,6 +572,7 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
   <section class="chooser">
    <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button><button type="button" class="link-btn" id="bigTiles" hidden>Show big tiles</button></h2>
    <div class="cats labs" id="labTiles"></div>
+   <div class="lvlpick" role="radiogroup" aria-label="Level"><span>Level</span><button type="button" class="chip" data-lvl="beg">Beginner<small>products given, pick from choices</small></button><button type="button" class="chip" data-lvl="int">Intermediate<small>like the real practical</small></button></div>
    <div class="pick-actions"><button type="button" class="btn" id="allLabs">Select all</button><button type="button" class="btn" id="noLabs">Clear</button></div>
   </section>
   <main class="panel" id="play">
@@ -599,6 +604,7 @@ body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
  <section id="vlabView" hidden>
   <div class="panel section">
    <div class="section-head"><h2>Virtual Lab</h2><span>Drag items onto the equipment, or tap an item and then tap where it goes.</span></div>
+   <div class="lvlpick" role="radiogroup" aria-label="Level"><span>Level</span><button type="button" class="chip" data-lvl="beg">Beginner<small>products given, pick from choices</small></button><button type="button" class="chip" data-lvl="int">Intermediate<small>like the real practical</small></button></div>
    <div class="simgrid" id="vlGrid"></div>
    <div id="vlArea"></div>
   </div>
@@ -878,6 +884,7 @@ function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'eq') return gradeEq(p, val);
   if (p.type === 'num') return gradeNum(p, val, unitVal, needUnit);
   if (p.type === 'choice') { const ok = String(val) === String(p.ok); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.why && p.why[val]) || '' }; }
+  if (p.type === 'text' && p.kw) { const t = ' ' + normWords(val) + ' ', ok = p.kw.some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Describe what you saw: a solid, bubbles, a smell, heat, a coating, a color change, or no change.' }; }
   if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
   if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
@@ -1711,12 +1718,13 @@ const K10a = {
   station() {
     const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
     const others = shuffle(RX.filter(x => x.tube && x.obs !== rx.obs && x.s2 !== rx.s2)).slice(0, 3).map(x => x.obs), opts = shuffle([rx.obs, ...others]);
-    const parts = [choice(opts, opts.indexOf(rx.obs), { label: 'Observation', w: 2 }), choice(S2, rx.s2, { label: 'Type of reaction', w: 2 }), eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
-    return { tag: 'Types of reactions station', prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then <b>predict the products</b> and write the <b>balanced equation with phases</b>.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
+    const beg = lvl() === 'beg', parts = [choice(opts, opts.indexOf(rx.obs), { label: 'Observation', w: 2 }), choice(S2, rx.s2, { label: 'Type of reaction', w: 2 }), beg ? balPart(rx, { label: 'Balance the equation', w: 6 }) : eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
+    return { tag: 'Types of reactions station', prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
       hint: 'Swap partners (double displacement) or let the metal replace the ion (single displacement). Fix each formula from the ion charges, check the solubility rules for (s) vs (aq), then balance.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   predict() {
     const rx = pick(RX.filter(x => x.r.length === 2 && x.p.length && x.s2 !== 5 && x.s2 !== 4));
+    if (lvl() === 'beg') return { tag: 'Balance the reaction', prompt: `${rxPlain(rx.r)} react. ${rx.obs} The products are given: balance the equation with the smallest whole numbers (write 1 where needed).`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [balPart(rx)], hint: 'Balance polyatomic ions as a unit. Save H and O for last.', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
     return { tag: 'Predict and balance', prompt: `Predict the products and write the <b>balanced equation with phases</b> for: <b>${rxPlain(rx.r)}</b>. ${rx.obs}`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [eqPart(rx)],
       hint: 'Reactants → products. Type -> for the arrow. Write the phase after each formula, like NaCl(aq).', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
   },
@@ -1983,8 +1991,9 @@ const ACH = [
   ['equip', 'Equipment Expert', '8 equipment questions right', 'checklist', P => (P.skill.equip || 0) >= 8],
   ['calc', 'Data Cruncher', '15 calculations right', 'percent', P => (P.skill.calc || 0) >= 15],
   ['rotation', 'Full Rotation', 'Finish a mock practical', 'finish', P => P.mocks >= 1],
-  ['honor', 'Honor Roll', 'Score 90 or more on a mock practical', 'medal', P => (P.bestMock || 0) >= 90],
+  ['honor', 'Honor Roll', 'Score 90% or more on a mock practical', 'medal', P => (P.bestMock || 0) >= 90],
   ['rainbow', 'All Three Colors', 'Finish a mock as Version A, B and C', 'stars', P => P.versions.A && P.versions.B && P.versions.C],
+  ['vlab', 'Bench Hand', 'Finish 4 different Virtual Labs', 'burette', P => Object.keys(P.vlab || {}).length >= 4],
   ['phet', 'PhET Explorer', 'Finish 6 PhET bench tasks', 'molecule', P => Object.keys(P.benchDone).length >= 6],
   ['alllabs', 'Every Lab', 'Get a question right in every lab on your list', 'trophy', P => labSet().every(id => P.lab[id] && P.lab[id].c > 0)]
 ];
@@ -2072,7 +2081,7 @@ function newQuestion() {
   $('playTitle').textContent = 'Practice';
   $('labTag').textContent = labTitle(lab); $('topicTag').textContent = q.tag;
   $('qBox').innerHTML = qHTML(q); $('qParts').innerHTML = partsHTML(q.parts, 'pq', false);
-  $('feedback').className = 'feedback'; $('feedback').innerHTML = ''; $('hintBox').hidden = true; $('nextBtn').hidden = true; $('checkBtn').hidden = false;
+  $('feedback').className = 'feedback'; $('feedback').innerHTML = ''; $('hintBox').hidden = true; if (lvl() === 'beg' && q.skill === 'calc' && q.hint) { $('hintBox').hidden = false; $('hintBox').innerHTML = `<b>Beginner tip:</b> ${q.hint}`; } $('nextBtn').hidden = true; $('checkBtn').hidden = false;
   $('simBtn').hidden = !PHET.some(s => s.labs.includes(lab));
   $('vlBtn').hidden = !VBENCH.some(b => b.labs.includes(lab));
   setVideoFor(q.video, lab);
@@ -2132,11 +2141,20 @@ function genStation() {
   const vq = v => { const two = items.slice('ABC'.indexOf(v) * 2, 'ABC'.indexOf(v) * 2 + 2); return { lab: 'gen', labName: 'General Lab Knowledge', kind: 'bench', tag: 'Name the equipment', prompt: `What are the names of the two pieces of equipment labeled <b>${v}</b>?`, parts: two.map((e, k) => textPart(e[5], { ans: e[1], partial: eqPartial(e), label: `Piece ${k + 1} labeled ${v}` })), solution: two.map(e => `<b>${e[1]}</b>: ${e[2]}.`).join('<br>'), video: 'practical1', skill: 'equip' }; };
   return { lab: 'gen', title: 'General Lab Knowledge', shared: art, versions: { A: vq('A'), B: vq('B'), C: vq('C') } };
 }
+function genSkills() {
+  const src = { A: ['0a', 'cyl'], B: ['7a', 'thermo'], C: ['1a', 'ruler'] }, v = {};
+  'ABC'.split('').forEach(V => { const q = makeQ(src[V][0], src[V][1]); q.lab = 'gen'; q.labName = 'General Lab Knowledge'; v[V] = q; });
+  return { lab: 'gen', title: 'General Lab Knowledge: Measurements', versions: v };
+}
 function buildPractical(ver, timer) {
-  const pool = shuffle(labSet()).slice(0, 9);
+  buildingMock = true; try { buildPractical0(ver, timer); } finally { buildingMock = false; }
+}
+function buildPractical0(ver, timer) {
+  const pool = shuffle(labSet());
   const stations = pool.map(id => { const l = labById(id), kinds = shuffle(l.mock || Object.keys(l.K)); const ks = [0, 1, 2].map(i => kinds[i % kinds.length]); const v = {}; 'ABC'.split('').forEach((V, i) => { v[V] = makeQ(id, ks[i]); }); return { lab: id, title: l.name, versions: v }; });
-  let nh = 0; stations.forEach((st, k) => { if (HANDS[st.lab] && nh < 4 && Math.random() < 0.7) { stations[k] = HANDS[st.lab](); nh++; } });
+  let nh = 0; stations.forEach((st, k) => { if (HANDS[st.lab] && nh < 4 && Math.random() < 0.6) { stations[k] = HANDS[st.lab](); nh++; } });
   stations.splice(rint(0, stations.length), 0, genStation());
+  stations.splice(rint(0, stations.length), 0, genSkills());
   stations.forEach(st => 'ABC'.split('').forEach(V => { const q = st.versions[V]; if (q && q.skill === 'read') q.parts.forEach(pt => { if (pt.type === 'num') { pt.read = true; if (pt.rtol == null) pt.rtol = RTOL[pt.unit] != null ? RTOL[pt.unit](pt) : null; } }); }));
   const n = stations.length, start = rint(0, n - 1);
   mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
@@ -2212,14 +2230,14 @@ function turnIn() {
     const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; const share = 10 * (p.w || 1) / q.parts.reduce((a, b) => a + (b.w || 1), 0), bdTxt = r && r.bd ? ` <small class="bd">${r.bd.map(b => `${b[0]} ${+(b[1] * share).toFixed(1)}/${+(b[2] * share).toFixed(1)}`).join(' · ')}</small>` : p.type === 'eq' && r ? ` <small class="bd">Equation ${+(r.score * share).toFixed(1)}/${+share.toFixed(1)} (reactants 1 · products 3 · balanced 1 · phases 1, out of 6)</small>` : ''; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}${bdTxt}</div>`; }).join('');
     return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${stShared(s)}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;
   }).join('');
-  total = Math.round(total * 10) / 10;
-  P.mocks++; P.bestMock = Math.max(P.bestMock || 0, total); P.versions[mock.ver] = 1; P.xp += Math.round(total); renderStats(); save(); checkAch();
+  total = Math.round(total * 10) / 10; const maxPts = 10 * mock.stations.length, pct = Math.round(total / maxPts * 100);
+  P.mocks++; P.bestMock = Math.max(P.bestMock || 0, pct); P.versions[mock.ver] = 1; P.xp += pct; renderStats(); save(); checkAch();
   const weak = mock.stations.map((s, i) => ({ s, i })).filter(x => x.s.lab !== 'gen').filter(x => { const q = x.s.versions[mock.ver]; return gradeAll(q.parts, mock.answers[x.i] || [], true).some(r => !r.ok); }).map(x => x.s.lab);
-  $('mockRun').innerHTML = `<div class="station results"><p class="eyebrow">Version ${mock.ver} · ${VCOL[mock.ver]} sheet</p><div class="score"><b>${total} / 100</b><span>${total >= 90 ? 'Outstanding: you’re ready.' : total >= 70 ? 'Solid. Review the stations below.' : 'Keep practicing: open the worked answers below.'}</span></div>
+  $('mockRun').innerHTML = `<div class="station results"><p class="eyebrow">Version ${mock.ver} · ${VCOL[mock.ver]} sheet</p><div class="score"><b>${total} / ${maxPts} <small class="pct">${pct}%</small></b><span>${pct >= 90 ? 'Outstanding: you’re ready.' : pct >= 70 ? 'Solid. Review the stations below.' : 'Keep practicing: open the worked answers below.'}</span></div>
     <p class="small-note">Graded like the real practical. <b>Readings:</b> accuracy 4, precision 4, units 2. <b>Calculations:</b> answer 8, sig figs 1, units 1. A known setup mistake earns half the answer points. <b>Equipment:</b> a partial name earns 2 of 5. On the real practical most calculation points come from your written setup, so show every conversion.</p>${rows}
     <div class="check-row">${weak.length ? `<button type="button" class="btn" id="practiceWeak">Practice the labs I missed (${[...new Set(weak)].length})</button>` : ''}<button type="button" class="btn primary" id="newMock">New mock practical <span data-icon="loop" aria-hidden="true"></span></button></div></div>`;
   paintIcons($('mockRun'));
-  if (total >= 90) confetti();
+  if (pct >= 90) confetti();
   $('newMock').onclick = () => { quitMock(); };
   if ($('practiceWeak')) $('practiceWeak').onclick = () => { const w = [...new Set(weak)]; quitMock(); state.sel = new Set(w); setMode('practice'); renderLabTiles(); newQuestion(); };
   $('mockRun').querySelectorAll('[data-practice]').forEach(b => (b.onclick = () => { const id = b.dataset.practice; quitMock(); state.sel = new Set([id]); setMode('practice'); renderLabTiles(); newQuestion(); }));
@@ -2230,7 +2248,7 @@ function turnIn() {
 /* ---------- PhET bench ---------- */
 function renderBench() {
   const set = labSet(), sims = PHET.filter(s => s.labs.some(l => set.includes(l)));
-  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small><small> ${s.tasks.filter((t, i) => P.benchDone[s.id + i]).length}/${s.tasks.length} tasks</small></button>`).join('');
+  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><img class="sc-pic" src="assets/sims/${s.id}.webp" alt="" onerror="this.remove()"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small><small> ${s.tasks.filter((t, i) => P.benchDone[s.id + i]).length}/${s.tasks.length} tasks</small></button>`).join('');
   if (!state.sim || !sims.some(s => s.id === state.sim)) { $('simArea').innerHTML = '<div class="empty">Pick a simulation to open it here.</div>'; return; }
   const s = PHET.find(x => x.id === state.sim), scr0 = (s.tasks.find(t => t.scr) || {}).scr;
   $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note">${scr0 ? `Opens right on the <b>${s.screens[scr0]}</b> screen. ` : ''}<a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open the simulation full screen ↗</a></p>` +
@@ -2301,8 +2319,9 @@ function vlTube(o = {}) {
   let t = `<svg viewBox="0 0 220 320" role="img" aria-label="${esc(o.aria || 'A test tube')}"><defs><clipPath id="vltc"><path d="M82 40 L82 250 Q82 284 110 284 Q138 284 138 250 L138 40 Z"/></clipPath></defs>`;
   if (o.glow) t += `<ellipse class="vl-glow" cx="110" cy="210" rx="70" ry="100" fill="#ff9a62" opacity=".35"/>`;
   t += `<g clip-path="url(#vltc)"><rect class="vl-liq" x="80" y="${lv}" width="60" height="${300 - lv}" fill="${liq}"/>`;
-  if (o.cloud) t += `<rect class="vl-cloud" x="80" y="${lv}" width="60" height="${300 - lv}" fill="${o.cloud}" opacity=".45"/>`;
-  if (o.ppt) t += `<path class="vl-ppt" d="M82 254 Q96 242 110 248 Q124 242 138 252 L138 300 L82 300 Z" fill="${o.ppt}"/>`;
+  const pale = c => /^#f[0-9a-f]{5}$/i.test(c || '');
+  if (o.cloud) t += `<rect class="vl-cloud" x="80" y="${lv}" width="60" height="${300 - lv}" fill="${pale(o.cloud) ? '#d9dee8' : o.cloud}" opacity="${pale(o.cloud) ? '.6' : '.45'}"/>`;
+  if (o.ppt) { const dk = pale(o.ppt) ? '#a9b1c0' : '#00000033'; t += `<path class="vl-ppt" d="M82 254 Q96 242 110 248 Q124 242 138 252 L138 300 L82 300 Z" fill="${o.ppt}" stroke="${dk}" stroke-width="1.5"/>` + [[90, 262], [102, 270], [116, 258], [128, 268], [96, 282], [112, 286], [126, 280], [106, 258], [120, 274], [88, 274]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" fill="${dk}"/>`).join(''); }
   if (o.fall) t += Array.from({ length: 34 }, (_, i) => `<circle class="vl-fall" cx="${rint(86, 134)}" cy="${rint(lv + 4, lv + 60)}" r="${rnd(1.6, 3.2, 1)}" fill="${o.fall}" style="animation-delay:${(i * 0.06).toFixed(2)}s;--fy:${rint(150, 230) - (lv - 150)}px"/>`).join('');
   if (o.pellets) t += `<ellipse cx="100" cy="268" rx="11" ry="8" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/><ellipse cx="121" cy="272" rx="10" ry="7" fill="${o.pellets}" stroke="#2f4d70" stroke-width="1.5"/>`;
   if (o.coat) t += `<ellipse class="vl-coat" cx="100" cy="268" rx="12" ry="9" fill="none" stroke="${o.coat}" stroke-width="5"/><ellipse class="vl-coat" cx="121" cy="272" rx="11" ry="8" fill="none" stroke="${o.coat}" stroke-width="5"/>`;
@@ -2410,7 +2429,7 @@ const VR = {
   'Na2CO3': { c: 'Na', a: 'CO3' }, 'Na2SO4': { c: 'Na', a: 'SO4' }, 'KI': { c: 'K', a: 'I' }, 'NaCl': { c: 'Na', a: 'Cl' },
   'NaOH': { c: 'Na', a: 'OH' }, 'HCl': { c: 'H', a: 'Cl' }, 'NH4Cl': { c: 'NH4', a: 'Cl' }, 'Zn': { metal: 1 }
 };
-const ION = { Ag: ['Ag⁺', 1], Pb: ['Pb²⁺', 2], Ba: ['Ba²⁺', 2], Cu: ['Cu²⁺', 2], Na: ['Na⁺', 1], K: ['K⁺', 1], NH4: ['NH₄⁺', 1], H: ['H₃O⁺', 1], NO3: ['NO₃⁻', 1], Cl: ['Cl⁻', 1], I: ['I⁻', 1], SO4: ['SO₄²⁻', 2], CO3: ['CO₃²⁻', 2], OH: ['OH⁻', 1] };
+const ION = { Zn: ['Zn²⁺', 2], Ag: ['Ag⁺', 1], Pb: ['Pb²⁺', 2], Ba: ['Ba²⁺', 2], Cu: ['Cu²⁺', 2], Na: ['Na⁺', 1], K: ['K⁺', 1], NH4: ['NH₄⁺', 1], H: ['H₃O⁺', 1], NO3: ['NO₃⁻', 1], Cl: ['Cl⁻', 1], I: ['I⁻', 1], SO4: ['SO₄²⁻', 2], CO3: ['CO₃²⁻', 2], OH: ['OH⁻', 1] };
 // insoluble combinations (Tro solubility rules) and the color of each solid
 const INSOL = { 'Ag|Cl': '#f4f4f4', 'Ag|I': '#f1e6a0', 'Ag|CO3': '#efe4b8', 'Ag|SO4': '#f4f4f4', 'Ag|OH': '#7a5230', 'Pb|Cl': '#f4f4f4', 'Pb|I': '#f7d417', 'Pb|SO4': '#f4f4f4', 'Pb|CO3': '#f4f4f4', 'Pb|OH': '#f4f4f4', 'Ba|SO4': '#f4f4f4', 'Ba|CO3': '#f4f4f4', 'Cu|CO3': '#5fb3a8', 'Cu|OH': '#5a9cf0' };
 const POLY = ['NO3', 'SO4', 'CO3', 'OH', 'NH4'];
@@ -2438,14 +2457,45 @@ function mixResult(A, B) {
   if (has('H', 'OH')) return { kind: 'neutral', obs: 2, type: 1, text: 'No visible change, but the test tube feels warm.', tube: { heat: 1, glow: 1 } };
   return { kind: 'none', obs: 4, type: 4, text: 'Nothing happens: the mixture stays clear, with no temperature change.', tube: {}, ions: [ION[x.c][0], ION[x.a][0], ION[y.c][0], ION[y.a][0]] };
 }
+// Beginner / Intermediate (Practice and Virtual Lab only; the mock is always the real thing)
+let buildingMock = false;
+const lvl = () => (buildingMock || (mock && mock.phase !== 'done') || VL.mock ? 'int' : (P && P.level) || 'int');
+function paintLvl() { document.querySelectorAll('.lvlpick .chip').forEach(b => { const on = b.dataset.lvl === ((P && P.level) || 'int'); b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('role', 'radio'); }); }
+const OBSKW = { ppt: ['precipitat', 'solid', 'cloud', 'ppt', 'milky', 'turbid', 'settl'], gas: ['bubbl', 'fizz', 'gas', 'effervesc', 'smell', 'odor', 'litmus', 'foam'], neutral: ['warm', 'heat', 'hot', 'temperature', 'exotherm'], redox: ['coat', 'deposit', 'plat', 'solid', 'color', 'fade', 'dark', 'brown', 'gray', 'grey'], none: ['no change', 'nothing', 'no reaction', 'no visible', 'no observ', 'stays clear', 'stayed clear', 'no evidence'] };
+const obsPart = (r, o = {}) => Object.assign({ type: 'text', kw: OBSKW[r.kind].map(w => (w.includes(' ') ? w : w)), accept: [], ans: r.text.replace(/: .*$/, '.') }, o);
+function balanceRx(r, p) {
+  const terms = [...r, ...p].map(x => parseFormula(x.replace(/\((s|l|g|aq)\)$/, ''))), els = [...new Set(terms.flatMap(t => Object.keys(t)))], n = terms.length, c = Array(n).fill(1);
+  const ok = () => els.every(e => terms.reduce((a, t, i) => a + (t[e] || 0) * c[i] * (i < r.length ? 1 : -1), 0) === 0);
+  const go = i => { if (i === n) return ok(); for (let v = 1; v <= 6; v++) { c[i] = v; if (go(i + 1)) return true; } return false; };
+  return go(0) ? c.slice() : null;
+}
+function mixEq(A, B) {
+  const x = VR[A], y = VR[B], ph = (f, sol) => f + (sol ? '(aq)' : '(s)'), r = [A, B].map(k => (VR[k].metal ? k + '(s)' : k + '(aq)'));
+  let pr = [];
+  if (x.metal || y.metal) {
+    const sol = x.metal ? y : x; if (!['H', 'Cu', 'Ag', 'Pb'].includes(sol.c)) return null;
+    pr = [saltFormula('Zn', sol.a) + '(aq)', sol.c === 'H' ? 'H2(g)' : sol.c + '(s)'];
+  } else {
+    [[x.c, y.a], [y.c, x.a]].forEach(([c, a]) => {
+      if (c === 'H' && a === 'OH') pr.push('H2O(l)');
+      else if (c === 'H' && a === 'CO3') pr.push('H2O(l)', 'CO2(g)');
+      else if (c === 'NH4' && a === 'OH') pr.push('NH3(g)', 'H2O(l)');
+      else if (c === 'Ag' && a === 'OH') pr.push('Ag2O(s)', 'H2O(l)');
+      else pr.push(ph(saltFormula(c, a), !INSOL[`${c}|${a}`]));
+    });
+    if (mixResult(A, B).kind === 'none') return null;
+  }
+  const cc = balanceRx(r, pr); return cc ? { r, p: pr, c: cc } : null;
+}
+const balPart = (rx, o = {}) => Object.assign({ type: 'coef', vals: rx.c, terms: [...rx.r, ...rx.p], nr: rx.r.length, ans: rxHTML(rx, true) }, o);
 const BENCH_MIX = {
   id: 'mix', labs: ['10a'], title: 'Mix and Observe', blurb: 'Combine two chemicals in a test tube and watch what happens.',
-  setup() { return { added: [], res: null }; },
+  setup() { return { added: [], res: null, lvl: lvl() }; },
   scene(s) {
     const shelf = Object.keys(VR).map(k => shelfBtn('r:' + k, k === 'Zn' ? VLI.slug('#b8bfcc') : VLI.dropper(VR[k].col || '#e8f4fc'), k === 'Zn' ? 'Zn(s)' : fhtml(k) + '(aq)', s.added.includes(k) || s.added.length >= 2 ? 'disabled' : '')).join('');
     return `<div class="vl-shelf many">${shelf}</div><div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.added.length ? ': ' + s.added.map(k => fhtml(k)).join(' + ') : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div>${VL.mock && s.added.length ? '<div class="vl-ctl"><button type="button" class="btn" id="mxRinse">Rinse the tube</button></div>' : ''}</div><div class="vl-st wide vl-popbox" id="vlPop"><div class="empty small">Add two chemicals. A particle view of the reaction pops up here.</div></div></div>`;
   },
-  restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', this.pop(s)); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s), pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); const r = $('mxRinse'); if (r) r.onclick = () => { s.added = []; s.res = null; vlScene(); vlSay('Rinsed. The tube is clean and empty.'); }; },
+  restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', s.seen && !VL.mock ? this.pop(s) : '<div class="empty small">Look closely at the tube and record what you see. The particle view opens after you record your observation.</div>'); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s), pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); const r = $('mxRinse'); if (r) r.onclick = () => { s.added = []; s.res = null; vlScene(); vlSay('Rinsed. The tube is clean and empty.'); }; },
   liq(s) { return s.added.some(k => k === 'CuSO4') ? '#8cc4ff' : '#e6f3fb'; },
   final(s) {
     const r = s.res, o = Object.assign({ level: 160, liquid: r.fade ? '#e6f3fb' : this.liq(s), aria: r.text }, r.tube || {});
@@ -2474,13 +2524,15 @@ const BENCH_MIX = {
     vlSet('vlTube', vlTube({ level: 170, liquid: this.liq(s), drops: '#cfe6f8', pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); await wait(900);
     const r = s.res, f = this.final(s);
     if (r.kind === 'ppt') { vlSet('vlTube', vlTube(Object.assign({}, f, { ppt: null, cloud: r.color, fall: r.color }))); await wait(1800); }
-    vlSet('vlTube', vlTube(f)); vlSet('vlPop', this.pop(s));
-    vlSay(`<b>Observation:</b> ${r.text}`, 'good'); return true;
+    vlSet('vlTube', vlTube(f)); vlSet('vlPop', VL.mock ? '' : '<div class="empty small">Look closely at the tube and record what you see. The particle view opens after you record your observation.</div>');
+    vlSay('Both chemicals are in. <b>Look closely at the tube</b>: is there a solid, bubbles, a smell, heat, a coating, or no change?'); return true;
   },
   steps: [
-    { title: 'Mix two chemicals', say: 'Drag <b>two different chemicals</b> into the test tube, one at a time.', act: s => !!s.res, parts: s => [choice(OBS6, s.res.obs, { label: 'What did you observe?' })], sol: s => s.res.text },
+    { title: 'Mix two chemicals', say: s => (s.lvl === 'beg' ? 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then pick what you observed.' : 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then <b>write your observation</b> in your own words.'), act: s => !!s.res, parts: s => [s.lvl === 'beg' ? choice(OBS6, s.res.obs, { label: 'What did you observe?' }) : obsPart(s.res, { label: 'Observation (in your own words)' })], rec: s => { s.seen = true; }, sol: s => { s.seen = true; setTimeout(() => vlSet('vlPop', BENCH_MIX.pop(s)), 0); return s.res.text; } },
     { title: 'Classify it', say: 'What type of reaction is this?', parts: s => [choice(TYPE5, s.res.type)], sol: s => `<b>${TYPE5[s.res.type]}</b>. ${s.res.kind === 'ppt' ? 'A solid formed from two solutions.' : s.res.kind === 'neutral' ? 'Acid + base → water + a salt, and heat.' : s.res.kind === 'gas' && s.res.gas !== 'H2' ? 'A gas formed from two solutions.' : s.res.kind === 'none' ? 'No evidence of a chemical change.' : 'An uncombined element (Zn) changes into an ion.'}` },
-    { title: 'Name the product', skip: s => !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
+    { title: 'Predict and balance', skip: s => s.lvl === 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Predict the products and write the <b>balanced equation with phases</b>. Type -> for the arrow.', parts: s => [eqPart(mixEq(s.added[0], s.added[1]), { label: 'Balanced equation with phases' })], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
+    { title: 'Balance it', skip: s => s.lvl !== 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Here are the products. Balance the equation with the smallest whole numbers (write 1 where needed).', parts: s => [balPart(mixEq(s.added[0], s.added[1]))], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
+    { title: 'Name the product', skip: s => s.lvl !== 'beg' || !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
   ]
 };
 
@@ -2775,9 +2827,9 @@ const HANDS = {
     const ppt = pick(all.filter(x => x[2].kind === 'ppt')), other = pick(all.filter(x => x[2].kind === 'gas' || x[2].kind === 'neutral' || x[2].kind === 'redox')), third = pick(all.filter(x => x !== ppt && x !== other && x[2].kind !== 'none'));
     const nm = x => `${fhtml(x[0])} and ${fhtml(x[1])}`;
     return { lab: '10a', title: 'Types of Reactions (hands-on)', hands: { bench: b, s, snap: () => `A: ${nm(ppt)} · B: ${nm(other)} · C: ${nm(third)}` }, versions: {
-      A: handQ('10a', `Mix <b>${nm(ppt)}</b> in the test tube. What is the formula of the precipitate?`, [{ type: 'formula', accept: [ppt[2].ppt, ppt[2].ppt + '(s)', ...(ppt[2].ppt === 'Ag2O' ? ['AgOH'] : [])], ans: fhtml(ppt[2].ppt) }], () => ppt[2].text, 'concept'),
+      A: handQ('10a', `Mix <b>${nm(ppt)}</b> in the test tube. Predict the products and write the <b>balanced equation with phases</b>.`, [eqPart(mixEq(ppt[0], ppt[1]), { label: 'Balanced equation with phases' })], () => `${ppt[2].text}${eqn(rxHTML(mixEq(ppt[0], ppt[1]), true))}`, 'concept'),
       B: handQ('10a', `Mix <b>${nm(other)}</b> in the test tube. What type of reaction is it?`, [choice(TYPE5, other[2].type)], () => `${other[2].text} → <b>${TYPE5[other[2].type]}</b>.`, 'concept'),
-      C: handQ('10a', `Mix <b>${nm(third)}</b> in the test tube. What do you observe?`, [choice(OBS6, third[2].obs)], () => third[2].text, 'concept') } };
+      C: handQ('10a', `Mix <b>${nm(third)}</b> in the test tube. Write your observation.`, [obsPart(third[2], { label: 'Observation' })], () => third[2].text, 'concept') } };
   },
   '12a'() {
     const b = BENCH_PH, s = b.setup(), h = pick(HOUSE.filter(x => cabIdx((x[1] + x[2]) / 2) !== 2 && cabIdx(x[1]) === cabIdx(x[2]))); s.item = h; s.pH = rnd(h[1], h[2], 2); s.pHR = s.pH;
@@ -2810,7 +2862,7 @@ const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${s.
 function renderVLab() {
   const set = labSet(), list = VBENCH.filter(b => b.labs.some(l => set.includes(l)));
   P.vlab = P.vlab || {};
-  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
+  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><img class="sc-pic" src="assets/vlab/${b.id}.webp" alt="" onerror="this.remove()"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
   if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
   vlRenderAll();
 }
@@ -3131,7 +3183,7 @@ function renderStats() {
   const r = rankOf(P.xp), nx = RANKS.find(x => x[0] > P.xp);
   $('rankName').textContent = r[1]; $('rankLine').textContent = r[1]; $('xpShort').textContent = `${P.xp} XP`; $('xpText').textContent = nx ? `${P.xp} XP · ${nx[0] - P.xp} to ${nx[1]}` : `${P.xp} XP`;
   $('xpFill').style.width = (nx ? Math.min(100, (P.xp - r[0]) / (nx[0] - r[0]) * 100) : 100) + '%';
-  $('streak').textContent = P.streak; $('sCorrect').textContent = P.correct; $('sTried').textContent = P.tried; $('sMocks').textContent = P.mocks; $('sBestMock').textContent = P.mocks ? P.bestMock : '–';
+  $('streak').textContent = P.streak; $('sCorrect').textContent = P.correct; $('sTried').textContent = P.tried; $('sMocks').textContent = P.mocks; $('sBestMock').textContent = P.mocks ? P.bestMock + '%' : '–';
   $('achGrid').innerHTML = ACH.map(a => `<div class="badge${P.ach[a[0]] ? ' got' : ''}"><img src="assets/ach-${a[0]}.webp" data-fb="${a[3]}" onerror="this.onerror=null;this.src='${BADGE(a[3])}'" alt=""><b>${a[1]}</b><small>${a[2]}</small></div>`).join('');
   $('achCount').textContent = `${ACH.filter(a => P.ach[a[0]]).length} / ${ACH.length}`;
 }
@@ -3173,6 +3225,7 @@ function bind() {
   $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => x.classList.toggle('on', x === b)); });
   $('timerpick').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#timerpick .chip').forEach(x => x.classList.toggle('on', x === b)); });
   $('mockStart').onclick = startMock;
+  paintLvl(); document.querySelectorAll('.lvlpick .chip').forEach(b => (b.onclick = () => { P.level = b.dataset.lvl; save(); paintLvl(); toast(P.level === 'beg' ? '<b>Beginner</b>: products are given and observations are multiple choice.' : '<b>Intermediate</b>: predict the products, balance with phases, and write your own observations.', 'stars'); if (state.mode === 'practice' && state.q && !state.done) newQuestion(); if (state.mode === 'vlab' && VL.bench && VL.bench.id === 'mix') vlStart('mix'); }));
   $('labTiles').addEventListener('click', e => { const b = e.target.closest('[data-lab]'); if (b) toggleLab(b.dataset.lab); });
   $('allLabs').onclick = () => { state.sel = new Set(labSet()); renderLabTiles(); save(); newQuestion(); };
   $('goQ').onclick = () => { if (state.sel.size) { state.mini = true; renderLabTiles(); } if (!state.sel.size) { const t = $('labTiles'); t.classList.add('nudge'); setTimeout(() => t.classList.remove('nudge'), 700); return; } if (!state.q) newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} const i = $('qParts').querySelector('input'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 500); };
