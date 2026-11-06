@@ -459,6 +459,58 @@ html.dd-embedded .mockbar{position:relative}
 
 .chooselist{margin:6px 0 4px;padding-left:22px;color:#38446a;font-weight:650}.chooselist li{margin:2px 0}
 
+
+/* ================= pastel theme (v12) ================= */
+:root{--p-lav:#efe9ff;--p-lav-d:#b9a6f5;--p-mint:#e2f6ec;--p-mint-d:#8fd3ae;--p-sky:#e3f1ff;--p-sky-d:#93c2f2;--p-peach:#ffeadf;--p-peach-d:#f3ad86;--p-pink:#ffe6f0;--p-pink-d:#f2a3c3;--p-lemon:#fff6cf;--p-lemon-d:#ecd06a}
+body{background:radial-gradient(900px 420px at 8% -6%,#efe6ff 0,transparent 60%),radial-gradient(760px 380px at 96% 4%,#ffe6f0 0,transparent 58%),radial-gradient(900px 520px at 50% 108%,#e2f6ec 0,transparent 60%),#f7f6fd;background-attachment:fixed}
+.panel{border:1.5px solid #ece8fb;border-radius:24px;box-shadow:0 10px 30px #6b5bd114}
+.intro h1{background:linear-gradient(90deg,#5b4bd6,#c2569b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro-logo,.intro img{transition:transform .25s}.intro img:hover{transform:rotate(-6deg) scale(1.05)}
+/* directions: three colored steps */
+.howto li{border:1.5px solid transparent}
+.howto li:nth-child(1){background:var(--p-lav);border-color:var(--p-lav-d)}.howto li:nth-child(1)::before{background:#7a66e0}
+.howto li:nth-child(2){background:var(--p-mint);border-color:var(--p-mint-d)}.howto li:nth-child(2)::before{background:#2f9e6a}
+.howto li:nth-child(3){background:var(--p-peach);border-color:var(--p-peach-d)}.howto li:nth-child(3)::before{background:#e07a45}
+/* mode tiles: one color per mode */
+.mode-switch button{border-width:2px;transition:transform .15s,box-shadow .15s}.mode-switch button:hover{transform:translateY(-2px)}
+.mode-switch [data-mode=mock]{background:var(--p-lav);border-color:var(--p-lav-d)}.mode-switch [data-mode=practice]{background:var(--p-mint);border-color:var(--p-mint-d)}
+.mode-switch [data-mode=bench]{background:var(--p-sky);border-color:var(--p-sky-d)}.mode-switch [data-mode=vlab]{background:var(--p-peach);border-color:var(--p-peach-d)}
+.mode-switch button.active{background:#fff;box-shadow:0 0 0 4px var(--ring,#4b57d133),0 10px 22px #6b5bd11f}
+.mode-switch [data-mode=mock].active{--ring:#b9a6f580;border-color:#8d76ea}.mode-switch [data-mode=practice].active{--ring:#8fd3ae80;border-color:#3fae78}
+.mode-switch [data-mode=bench].active{--ring:#93c2f280;border-color:#4d94dd}.mode-switch [data-mode=vlab].active{--ring:#f3ad8680;border-color:#e2834f}
+.mode-switch button.active .ms-ico:not(:has(.ms-pic)){background:var(--accent)}
+/* each mode's panels pick up its color */
+#mockView .panel{background:linear-gradient(180deg,#f7f3ff,#fff 160px)}#practiceView .panel{background:linear-gradient(180deg,#f0fbf5,#fff 160px)}
+#benchView .panel{background:linear-gradient(180deg,#f1f8ff,#fff 160px)}#vlabView .panel{background:linear-gradient(180deg,#fff4ec,#fff 160px)}
+/* lab tiles and bench cards rotate through pastels */
+.cats.labs .cat,.simcard{transition:transform .15s,box-shadow .15s}.cats.labs .cat:hover,.simcard:hover{transform:translateY(-2px)}
+.cats.labs .cat:nth-child(6n+1),.simgrid .simcard:nth-child(6n+1){background:var(--p-lav);border-color:var(--p-lav-d)}
+.cats.labs .cat:nth-child(6n+2),.simgrid .simcard:nth-child(6n+2){background:var(--p-mint);border-color:var(--p-mint-d)}
+.cats.labs .cat:nth-child(6n+3),.simgrid .simcard:nth-child(6n+3){background:var(--p-sky);border-color:var(--p-sky-d)}
+.cats.labs .cat:nth-child(6n+4),.simgrid .simcard:nth-child(6n+4){background:var(--p-peach);border-color:var(--p-peach-d)}
+.cats.labs .cat:nth-child(6n+5),.simgrid .simcard:nth-child(6n+5){background:var(--p-pink);border-color:var(--p-pink-d)}
+.cats.labs .cat:nth-child(6n+6),.simgrid .simcard:nth-child(6n+6){background:var(--p-lemon);border-color:var(--p-lemon-d)}
+.cats.labs .cat.on,.simcard.on{box-shadow:0 0 0 4px #4b57d12e,0 8px 18px #6b5bd11c;border-color:var(--accent)}
+.cats.labs .cat:not(.on){opacity:.82}.cats.labs .cat:not(.on):hover{opacity:1}
+/* question card + tags */
+.question{background:linear-gradient(180deg,#fbf9ff,#fff);border:1.5px solid #e7e1fb;border-radius:18px}
+.tag{background:var(--p-lav);color:#5a48b8}.tags .tag:nth-child(2){background:var(--p-mint);color:#23704f}
+/* practice helper buttons: one color each */
+#hintBtn{background:var(--p-lemon);border-color:var(--p-lemon-d);color:#7a5a00}#solBtn{background:var(--p-pink);border-color:var(--p-pink-d);color:#9c3366}
+#refBtn2,.actions .btn[data-ref]{background:var(--p-sky);border-color:var(--p-sky-d);color:#1d5aa6}#videoBtn{background:var(--p-peach);border-color:var(--p-peach-d);color:#a2491d}
+#simBtn{background:var(--p-sky);border-color:var(--p-sky-d);color:#1d5aa6}#vlBtn{background:var(--p-mint);border-color:var(--p-mint-d);color:#23704f}
+.actions .btn{transition:transform .12s}.actions .btn:hover{transform:translateY(-2px);filter:saturate(1.15)}
+/* main buttons: playful gradient */
+.btn.primary{background:linear-gradient(135deg,#6a5cf0,#b05ad6);border:0;box-shadow:0 6px 16px #6a5cf040;border-radius:14px}.btn.primary:hover{background:linear-gradient(135deg,#5b4be3,#9d45c6)}
+.btn{border-radius:14px}
+/* section titles get a little color bar */
+.pick-title .stepnum,.stepnum{background:linear-gradient(135deg,#7a66e0,#c2569b)!important;color:#fff}
+.section-head h2::after,.play-title::after{content:'';display:block;width:44px;height:4px;border-radius:4px;margin-top:4px;background:linear-gradient(90deg,#8fd3ae,#93c2f2,#f2a3c3)}
+/* progress stats */
+.stat-row .stat:nth-child(1){background:var(--p-lav)}.stat-row .stat:nth-child(2){background:var(--p-mint)}.stat-row .stat:nth-child(3){background:var(--p-sky)}.stat-row .stat:nth-child(4){background:var(--p-peach)}.stat-row .stat:nth-child(5){background:var(--p-pink)}
+/* feedback a bit friendlier */
+.feedback.good{background:var(--p-mint);border:1.5px solid var(--p-mint-d)}.feedback.bad{background:var(--p-pink);border:1.5px solid var(--p-pink-d)}
+@media(prefers-reduced-motion:reduce){.mode-switch button:hover,.cats.labs .cat:hover,.simcard:hover,.actions .btn:hover{transform:none}}
 </style>
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
