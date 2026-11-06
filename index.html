@@ -467,7 +467,7 @@ html.dd-embedded .mockbar{position:relative}
  <section class="intro" id="intro"><img class="intro-logo" src="assets/logo-256.webp" data-fbsrc="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%20role%3D%22img%22%20aria-label%3D%22Station%20Rotation%20logo%3A%20a%20clipboard%20answer%20sheet%20with%20green%2C%20yellow%20and%20purple%20version%20tabs%20and%20a%20stopwatch%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22bg%22%20cx%3D%2250%25%22%20cy%3D%2240%25%22%20r%3D%2265%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f6f4ff%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e4e8ff%22/%3E%3C/radialGradient%3E%3C/defs%3E%0A%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%22112%22%20height%3D%22112%22%20rx%3D%2228%22%20fill%3D%22url%28%23bg%29%22/%3E%0A%3Crect%20x%3D%2274%22%20y%3D%2226%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%237fd39b%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2246%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23ffd84d%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2266%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23b89cff%22/%3E%0A%3Crect%20x%3D%2222%22%20y%3D%2220%22%20width%3D%2260%22%20height%3D%2278%22%20rx%3D%229%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%234b57d1%22%20stroke-width%3D%224%22/%3E%0A%3Crect%20x%3D%2238%22%20y%3D%2214%22%20width%3D%2228%22%20height%3D%2212%22%20rx%3D%225%22%20fill%3D%22%234b57d1%22/%3E%0A%3Cpath%20d%3D%22M46%2036%20L46%2050%20L36%2070%20Q34%2075%2039%2075%20L65%2075%20Q70%2075%2068%2070%20L58%2050%20L58%2036%22%20fill%3D%22%23eaf4fb%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M41%2062%20L63%2062%20L68%2070%20Q70%2075%2065%2075%20L39%2075%20Q34%2075%2036%2070%20Z%22%20fill%3D%22%23a7d8f5%22/%3E%0A%3Cline%20x1%3D%2243%22%20y1%3D%2236%22%20x2%3D%2261%22%20y2%3D%2236%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cline%20x1%3D%2232%22%20y1%3D%2284%22%20x2%3D%2260%22%20y2%3D%2284%22%20stroke%3D%22%23c9cfe6%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%2288%22%20cy%3D%2290%22%20r%3D%2217%22%20fill%3D%22%23fff%22%20stroke%3D%22%23d9577f%22%20stroke-width%3D%224%22/%3E%3Crect%20x%3D%2284%22%20y%3D%2268%22%20width%3D%228%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%23d9577f%22/%3E%0A%3Cpath%20d%3D%22M88%2090%20L88%2080%20M88%2090%20L95%2094%22%20stroke%3D%22%231f2a44%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3C/svg%3E" onerror="this.onerror=null;this.src=this.dataset.fbsrc" alt="Station Rotation logo"><div><p class="eyebrow">CHEM 3A · Lab Practical</p><h1>Station Rotation</h1><p class="lede">Get ready for the lab practical: read the glassware, crunch the data, name the equipment.</p></div></section>
  <ol class="howto" aria-label="How to use this game">
   <li><span><b>Pick a mode</b> below.</span></li>
-  <li><span><b>Answer</b> with a number, unit and the right sig figs. Type 3.2E-5 for 3.2 × 10⁻⁵.</span></li>
+  <li><span><b>Answer</b> with a number, unit and the right sig figs. Smart typing: 3.2E-5 → 3.2×10⁻⁵, H2O → H₂O. <button type="button" class="link-btn" id="smartBtn"></button></span></li>
   <li><span><b>Stuck?</b> Tap <b>Hint</b>, <b>Show answer</b>, or <b>Reference</b> (top right).</span></li>
  </ol>
  <p class="labset" id="labset"></p>
@@ -1248,7 +1248,7 @@ const K3a = {
 };
 
 /* ---------------- Exp 3z: Found or Forgery ---------------- */
-const FLAME = [['Antimony', 'Sb', 'Pale green', '#c9f2b8'], ['Arsenic', 'As', 'Blue', '#6f9cf2'], ['Barium', 'Ba', 'Green', '#5cd17a'], ['Boron', 'B', 'Green', '#5cd17a'], ['Calcium', 'Ca', 'Orange-red', '#ff6a3d'], ['Cobalt', 'Co', 'Silver white', '#e8ecf4'], ['Copper (II)', 'Cu', 'Green', '#5cd17a'], ['Iron (III)', 'Fe', 'Orange', '#ff8c2a'], ['Lead', 'Pb', 'Blue', '#6f9cf2'], ['Lithium', 'Li', 'Red', '#ff3b4e'], ['Manganese', 'Mn', 'Yellow green', '#c6e84a'], ['Mercury (I)', 'Hg', 'Red', '#ff3b4e'], ['Sodium', 'Na', 'Yellow', '#ffe14a'], ['Strontium', 'Sr', 'Red', '#ff3b4e'], ['Thallium', 'Tl', 'Green', '#5cd17a'], ['Tin', 'Sn', 'Blue white', '#c3d8ff'], ['Titanium', 'Ti', 'Silver white', '#e8ecf4'], ['Zinc', 'Zn', 'Green-blue', '#46c7b8']];
+const FLAME = [['Antimony', 'Sb', 'Pale green', '#c9f2b8'], ['Arsenic', 'As', 'Blue', '#6f9cf2'], ['Barium', 'Ba', 'Green', '#5cd17a'], ['Boron', 'B', 'Green', '#5cd17a'], ['Calcium', 'Ca', 'Yellow orange', '#ffb347'], ['Cobalt', 'Co', 'Silver white', '#e8ecf4'], ['Copper (II)', 'Cu', 'Green', '#5cd17a'], ['Iron (III)', 'Fe', 'Orange', '#ff8c2a'], ['Lead', 'Pb', 'Blue', '#6f9cf2'], ['Lithium', 'Li', 'Red', '#ff3b4e'], ['Manganese', 'Mn', 'Yellow green', '#c6e84a'], ['Mercury (I)', 'Hg', 'Red', '#ff3b4e'], ['Sodium', 'Na', 'Yellow', '#ffe14a'], ['Strontium', 'Sr', 'Red', '#ff3b4e'], ['Thallium', 'Tl', 'Green', '#5cd17a'], ['Tin', 'Sn', 'Blue white', '#c3d8ff'], ['Titanium', 'Ti', 'Silver white', '#e8ecf4'], ['Zinc', 'Zn', 'Green-blue', '#46c7b8']];
 const flameTable = () => { const h = Math.ceil(FLAME.length / 2); return `<table class="data small"><tr><th>Element</th><th>Flame color</th><th>Element</th><th>Flame color</th></tr>${FLAME.slice(0, h).map((f, i) => { const g = FLAME[i + h]; return `<tr><td>${f[0]}</td><td>${f[2]}</td>${g ? `<td>${g[0]}</td><td>${g[2]}</td>` : '<td></td><td></td>'}</tr>`; }).join('')}</table>`; };
 const PB = { Europe: [1.36, 21.64, 28.40, 48.60], 'North America': [1.34, 26.31, 22.66, 49.69], Australia: [1.47, 27.53, 25.50, 45.50] };
 const avgPb = ab => (204 * ab[0] + 206 * ab[1] + 207 * ab[2] + 208 * ab[3]) / 100;
@@ -1638,12 +1638,12 @@ const K11a = {
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1] })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.12, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
     return { tag: 'Theoretical yield', prompt: `A student starts with <b>${al.toFixed(4)} g of aluminum</b>. Every 1 mol of Al makes 1 mol of alum. What is the theoretical yield of alum?`,
-      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.37 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.37 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
+      parts: [num(y, { sf: 4, unit: 'g' })], hint: 'g Al → mol Al → mol alum (1 : 1) → g alum (474.39 g/mol).', solution: `${al.toFixed(4)} ÷ 26.98 × 474.39 = <b>${sfHTML(y, 4)} g alum</b>.`, video: 'yield', skill: 'calc' };
   },
   percentYield() {
     const th = rnd(9, 18, 2), act = +(th * rnd(0.55, 1.12, 3)).toFixed(2), py = act / th * 100;
@@ -1715,8 +1715,8 @@ const K12b = {
   citric() {
     const Mb = rnd(0.09001, 0.11499, 5), Vi = offLine(0.5, 4, 2), Vf = +(Vi + rnd(5, 13, 2)).toFixed(2), Vb = Vf - Vi, C = Mb * Vb / 1000 / 3 / 0.01000;
     return { tag: 'Molarity of citric acid', prompt: `A 10.00 mL soda sample was titrated with <b>${Mb.toFixed(5)} M NaOH</b>. The buret went from <b>${Vi.toFixed(2)} mL</b> to <b>${Vf.toFixed(2)} mL</b>. What is the molarity of citric acid in the soda?`, art: RXN_CIT, eq: 'Molarity (M) = mol solute ÷ L solution',
-      parts: [num(C, { sf: Math.min(4, sfCount(Vb.toFixed(2))), unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
-      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, Math.min(4, sfCount(Vb.toFixed(2))))} M</b>.`, video: 'titration', skill: 'calc' };
+      parts: [num(C, { sf: 4, unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
+      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, 4)} M</b>.`, video: 'titration', skill: 'calc' };
   },
   terms() {
     const q = pick([['In this titration, which chemical is the <b>titrant</b> (the one with a known molarity, added from the buret)?', 'NaOH (sodium hydroxide)', ['Citric acid', 'Oxalic acid', 'Phenolphthalein'], 'The <b>titrant</b> is NaOH: it goes in the buret and its molarity is known.'],
@@ -1898,7 +1898,7 @@ function partsHTML(parts, key, mock, saved = []) {
     const id = `${key}-${i}`, v = saved[i] || {}, lab = p.label ? `<label for="${id}">${p.label}</label>` : '';
     let inner = '';
     if (p.type === 'num') {
-      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="${mock ? 'number' : 'Type your answer'}" value="${esc(v.val || '')}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}">` +
+      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-smart="num" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="${mock ? 'number' : 'Type your answer'}" value="${esc(SMART && v.val ? smartFormat('num', v.val) : v.val || '')}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}">` +
         (mock && p.unit ? `<input type="text" class="unit-in" data-pu="${i}" autocomplete="off" spellcheck="false" placeholder="unit" value="${esc(v.unit || '')}" aria-label="Unit">` : p.unit ? `<span class="unit">${p.unit}</span>` : '') + `</div>`;
     } else if (p.type === 'choice') {
       inner = mock ? `<select id="${id}" data-pi="${i}"><option value="">Choose…</option>${p.options.map((o, k) => `<option value="${k}" ${String(v.val) === String(k) ? 'selected' : ''}>${'abcdefgh'[k]}. ${o.replace(/<[^>]+>/g, '')}</option>`).join('')}</select>`
@@ -1907,7 +1907,7 @@ function partsHTML(parts, key, mock, saved = []) {
       const cells = p.terms.map((tm, k) => `${k === p.nr ? '<span>→</span>' : k ? '<span>+</span>' : ''}<input type="text" data-pc="${i}" data-k="${k}" inputmode="numeric" autocomplete="off" aria-label="Coefficient for ${tm}" value="${esc((v.val || '').split(',')[k] || '')}"><span>${fhtml(tm.replace(/\((s|l|g|aq)\)$/, ''))}</span>`).join(' ');
       inner = `<div class="coef" id="${id}">${cells}</div>`;
     } else {
-      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : 'Type your answer'}" value="${esc(v.val || '')}"></div>`;
+      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" ${p.type === 'formula' ? 'data-smart="formula" ' : ''}autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : 'Type your answer'}" value="${esc(v.val || '')}"></div>`;
     }
     return `<div class="part" data-part="${i}">${lab}${inner}<div class="pnote"></div></div>`;
   }).join('');
@@ -1917,7 +1917,7 @@ function readParts(root, parts) {
     if (p.type === 'choice') { const sel = root.querySelector(`select[data-pi="${i}"]`); if (sel) return { val: sel.value }; const b = root.querySelector(`.opt.sel[data-pi="${i}"]`); return { val: b ? b.dataset.oi : '' }; }
     if (p.type === 'coef') return { val: [...root.querySelectorAll(`input[data-pc="${i}"]`)].map(x => x.value.trim()).join(',') };
     const inp = root.querySelector(`input[data-pi="${i}"]`), u = root.querySelector(`input[data-pu="${i}"]`);
-    return { val: inp ? inp.value : '', unit: u ? u.value : '' };
+    return { val: inp ? (inp.dataset.smart ? toPlain(inp.value) : inp.value) : '', unit: u ? u.value : '' };
   });
 }
 function gradeAll(parts, vals, mock) {
@@ -2923,6 +2923,26 @@ async function play(seq,ms=340){if(playing)return;playing=true;second=false;rese
 function clearAll(){reset();hist=[];second=false;showFrac=false;draw()}
 return{mount,press,play,evaluate,fmt,plainE,clearAll,get ans(){return ans},get hist(){return hist},get entry(){return entry},_t:{ins,reset}}})();
 
+
+/* ---------- smart typing: H2O → H₂O, ^2- → ²⁻, 1.5E4 → 1.5×10⁴, * → × (from Exam Retake Prep) ---------- */
+const SUBD = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' };
+const SUPD = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '+': '⁺', '-': '⁻' };
+const UNSUBD = {}; Object.entries(SUBD).forEach(([k, v]) => (UNSUBD[v] = k)); Object.entries(SUPD).forEach(([k, v]) => (UNSUBD[v] = k));
+const SUBC = d => d.replace(/\d/g, c => SUBD[c]), SUPC = d => d.replace(/[0-9+\-]/g, c => SUPD[c] || c);
+function toPlain(t) { return String(t).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻₀₁₂₃₄₅₆₇₈₉]/g, c => UNSUBD[c]).replace(/\s*×\s*10\s*\^?/g, 'E').replace(/×/g, '*').replace(/−/g, '-'); }
+function smartFormat(mode, raw) {
+  let t = toPlain(raw);
+  if (mode === 'formula') { t = t.replace(/\^([0-9]*[+\-])/g, (m, g) => SUPC(g)); t = t.replace(/([A-Za-z\)\]])(\d+)/g, (m, a, d) => a + SUBC(d)); t = t.replace(/([₀-₉A-Za-z\)\]])([+\-])(?=\s|$|\)|,)/g, (m, a, c) => a + SUPD[c]); return t; }
+  if (mode === 'num') { t = t.replace(/(\d)\s*[eE]\s*([+\-]?\d+)/g, (m, a, e) => a + '×10' + SUPC(e)); t = t.replace(/\^([+\-]?\d+)/g, (m, e) => SUPC(e)); t = t.replace(/\*/g, '×'); return t; }
+  return t;
+}
+let SMART = true; try { SMART = localStorage.getItem('sr-smart') !== '0'; } catch (e) {}
+document.addEventListener('input', e => {
+  const el = e.target; if (!SMART || !el.matches || !el.matches('input[data-smart]')) return;
+  const raw = el.value, pos = el.selectionStart, atEnd = pos === raw.length, out = smartFormat(el.dataset.smart, raw);
+  if (out !== raw) { el.value = out; const np = atEnd ? out.length : Math.max(0, Math.min(pos + (out.length - raw.length), out.length)); try { el.setSelectionRange(np, np); } catch (x) {} }
+});
+
 /* ---------- practice calculator (from Algebra Trainer) ---------- */
 let calcMounted = false, lastBox = null;
 document.addEventListener('focusin', e => { const t = e.target; if (t.matches && t.matches('input[data-pi]') && !t.closest('#calcDock')) lastBox = t; });
@@ -3014,6 +3034,7 @@ function renderRef() {
 function openRef() { renderRef(); try { $('refDialog').showModal(); } catch (e) { $('refDialog').setAttribute('open', ''); } }
 
 function bind() {
+  const sb = $('smartBtn'), sbTxt = () => { sb.textContent = SMART ? 'Turn off' : 'Turn on'; }; sbTxt(); sb.onclick = () => { SMART = !SMART; try { localStorage.setItem('sr-smart', SMART ? '1' : '0'); } catch (e) {} sbTxt(); toast(SMART ? 'Smart typing on: H2O → H₂O, 1.5E4 → 1.5×10⁴' : 'Smart typing off: what you type stays as typed.', 'stars'); };
   $('calcBtn').onclick = () => { $('calcDock').hidden ? openCalc(true) : closeCalc(); }; $('calcClose').onclick = closeCalc;
   $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
   $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => x.classList.toggle('on', x === b)); });
