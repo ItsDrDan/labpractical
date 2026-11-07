@@ -1402,10 +1402,15 @@ const K4a = {
     return { tag: 'Mass of sulfur reacted', prompt: 'Copper was heated with excess sulfur to make a copper sulfide. How much <b>sulfur reacted</b> with the copper?', ref: tableHTML([['Mass of crucible + cover', `${cr.toFixed(4)} g`], ['Mass of crucible + cover + Cu', `${(cr + cu).toFixed(4)} g`], ['Mass of crucible + cover + product', `${prod.toFixed(4)} g`]]),
       parts: [num(+(prod - cr - cu).toFixed(4), { dp: 4, unit: 'g', tol: 0.00015 })], hint: 'Sulfur reacted = product − copper. Subtracting keeps 4 decimal places.', solution: `(${prod.toFixed(4)} − ${cr.toFixed(4)}) − ${cu.toFixed(4)} = <b>${(prod - cr - cu).toFixed(4)} g S</b>.`, video: 'empirical', skill: 'calc' };
   },
-  ratio() {
-    const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), r = cu / s;
-    return { tag: 'Mass ratio', prompt: `A student found that <b>${cu.toFixed(4)} g Cu</b> reacted with <b>${s.toFixed(4)} g S</b>. Calculate the mass ratio (g Cu / g S).`,
-      parts: [num(r, { sf: 4, unit: '' })], hint: 'Divide the mass of copper by the mass of sulfur.', solution: `${cu.toFixed(4)} ÷ ${s.toFixed(4)} = <b>${sfHTML(r, 4)}</b>. Same compound → same ratio every time (law of constant composition).`, video: 'empirical', skill: 'calc' };
+  formula() {
+    const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), nCu = cu / 63.55, nS = s / 32.06, r = nCu / nS;
+    return { tag: 'Empirical formula', prompt: `A student heated <b>${cu.toFixed(4)} g Cu</b> with sulfur and found that <b>${s.toFixed(4)} g S</b> reacted. What is the <b>empirical formula</b> of the copper sulfide?`, ref: tableHTML([['Molar mass of Cu', '63.55 g mol⁻¹'], ['Molar mass of S', '32.06 g mol⁻¹']]),
+      parts: [{ type: 'formula', accept: ['Cu2S'], ans: fhtml('Cu2S') }], hint: 'Change each mass to moles, then divide both by the smaller number of moles. Round to a whole number.', solution: `mol Cu = ${cu.toFixed(4)} ÷ 63.55 = ${nCu.toFixed(5)} mol; mol S = ${s.toFixed(4)} ÷ 32.06 = ${nS.toFixed(5)} mol. Divide by the smaller: Cu ${r.toFixed(2)} : S 1.00 ≈ 2 : 1 → <b>${fhtml('Cu2S')}</b> (copper(I) sulfide).`, video: 'empirical', skill: 'calc' };
+  },
+  pctCu() {
+    const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), pc = cu / (cu + s) * 100;
+    return { tag: 'Percent copper', prompt: `A student found that <b>${cu.toFixed(4)} g Cu</b> reacted with <b>${s.toFixed(4)} g S</b>. Calculate the <b>mass percent of copper</b> in the copper sulfide.`,
+      parts: [num(pc, { sf: 4, unit: '%' })], hint: 'Mass of product = Cu + S. Percent Cu = (g Cu ÷ g product) × 100.', solution: `${cu.toFixed(4)} + ${s.toFixed(4)} = ${(cu + s).toFixed(4)} g product. ${cu.toFixed(4)} ÷ ${(cu + s).toFixed(4)} × 100 = <b>${sfHTML(pc, 4)}%</b> Cu. (Cu₂S is 79.85% Cu.)`, video: 'empirical', skill: 'calc' };
   },
   idea() {
     return { tag: 'Constant composition', prompt: 'Two groups make copper(I) sulfide. Group 1 uses 1.0 g of copper and group 2 uses 2.0 g. How do their mass ratios (g Cu / g S) compare?',
@@ -2149,7 +2154,7 @@ const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '1
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
   '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr',
   '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
-  '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula' };
+  '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula', '4a.formula': 'empirical', '5a.formula': 'empirical', '4a.pctCu': 'masspct', '5a.percent': 'masspct', '5a.pctFormula': 'masspct' };
 const famOf = (lab, kind) => FAM[lab + '.' + kind] || lab + '.' + kind;
 const HFAM = { '0a': ['cyl', 'balance', 'density'], '1a': ['cyl', 'balance', 'density'], '9a': ['balance', 'density'], '10a': ['rxn', 'rxtype'], '12a': ['cabbage', 'ph'], '12b': ['buret', 'titr'], '6a': ['vsepr', '6a.valence'] };
 const MOCK_N = 10, MOCK_GEN = 2;
@@ -2179,7 +2184,7 @@ function buildPractical0(ver, timer) {
     const pickK = [], fams = new Set();
     fresh.forEach(k => { if (pickK.length < 3 && !fams.has(famOf(id, k))) { pickK.push(k); fams.add(famOf(id, k)); } });
     fresh.forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); });
-    shuffle(all).forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); });
+    if (!pickK.length) shuffle(all).forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); }); // only if nothing fresh is left; otherwise reuse a fresh type
     const v = {}; 'ABC'.split('').forEach((V, i) => { const k = pickK[i % pickK.length]; v[V] = makeQ(id, k); used.add(famOf(id, k)); });
     stations.push({ lab: id, title: l.name, versions: v }); P.mockLabs[id] = (P.mockLabs[id] || 0) + 1;
   });
