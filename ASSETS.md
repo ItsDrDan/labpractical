@@ -5,25 +5,10 @@ The instruments students read (graduated cylinder, buret, thermometer, eudiomete
 ## Equipment pictures (`assets/equip/<id>.webp`, 1024 × 1024 transparent)
 Used by "Name that equipment" and "What is it for?". If a file is missing, the game shows its built-in drawing. IDs: thermometer, testtube, beaker, watchglass, gradcyl, erlenmeyer, volflask, transferpipet, volpipet, pipetbulb, buret, buretclamp, bunsen, funnel, washbottle, tongs, scoopula, ringstand, utilityclamp, clampholder, crucible, claytriangle, wiregauze, eudiometer, calorimeter, filterflask, buchner. No text or labels in any picture.
 
-Until an image exists, the game uses its built-in clipboard logo and brand-kit badges. Drop files in with the exact names below and the game picks them up. No code changes needed.
+## Art package (ChatGPT, Nov 2026), all in place
+- Logo: `assets/logo-256.webp`, `logo.png` (512), `assets/favicon-64.png`; hub card `games/assets/games/labpractical.webp`
+- Mascot **Tock** (pink lab stopwatch with goggles and a clipboard): `assets/mascot/tock-{idle,thinking,correct,oops,victory}.webp`. Idle on the intro; correct / oops / thinking (Show answer) in feedback; victory, correct or thinking on mock results by score.
+- 11 achievement badges: `assets/ach-<id>.webp` (first, streak5, reader, equip, calc, rotation, honor, rainbow, vlab, phet, alllabs), also used in the achievement toast.
+- 15 lab tile icons: `assets/labs/<lab id>.webp` (0a 1a 3a 3z 4a 4b 5a 6a 7a 8a 9a 10a 11a 12a 12b). A new lab without a file falls back to its brand-kit badge.
 
-## Logo
-| File | Size | Subject |
-|---|---|---|
-| `assets/logo-256.webp` (and `logo.png`, plus `games/assets/games/labpractical.webp` for the hub card) | 1024 × 1024 | A cheerful clipboard answer sheet with three colored tabs on its edge (green, yellow, purple), a small Erlenmeyer flask printed on the sheet, and a pink stopwatch peeking from the bottom corner. Name: Station Rotation. |
-
-## 10 achievement badges (256 × 256 transparent WebP, in `assets/`)
-| File | Achievement | Subject |
-|---|---|---|
-| `ach-first.webp` | First Station | A station card with a big "1" and a green check |
-| `ach-streak5.webp` | Steady Hands | A gloved hand holding a pipet perfectly still, 5 small stars |
-| `ach-reader.webp` | Meniscus Master | A zoomed-in meniscus under a magnifying glass |
-| `ach-equip.webp` | Equipment Expert | A tidy row of glassware (beaker, flask, buret) with a gold ribbon |
-| `ach-calc.webp` | Data Cruncher | A TI-36X-style calculator with a lab notebook |
-| `ach-rotation.webp` | Full Rotation | Ten station cards arranged in a circle with a rotating arrow |
-| `ach-honor.webp` | Honor Roll | A gold medal with "90+" |
-| `ach-rainbow.webp` | All Three Colors | Three answer sheets fanned out: green, yellow, purple |
-| `ach-phet.webp` | PhET Explorer | A laptop showing a simulation with sliders |
-| `ach-alllabs.webp` | Every Lab | A gold trophy filled with tiny lab icons |
-
-Use the brand prompt from itsdrdan.github.io/games/brand and change only the Subject line.
+Prompt style: the brand prompt from itsdrdan.github.io/games/brand, changing only the Subject line.
