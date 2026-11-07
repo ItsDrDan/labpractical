@@ -519,6 +519,91 @@ body{background:radial-gradient(900px 420px at 8% -6%,#efe6ff 0,transparent 60%)
 body.compact .intro h1 .h1sub{display:inline;margin-left:6px}
 .tb-name{display:flex;flex-direction:column;line-height:1.1}.tb-name small{font-family:var(--font);font-size:.72rem;font-weight:800;color:#2f9e6a;letter-spacing:.02em}@media(max-width:640px){.tb-name small{display:none}}
 @media(max-width:640px){.tb{flex-wrap:nowrap!important;gap:6px!important}.tb-xp>div{display:none}.tb-xp{min-width:0!important}.tb-brand{min-width:0;overflow:hidden}.tb-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem}.tb-btn{padding:6px 9px!important;min-width:40px;justify-content:center}}
+/* ===================== v17 polish layer: one button system ===================== */
+:root{--key-edge:#d5daec;--key-shadow:0 1px 0 #fff inset,0 2px 0 var(--key-edge),0 6px 14px #1f2a440f;--ring-focus:0 0 0 3px #fff,0 0 0 6px #6a5cf0aa;--ease:cubic-bezier(.2,.8,.2,1)}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{cursor:not-allowed}
+/* base button: soft raised key */
+.btn,.tb-btn,.reset-btn{position:relative;border-width:1.5px;border-radius:14px;font-weight:800;letter-spacing:.01em;background-image:linear-gradient(180deg,#ffffff,#f6f7fc);box-shadow:var(--key-shadow);transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .14s,border-color .14s,filter .14s}
+.btn:hover:not(:disabled),.tb-btn:hover,.reset-btn:hover{transform:translateY(-1px);box-shadow:0 1px 0 #fff inset,0 3px 0 var(--key-edge),0 10px 20px #1f2a4417}
+.btn:active:not(:disabled),.tb-btn:active,.reset-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #fff inset,0 0 0 var(--key-edge),0 2px 6px #1f2a4414;transition-duration:.05s}
+.btn:focus-visible,.tb-btn:focus-visible,.reset-btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.vbtn:focus-visible,.cat:focus-visible,.simcard:focus-visible,.mode-switch button:focus-visible,.link-btn:focus-visible,.lesson-card:focus-visible{outline:none;box-shadow:var(--ring-focus)}
+.btn:disabled{opacity:.5;box-shadow:none;transform:none;filter:grayscale(.3)}
+.btn [data-icon] svg,.tb-btn [data-icon] svg{transition:transform .14s var(--ease)}
+.btn:hover [data-icon="arrow"] svg{transform:translateX(3px)}
+/* primary: violet gradient with a pressable edge */
+.btn.primary{background-image:linear-gradient(135deg,#6f5ff2 0%,#8f5be6 55%,#b05ad6 100%);color:#fff;border:0;text-shadow:0 1px 1px #3a2a9a55;box-shadow:0 1px 0 #ffffff40 inset,0 3px 0 #4a3bb8,0 10px 22px #6a5cf04d;padding:0 26px}
+.btn.primary:hover:not(:disabled){filter:brightness(1.06) saturate(1.05);box-shadow:0 1px 0 #ffffff40 inset,0 4px 0 #4a3bb8,0 14px 28px #6a5cf05e}
+.btn.primary:active:not(:disabled){box-shadow:0 1px 0 #ffffff30 inset,0 0 0 #4a3bb8,0 4px 10px #6a5cf04d}
+.btn.primary:disabled{background-image:linear-gradient(135deg,#b9b3e9,#cdb3e3)}
+/* colored helper buttons keep their pastel, with a matching edge */
+#hintBtn{--key-edge:#e6c34a}#solBtn{--key-edge:#ea9cc0}#videoBtn{--key-edge:#efb08c}#simBtn{--key-edge:#8cc4ff}#vlBtn{--key-edge:#86d3ac}
+#refBtn2{background:var(--p-lav);border-color:var(--p-lav-d);color:#5236b8;--key-edge:#b9a6f5}
+#hintBtn,#solBtn,#videoBtn,#simBtn,#vlBtn,#refBtn2,.tb-btn#calcBtn,.tb-btn#refBtn{background-image:none}
+.tb-btn#calcBtn{--key-edge:#e6c34a}.tb-btn#refBtn{--key-edge:#8cc4ff}
+.actions{gap:10px}
+.actions .btn{min-height:50px;font-size:.96rem}
+/* small inline buttons */
+.btn.small{min-height:38px;padding:6px 14px;border-radius:11px;font-size:.9rem}
+/* pill chips (timer, filters) */
+.chip{border-width:1.5px;background:#fff;box-shadow:0 2px 0 var(--key-edge),0 4px 10px #1f2a440a;transition:transform .14s var(--ease),box-shadow .14s,background .14s,border-color .14s}
+.chip:hover{border-color:#aab2ea;transform:translateY(-1px)}
+.chip:active{transform:translateY(1px);box-shadow:0 0 0 var(--key-edge)}
+.chip.on{box-shadow:0 0 0 3px #6a5cf026,0 2px 0 #b3abef}
+/* level picker: a clean two-option radio card */
+.lvlpick{gap:10px}
+.lvlpick .chip{display:grid;grid-template-columns:22px auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;text-align:left;padding:10px 18px 10px 14px;border-radius:16px;font-size:1rem}
+.lvlpick .chip::before{grid-row:1 / span 2;width:20px;height:20px;border-radius:50%;border:2px solid #b7bdd6;background:#fff;box-shadow:inset 0 0 0 4px #fff}
+.lvlpick .chip.on::before{background:var(--accent);border-color:var(--accent);background-image:none}
+.lvlpick .chip small{grid-column:2;font-size:.76rem;line-height:1.2}
+/* multiple-choice options: radio dot on the left */
+.opt{display:inline-flex;align-items:center;gap:10px;border-width:1.5px;border-radius:14px;box-shadow:0 2px 0 var(--key-edge),0 4px 10px #1f2a440a;transition:transform .12s var(--ease),box-shadow .12s,background .12s,border-color .12s}
+.opt::before{content:'';flex:none;width:18px;height:18px;border-radius:50%;border:2px solid #b7bdd6;background:#fff;box-shadow:inset 0 0 0 3px #fff;transition:background .12s,border-color .12s}
+.opt:hover:not(:disabled){transform:translateY(-1px)}
+.opt:active:not(:disabled){transform:translateY(1px);box-shadow:0 0 0 var(--key-edge)}
+.opt.sel::before{background:var(--accent);border-color:var(--accent)}
+.opt.right::before{background:#3a9a71;border-color:#3a9a71}
+.opt.wrong::before{background:#d4677a;border-color:#d4677a}
+/* answer-sheet version buttons */
+.vbtn{border:3px solid transparent;transition:transform .15s var(--ease),box-shadow .15s,border-color .15s;position:relative}
+.vbtn:hover{transform:translateY(-3px);box-shadow:0 12px 26px #1f2a441c}
+.vbtn:active{transform:translateY(0)}
+.vbtn.on{border-color:#1f2a44;box-shadow:0 12px 26px #1f2a4426}
+.vbtn.on::after{content:'✓';position:absolute;top:8px;right:10px;width:26px;height:26px;border-radius:50%;background:#1f2a44;color:#fff;font:800 .9rem/26px var(--font);text-align:center}
+/* selectable cards: lab tiles, sims, benches, mode tiles */
+.cat,.simcard,.mode-switch button{transition:transform .16s var(--ease),box-shadow .16s,border-color .16s,opacity .16s}
+.cats.labs .cat:hover,.simcard:hover,.mode-switch button:hover{transform:translateY(-2px);box-shadow:0 12px 24px #1f2a4416}
+.cats.labs .cat:active,.simcard:active,.mode-switch button:active{transform:translateY(0)}
+.simcard{display:flex;flex-direction:column;gap:3px}
+.sc-status{align-self:flex-start;margin-top:6px;display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:800;letter-spacing:.02em;padding:3px 10px;border-radius:99px;background:#ffffffb3;border:1px solid #1f2a441a;color:#4f5a74}
+.sc-status.done{background:#dff5e8;border-color:#8fd3ae;color:#23704f}
+.sc-status.done::before{content:'✓';font-weight:900}
+.simcard .sc-go{position:absolute;right:12px;bottom:10px;font-size:.8rem;font-weight:800;color:var(--accent-d);opacity:0;transform:translateX(-4px);transition:opacity .15s,transform .15s}
+.simcard:hover .sc-go{opacity:1;transform:none}
+.simgrid.mini .sc-status,.simgrid.mini .sc-go{display:none}
+/* link buttons: a soft pill on hover */
+.link-btn{border-radius:8px;padding:4px 6px;transition:background .12s,color .12s}
+.link-btn:hover{background:var(--accent-soft);color:var(--accent)}
+.reset-btn{border-radius:12px;background-image:none;--key-edge:#f0b3c0}
+.lesson-card{transition:transform .14s var(--ease),box-shadow .14s,border-color .14s}
+.lesson-card:hover{transform:translateY(-1px);box-shadow:0 8px 18px #1f2a4412;border-color:#c9cfe6}
+.sim-shield span,.sim-release{transition:transform .14s var(--ease),background .14s}
+.sim-shield:hover span{transform:scale(1.04);background:#2b3760}
+/* PhET bench directions */
+.sim-howto{margin:4px 0 10px}
+.sim-setup{background:linear-gradient(180deg,#f3f6ff,#fff);border:1.5px solid #c9d4f6;border-radius:16px;padding:12px 16px 10px;margin:4px 0 12px}
+.sim-setup h4{margin:0 0 6px;font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:#2b3e8f}
+.sim-setup ol,.tsteps{margin:0;padding-left:24px;display:grid;gap:5px}
+.sim-setup li,.tsteps li{padding-left:2px;line-height:1.45}
+.sim-setup li::marker,.tsteps li::marker{font-weight:900;color:var(--accent)}
+.task{border-radius:16px;padding:14px 16px}
+.task .tq{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+.tnum{font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:#2b3760}
+.tdone{font-size:.74rem;font-weight:800;padding:2px 9px;border-radius:99px;background:#dff5e8;color:#23704f;border:1px solid #8fd3ae}
+.tsteps{margin:0 0 10px;background:#fff;border:1px dashed #cdd3ee;border-radius:12px;padding:10px 12px 10px 34px}
+.tqq{font-weight:800;color:#1f2a44;margin:6px 0 4px;font-size:1.04rem}
+@media (prefers-reduced-motion: reduce){.btn,.tb-btn,.chip,.opt,.vbtn,.cat,.simcard,.mode-switch button,.lesson-card{transition:none!important;transform:none!important}}
+@media (max-width:760px){.btn.primary{padding:0 18px}.lvlpick .chip{flex:1 1 100%}}
 </style>
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
@@ -1087,7 +1172,7 @@ const EQUIP = [
   ['bunsen', 'Bunsen burner', 'heats things with a gas flame', 'heat', `<path d="M60 200 L140 200 L130 184 L70 184 Z" ${M}/><rect x="90" y="84" width="20" height="100" fill="#c9cfe0" ${EQ_S}/><rect x="86" y="150" width="28" height="14" rx="3" fill="#9fb0ff" ${EQ_S}/><path d="M100 18 Q122 48 112 72 Q106 84 100 84 Q94 84 88 72 Q78 48 100 18 Z" fill="#9fb0ff" ${EQ_S}/><path d="M100 46 Q110 62 104 74 Q100 78 96 74 Q90 62 100 46 Z" fill="#ffd36b"/><path d="M114 176 L150 166" ${EQ_S}/>`],
   ['funnel', 'Funnel', 'pours liquid into a narrow opening, or holds filter paper', 'move', `<path d="M30 40 L170 40 L108 120 L108 200 L92 200 L92 120 Z" ${G}/><ellipse cx="100" cy="40" rx="70" ry="10" fill="#f4f9ff" ${EQ_S}/>`],
   ['washbottle', 'Wash bottle', 'squirts DI water to rinse glassware', 'move', `<path d="M60 70 Q60 60 70 60 L130 60 Q140 60 140 70 L140 196 Q140 204 132 204 L68 204 Q60 204 60 196 Z" fill="#fdf7ff" ${EQ_S}/><rect x="80" y="44" width="40" height="18" rx="3" fill="#f28aa3" ${EQ_S}/><path d="M100 44 L100 18 L150 18 L168 34" fill="none" ${EQ_S} stroke-width="4"/><rect x="62" y="120" width="76" height="82" fill="${L}" opacity=".7"/>`],
-  ['tongs', 'Crucible tongs', 'pick up hot crucibles and lids', 'heat', `<path d="M40 30 Q70 90 96 112 Q120 132 150 196" fill="none" ${EQ_S} stroke-width="6"/><path d="M160 30 Q130 90 104 112 Q80 132 50 196" fill="none" ${EQ_S} stroke-width="6"/><circle cx="100" cy="114" r="7" fill="#ffd36b" ${EQ_S}/><path d="M38 30 Q30 18 46 16 M162 30 Q170 18 154 16" fill="none" ${EQ_S} stroke-width="5"/>`],
+  ['tongs', 'Crucible tongs', 'picks up hot crucibles and lids', 'heat', `<path d="M40 30 Q70 90 96 112 Q120 132 150 196" fill="none" ${EQ_S} stroke-width="6"/><path d="M160 30 Q130 90 104 112 Q80 132 50 196" fill="none" ${EQ_S} stroke-width="6"/><circle cx="100" cy="114" r="7" fill="#ffd36b" ${EQ_S}/><path d="M38 30 Q30 18 46 16 M162 30 Q170 18 154 16" fill="none" ${EQ_S} stroke-width="5"/>`],
   ['scoopula', 'Scoopula', 'scoops solid chemicals', 'move', `<path d="M30 170 L150 60" ${EQ_S} stroke-width="10"/><path d="M146 40 Q182 30 180 60 Q176 84 150 82 Q136 78 140 62 Z" fill="#dfe5ef" ${EQ_S}/><rect x="16" y="160" width="40" height="22" rx="8" transform="rotate(-42 36 171)" fill="#9fb0ff" ${EQ_S}/>`],
   ['ringstand', 'Ring stand with rings', 'supports glassware above a burner or bench', 'support', `<rect x="30" y="186" width="140" height="16" rx="4" ${M}/><rect x="60" y="14" width="10" height="174" fill="#c9cfe0" ${EQ_S}/><ellipse cx="128" cy="80" rx="40" ry="10" fill="none" ${EQ_S} stroke-width="4"/><path d="M70 80 L88 80" ${EQ_S} stroke-width="4"/><rect x="58" y="72" width="14" height="16" rx="3" fill="#9fb0ff" ${EQ_S}/>`],
   ['utilityclamp', 'Utility clamp', 'holds a flask or test tube on a ring stand', 'support', `<rect x="10" y="94" width="90" height="12" rx="5" fill="#c9cfe0" ${EQ_S}/><path d="M98 88 L120 88 Q150 60 176 70 L182 82 Q156 78 132 100 Q156 122 182 118 L176 130 Q150 140 120 112 L98 112 Z" fill="#9fb0ff" ${EQ_S}/><rect x="170" y="62" width="16" height="24" rx="6" fill="#f9a8c0" ${EQ_S}/><rect x="170" y="114" width="16" height="24" rx="6" fill="#f9a8c0" ${EQ_S}/><path d="M128 76 L128 46 M116 46 L140 46" ${EQ_S} stroke-width="5"/>`],
@@ -1264,7 +1349,7 @@ const K0a = {
       hint: 'Copy every digit on a digital display, including zeros at the end.', solution: `Record <b>${s} g</b>. The last digit is the uncertain one, so a final zero still counts.`, video: 'sigfig', skill: 'read' };
   },
   massWater() {
-    const empty = rnd(28, 46, 4), water = rnd(48.6, 49.9, 4), full = +(empty + water).toFixed(4);
+    const empty = rnd(28, 46, 4), water = rnd(49.80, 49.90, 4), full = +(empty + water).toFixed(4);
     return { tag: 'Mass by difference', prompt: 'A dry 50 mL volumetric flask (with stopper) is weighed, filled to the line with DI water, and weighed again. What is the <b>mass of the water</b>?',
       ref: tableHTML([['Mass of flask + stopper (empty)', `${empty.toFixed(4)} g`], ['Mass of flask + stopper + water', `${full.toFixed(4)} g`]]),
       parts: [num(water, { dp: 4, unit: 'g', tol: 0.00011 })], hint: 'Subtract: (flask + water) − (empty flask). Keep 4 decimal places.', solution: `${full.toFixed(4)} − ${empty.toFixed(4)} = <b>${water.toFixed(4)} g</b> of water.`, video: 'density', skill: 'calc' };
@@ -1311,13 +1396,13 @@ const K1a = {
       parts: [num(Vb, { dp: 1, unit: 'mL', tol: 0.3, slip: x => Math.abs(x - b) < 0.4 ? 'That is only the final reading. Subtract the starting volume.' : '' })], hint: 'Volume of object = final − initial. Both readings go to 0.1 mL.', solution: `${b.toFixed(1)} − ${a.toFixed(1)} = <b>${Vb.toFixed(1)} mL</b>.`, video: 'displacement', skill: 'read' };
   },
   densityDisp() {
-    const mass = rnd(30, 140, 4), Vi = rnd(20, 40, 1), Vf = +(Vi + rnd(4, 18, 1)).toFixed(1), V = +(Vf - Vi).toFixed(1), d = mass / V, sf = sfCount(V.toFixed(1));
+    const Vi = rnd(20, 40, 1), Vf = +(Vi + rnd(4, 18, 1)).toFixed(1), V = +(Vf - Vi).toFixed(1), mass = +(V * pick([2.70, 7.14, 7.87, 8.47, 8.96, 11.34]) * rnd(0.99, 1.01, 3)).toFixed(4), d = mass / V, sf = sfCount(V.toFixed(1));
     return { tag: 'Density by displacement', prompt: `A metal sample has a mass of <b>${mass.toFixed(4)} g</b>. It is placed in a graduated cylinder: the water rises from <b>${Vi.toFixed(1)} mL</b> to <b>${Vf.toFixed(1)} mL</b>. What is the density?`, eq: 'd = m / V',
       parts: [num(d, { sf, unit: 'g/mL', slip: x => Math.abs(x - mass / Vf) < d * 0.01 ? 'Use the volume of the object (final − initial), not the final reading.' : '' })], hint: 'Find the displaced volume first. The volume limits the sig figs.',
       solution: `V = ${Vf.toFixed(1)} − ${Vi.toFixed(1)} = ${V.toFixed(1)} mL. d = ${mass.toFixed(4)} g ÷ ${V.toFixed(1)} mL = <b>${sfHTML(d, sf)} g/mL</b> (${sf} sig figs from the volume).`, video: 'displacement', skill: 'calc' };
   },
   densityBar() {
-    const l = rnd(2.5, 5.0, 2), w = rnd(2.0, 5.5, 2), h = rnd(5.0, 10.5, 2), mass = rnd(40, 600, 4), V = l * w * h, d = mass / V, sf = sfMin(l.toFixed(2), w.toFixed(2), h.toFixed(2));
+    const l = rnd(2.5, 5.0, 2), w = rnd(2.0, 5.5, 2), h = rnd(5.0, 10.5, 2), mass = +(l * w * h * pick([2.70, 7.14, 7.87, 8.47, 8.96]) * rnd(0.99, 1.01, 3)).toFixed(4), V = l * w * h, d = mass / V, sf = sfMin(l.toFixed(2), w.toFixed(2), h.toFixed(2));
     return { tag: 'Density of a bar', prompt: `A metal bar measures <b>${l.toFixed(2)} cm × ${w.toFixed(2)} cm × ${h.toFixed(2)} cm</b> and has a mass of <b>${mass.toFixed(4)} g</b>. Calculate its density.`, eq: 'V = l × w × h &nbsp;&nbsp; d = m / V',
       parts: [num(d, { sf, unit: 'g/cm³' })], hint: 'Find the volume, then divide mass by volume. The fewest sig figs in the measurements wins.', solution: `V = ${V.toFixed(3)} cm³. d = ${mass.toFixed(4)} ÷ ${V.toFixed(3)} = <b>${sfHTML(d, sf)} g/cm³</b>.`, video: 'density', skill: 'calc' };
   },
@@ -1361,7 +1446,7 @@ const K3a = {
 };
 
 /* ---------------- Exp 3z: Found or Forgery ---------------- */
-const FLAME = [['Antimony', 'Sb', 'Pale green', '#c9f2b8'], ['Arsenic', 'As', 'Blue', '#6f9cf2'], ['Barium', 'Ba', 'Green', '#5cd17a'], ['Boron', 'B', 'Green', '#5cd17a'], ['Calcium', 'Ca', 'Yellow orange', '#ffb347'], ['Cobalt', 'Co', 'Silver white', '#e8ecf4'], ['Copper (II)', 'Cu', 'Green', '#5cd17a'], ['Iron (III)', 'Fe', 'Orange', '#ff8c2a'], ['Lead', 'Pb', 'Blue', '#6f9cf2'], ['Lithium', 'Li', 'Red', '#ff3b4e'], ['Manganese', 'Mn', 'Yellow green', '#c6e84a'], ['Mercury (I)', 'Hg', 'Red', '#ff3b4e'], ['Sodium', 'Na', 'Yellow', '#ffe14a'], ['Strontium', 'Sr', 'Red', '#ff3b4e'], ['Thallium', 'Tl', 'Green', '#5cd17a'], ['Tin', 'Sn', 'Blue white', '#c3d8ff'], ['Titanium', 'Ti', 'Silver white', '#e8ecf4'], ['Zinc', 'Zn', 'Green-blue', '#46c7b8']];
+const FLAME = [['Antimony', 'Sb', 'Pale green', '#c9f2b8'], ['Arsenic', 'As', 'Blue', '#6f9cf2'], ['Barium', 'Ba', 'Green', '#5cd17a'], ['Boron', 'B', 'Green', '#5cd17a'], ['Calcium', 'Ca', 'Orange-red', '#ff6a3d'], ['Cobalt', 'Co', 'Silver white', '#e8ecf4'], ['Copper (II)', 'Cu', 'Green', '#5cd17a'], ['Iron (III)', 'Fe', 'Orange', '#ff8c2a'], ['Lead', 'Pb', 'Blue', '#6f9cf2'], ['Lithium', 'Li', 'Red', '#ff3b4e'], ['Manganese', 'Mn', 'Yellow green', '#c6e84a'], ['Mercury (I)', 'Hg', 'Red', '#ff3b4e'], ['Sodium', 'Na', 'Yellow', '#ffe14a'], ['Strontium', 'Sr', 'Red', '#ff3b4e'], ['Thallium', 'Tl', 'Green', '#5cd17a'], ['Tin', 'Sn', 'Blue white', '#c3d8ff'], ['Titanium', 'Ti', 'Silver white', '#e8ecf4'], ['Zinc', 'Zn', 'Green-blue', '#46c7b8']];
 const flameTable = () => { const h = Math.ceil(FLAME.length / 2); return `<table class="data small"><tr><th>Element</th><th>Flame color</th><th>Element</th><th>Flame color</th></tr>${FLAME.slice(0, h).map((f, i) => { const g = FLAME[i + h]; return `<tr><td>${f[0]}</td><td>${f[2]}</td>${g ? `<td>${g[0]}</td><td>${g[2]}</td>` : '<td></td><td></td>'}</tr>`; }).join('')}</table>`; };
 const PB = { Europe: [1.36, 21.64, 28.40, 48.60], 'North America': [1.34, 26.31, 22.66, 49.69], Australia: [1.47, 27.53, 25.50, 45.50] };
 const avgPb = ab => (204 * ab[0] + 206 * ab[1] + 207 * ab[2] + 208 * ab[3]) / 100;
@@ -1410,7 +1495,7 @@ const K4a = {
   pctCu() {
     const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), pc = cu / (cu + s) * 100;
     return { tag: 'Percent copper', prompt: `A student found that <b>${cu.toFixed(4)} g Cu</b> reacted with <b>${s.toFixed(4)} g S</b>. Calculate the <b>mass percent of copper</b> in the copper sulfide.`,
-      parts: [num(pc, { sf: 4, unit: '%' })], hint: 'Mass of product = Cu + S. Percent Cu = (g Cu ÷ g product) × 100.', solution: `${cu.toFixed(4)} + ${s.toFixed(4)} = ${(cu + s).toFixed(4)} g product. ${cu.toFixed(4)} ÷ ${(cu + s).toFixed(4)} × 100 = <b>${sfHTML(pc, 4)}%</b> Cu. (Cu₂S is 79.85% Cu.)`, video: 'empirical', skill: 'calc' };
+      parts: [num(pc, { sf: Math.min(sfCount(cu.toFixed(4)), sfCount((cu + s).toFixed(4))), unit: '%' })], hint: 'Mass of product = Cu + S. Percent Cu = (g Cu ÷ g product) × 100.', solution: `${cu.toFixed(4)} + ${s.toFixed(4)} = ${(cu + s).toFixed(4)} g product. ${cu.toFixed(4)} ÷ ${(cu + s).toFixed(4)} × 100 = <b>${sfHTML(pc, Math.min(sfCount(cu.toFixed(4)), sfCount((cu + s).toFixed(4))))}%</b> Cu. (Pure Cu₂S is 79.86% Cu.)`, video: 'empirical', skill: 'calc' };
   },
   idea() {
     return { tag: 'Constant composition', prompt: 'Two groups make copper(I) sulfide. Group 1 uses 1.0 g of copper and group 2 uses 2.0 g. How do their mass ratios (g Cu / g S) compare?',
@@ -1437,10 +1522,10 @@ function ionic(t2) {
   const g = gcd(q, an[2]), nc = an[2] / g, na = q / g;
   const part = (sym, n, poly) => (n === 1 ? sym : poly ? `(${sym})${n}` : `${sym}${n}`);
   const formula = part(cat[0], nc, cat[3]) + part(an[0], na, an[3]);
-  const name = `${cat[1]} ${an[1]}`, alts = [name, ...(an[4] || []).map(a => `${cat[1]} ${a}`)];
+  const name = `${cat[1]} ${an[1]}`, alts = [name, ...(an[4] || []).map(a => `${cat[1]} ${a}`), ...(!t2 && (cat[0] === 'Ag' || cat[0] === 'Zn') ? [`${cat[1]}(${ROMAN[q]}) ${an[1]}`] : [])];
   return { formula, name, alts, type: t2 ? 'Type II ionic' : 'Type I ionic', altF: an[0] === 'C2H3O2' ? [formula.replace(/C2H3O2/g, 'CH3COO')] : [] };
 }
-const MOLEC = [['CO', 'carbon monoxide'], ['CO2', 'carbon dioxide'], ['N2O4', 'dinitrogen tetroxide', 'dinitrogen tetraoxide'], ['PCl5', 'phosphorus pentachloride'], ['SF6', 'sulfur hexafluoride'], ['N2O', 'dinitrogen monoxide', 'dinitrogen monooxide'], ['NO2', 'nitrogen dioxide'], ['P4O10', 'tetraphosphorus decoxide', 'tetraphosphorus decaoxide'], ['CCl4', 'carbon tetrachloride'], ['SO3', 'sulfur trioxide'], ['Cl2O7', 'dichlorine heptoxide', 'dichlorine heptaoxide'], ['N2O5', 'dinitrogen pentoxide', 'dinitrogen pentaoxide'], ['PCl3', 'phosphorus trichloride'], ['NF3', 'nitrogen trifluoride'], ['SiO2', 'silicon dioxide'], ['CS2', 'carbon disulfide'], ['BCl3', 'boron trichloride'], ['S2Cl2', 'disulfur dichloride'], ['IF7', 'iodine heptafluoride'], ['N2O3', 'dinitrogen trioxide']];
+const MOLEC = [['CO', 'carbon monoxide', 'carbon monooxide'], ['CO2', 'carbon dioxide'], ['N2O4', 'dinitrogen tetroxide', 'dinitrogen tetraoxide'], ['PCl5', 'phosphorus pentachloride'], ['SF6', 'sulfur hexafluoride'], ['N2O', 'dinitrogen monoxide', 'dinitrogen monooxide'], ['NO2', 'nitrogen dioxide'], ['P4O10', 'tetraphosphorus decoxide', 'tetraphosphorus decaoxide'], ['CCl4', 'carbon tetrachloride'], ['SO3', 'sulfur trioxide'], ['Cl2O7', 'dichlorine heptoxide', 'dichlorine heptaoxide'], ['N2O5', 'dinitrogen pentoxide', 'dinitrogen pentaoxide'], ['PCl3', 'phosphorus trichloride'], ['NF3', 'nitrogen trifluoride'], ['SiO2', 'silicon dioxide'], ['CS2', 'carbon disulfide'], ['BCl3', 'boron trichloride'], ['S2Cl2', 'disulfur dichloride'], ['IF7', 'iodine heptafluoride'], ['N2O3', 'dinitrogen trioxide']];
 const ACIDS = [['HCl', 'hydrochloric acid'], ['HBr', 'hydrobromic acid'], ['HI', 'hydroiodic acid'], ['HF', 'hydrofluoric acid'], ['HNO3', 'nitric acid'], ['HNO2', 'nitrous acid'], ['H2SO4', 'sulfuric acid'], ['H2SO3', 'sulfurous acid'], ['H3PO4', 'phosphoric acid'], ['HC2H3O2', 'acetic acid'], ['H2CO3', 'carbonic acid'], ['HClO3', 'chloric acid'], ['HClO2', 'chlorous acid'], ['HClO', 'hypochlorous acid'], ['HClO4', 'perchloric acid']];
 const nameCheck = (want) => raw => { const t = normName(raw); if (/\b(mono|di|tri|tetra|penta|hexa)/.test(t) && !/\b(mono|di|tri|tetra|penta|hexa)/.test(normName(want))) return 'Ionic compounds don’t use prefixes like di- or tri-.'; if (/[IVX]/.test(want) && !/\b(I|II|III|IV|V|VI|VII)\b/.test(t)) return 'This metal can have more than one charge, so include a Roman numeral.'; return ''; };
 const K4b = {
@@ -1461,8 +1546,8 @@ const K4b = {
   },
   acid() {
     const a = pick(ACIDS), toName = chance(0.6);
-    return toName ? { tag: 'Name the acid', prompt: `Name this acid (aqueous): <span class="fbig">${fhtml(a[0])}</span>`, parts: [{ type: 'name', accept: [a[1]], ans: a[1] }], hint: 'No oxygen → hydro-___-ic acid. -ate ion → -ic acid. -ite ion → -ous acid.', solution: `<b>${a[1]}</b>`, video: 'acids', skill: 'concept' }
-      : { tag: 'Acid formula', prompt: `Write the formula for <b>${a[1]}</b>.`, parts: [{ type: 'formula', accept: [a[0]], ans: fhtml(a[0]) }], hint: 'Add enough H⁺ to cancel the anion’s charge.', solution: `<b>${fhtml(a[0])}</b>`, video: 'acids', skill: 'concept' };
+    return toName ? { tag: 'Name the acid', prompt: `Name this acid (aqueous): <span class="fbig">${fhtml(a[0])}</span>`, parts: [{ type: 'name', accept: a[0] === 'HI' ? [a[1], 'hydriodic acid'] : [a[1]], ans: a[1] }], hint: 'No oxygen → hydro-___-ic acid. -ate ion → -ic acid. -ite ion → -ous acid.', solution: `<b>${a[1]}</b>`, video: 'acids', skill: 'concept' }
+      : { tag: 'Acid formula', prompt: `Write the formula for <b>${a[1]}</b>.`, parts: [{ type: 'formula', accept: a[0] === 'HC2H3O2' ? [a[0], 'CH3COOH'] : [a[0]], ans: fhtml(a[0]) }], hint: 'Add enough H⁺ to cancel the anion’s charge.', solution: `<b>${fhtml(a[0])}</b>`, video: 'acids', skill: 'concept' };
   },
   type() {
     const r = rint(0, 3); let f, ok;
@@ -1541,7 +1626,7 @@ const K6a = {
   },
   angle() {
     const m = pick(MOLS);
-    return { tag: 'Bond angle', prompt: `About what bond angle would you measure around the central atom in this model of ${fhtml(m[0])}?`, art: molModel(m), parts: [choice(ANGLES, m[6])], hint: 'Linear 180°, trigonal planar 120°, tetrahedral 109.5°. Lone pairs squeeze the angle smaller.', solution: `${GEO_NAMES[m[3]]} → <b>${ANGLES[m[6]]}</b>.`, video: 'lewis', skill: 'concept' };
+    return { tag: 'Bond angle', prompt: `What bond angle does VSEPR predict around the central atom in this model of ${fhtml(m[0])}?`, art: molModel(m), parts: [choice(ANGLES, m[6])], hint: 'Linear 180°, trigonal planar 120°, tetrahedral 109.5°. Lone pairs squeeze the angle smaller.', solution: `${GEO_NAMES[m[3]]} → <b>${ANGLES[m[6]]}</b>.`, video: 'lewis', skill: 'concept' };
   }
 };
 
@@ -1591,7 +1676,7 @@ const K7a = {
 };
 const K7aOld = {
   metalC() {
-    const mm = rnd(20, 45, 2), mw = rnd(30, 60, 1), Tw = rnd(20.5, 23.5, 1), Tf = +(Tw + rnd(2.5, 6.5, 1)).toFixed(1), Tm = 100.0, qw = mw * 4.184 * (Tf - Tw), c = qw / (mm * (Tm - Tf)), sf = Math.min(sfCount(mw.toFixed(1)), sfCount((Tf - Tw).toFixed(1)), 4);
+    const mm = rnd(45, 90, 2), mw = rnd(40, 60, 1), Tw = rnd(20.5, 23.5, 1), cT = pick([0.385, 0.388, 0.449, 0.897]), Tf = +((mm * cT * 100 + mw * 4.184 * Tw) / (mm * cT + mw * 4.184)).toFixed(1), Tm = 100.0, qw = mw * 4.184 * (Tf - Tw), c = qw / (mm * (Tm - Tf)), sf = Math.min(sfCount(mw.toFixed(1)), sfCount((Tf - Tw).toFixed(1)), 4);
     return { tag: 'Specific heat of a metal', prompt: `A ${mm.toFixed(2)} g metal cylinder at <b>100.0 °C</b> is dropped into <b>${mw.toFixed(1)} g</b> of water at <b>${Tw.toFixed(1)} °C</b>. Both end at <b>${Tf.toFixed(1)} °C</b>. Find the specific heat of the metal.`, eq: 'q<sub>metal</sub> + q<sub>water</sub> = 0 &nbsp;&nbsp; q = m × c × ΔT &nbsp;&nbsp; c<sub>water</sub> = 4.184 J/g·°C',
       parts: [num(c, { sf, unit: 'J/g°C' })], hint: 'Find q<sub>water</sub>, then q<sub>metal</sub> = −q<sub>water</sub>. Solve for c<sub>metal</sub> with the metal’s ΔT (which is negative).', solution: `q<sub>water</sub> = ${mw.toFixed(1)} × 4.184 × ${(Tf - Tw).toFixed(1)} = ${qw.toFixed(1)} J. c = ${qw.toFixed(1)} ÷ (${mm.toFixed(2)} × ${(Tm - Tf).toFixed(1)}) = <b>${sfHTML(c, sf)} J/g·°C</b>.`, video: 'specificheat', skill: 'calc' };
   }
@@ -1627,7 +1712,7 @@ const K8a = {
   pH2() {
     const g = gasRun();
     return { tag: 'Pressure of H₂ (Dalton’s law)', prompt: `The room’s pressure gauge reads <b>${g.Pin.toFixed(2)} in Hg</b> and the water is at <b>${g.T}.0 °C</b>. What is the pressure of the hydrogen gas in the tube, in mmHg?`, eq: 'P<sub>total</sub> = P<sub>H₂</sub> + P<sub>water</sub> &nbsp;&nbsp; 1 in Hg = 25.4 mmHg', ref: vpTable(),
-      parts: [num(g.Ph, { dp: 1, unit: 'mmHg', rel: 0.002, slip: x => Math.abs(x - g.Pmm) < 1 ? 'That is the total pressure. Subtract the water vapor pressure.' : Math.abs(x - (g.Pin - VP[g.T])) < 1 ? 'Convert in Hg to mmHg first (× 25.4).' : '' })], hint: 'Convert the room pressure to mmHg, then subtract the vapor pressure of water at that temperature.', solution: `${g.Pin.toFixed(2)} × 25.4 = ${g.Pmm.toFixed(1)} mmHg. ${g.Pmm.toFixed(1)} − ${VP[g.T].toFixed(1)} = <b>${g.Ph.toFixed(1)} mmHg</b>.`, video: 'dalton', skill: 'calc' };
+      parts: [num(g.Ph, { dp: 1, unit: 'mmHg', tol: 0.15, slip: x => Math.abs(x - g.Pmm) < 1 ? 'That is the total pressure. Subtract the water vapor pressure.' : Math.abs(x - (g.Pin - VP[g.T])) < 1 ? 'Convert in Hg to mmHg first (× 25.4).' : '' })], hint: 'Convert the room pressure to mmHg, then subtract the vapor pressure of water at that temperature.', solution: `${g.Pin.toFixed(2)} × 25.4 = ${g.Pmm.toFixed(1)} mmHg. ${g.Pmm.toFixed(1)} − ${VP[g.T].toFixed(1)} = <b>${g.Ph.toFixed(1)} mmHg</b>.`, video: 'dalton', skill: 'calc' };
   },
   toAtm() {
     const p = rnd(720, 760, 1), a = p / 760;
@@ -1669,19 +1754,19 @@ const K9a = {
       parts: [num(M2, { sf: 4, unit: 'M', slip: x => Math.abs(x - M1 * V2 / V1) < M2 * 0.1 ? 'A dilution makes the solution weaker. Check which volume goes on top.' : '' })], hint: 'M₁V₁ = M₂V₂ (you need to know this one by heart).', solution: `M₂ = (${M1.toFixed(4)} M)(${V1}.00 mL) ÷ ${V2}.00 mL = <b>${sfHTML(M2, 4)} M</b>.`, video: 'dilution', skill: 'calc' };
   },
   curve() {
-    const m = 0.0435, b = 0.9984, x = rnd(0.25, 2.6, 4), y = +(m * x + b).toFixed(3), xc = (y - b) / m, pts = [[0, 0.9984], [0.25, 1.0101], [0.5, 1.0201], [1.0, 1.0405], [2.0, 1.0866], [2.5, 1.1077]];
+    const m = 0.0435, b = 0.9984, x = rnd(0.25, 2.45, 4), y = +(m * x + b).toFixed(3), xc = (y - b) / m, pts = [[0, 0.9984], [0.25, 1.0101], [0.5, 1.0201], [1.0, 1.0405], [2.0, 1.0866], [2.5, 1.1077]];
     return { tag: 'Standard curve', prompt: `A student measured the density of their unknown as <b>${y.toFixed(3)} g/mL</b>. Use the standard curve and the equation of the line to find its concentration (mol/L).`, art: curveSVG(m, b, pts, y),
       parts: [num(xc, { unit: 'M', rel: 0.012, ans: xc.toFixed(3) })], hint: 'Density is y. Solve y = 0.0435x + 0.9984 for x: x = (y − 0.9984) ÷ 0.0435.', solution: `x = (${y.toFixed(3)} − 0.9984) ÷ 0.0435 = <b>${xc.toFixed(3)} M</b>.`, video: 'part2_9a', skill: 'calc' };
   },
   massPct() {
     const g = rnd(2.5, 8, 4), w = rnd(45, 52, 4), pc = g / (g + w) * 100;
     return { tag: 'Mass percent (m/m)', prompt: `A solution contains <b>${g.toFixed(4)} g NaCl</b> and the total mass of the solution is <b>${(g + w).toFixed(4)} g</b>. What is the mass percent (m/m %) of NaCl?`, eq: 'm/m % = mass solute ÷ mass solution × 100',
-      parts: [num(pc, { sf: 4, unit: '%', rel: 0.002, slip: x => Math.abs(x - g / w * 100) < 0.05 ? 'Divide by the mass of the whole solution, not the water.' : '' })], hint: 'Divide by the solution mass.', solution: `${g.toFixed(4)} ÷ ${(g + w).toFixed(4)} × 100 = <b>${sfHTML(pc, 4)}%</b>.`, video: 'concentrations', skill: 'calc' };
+      parts: [num(pc, { sf: Math.min(sfCount(g.toFixed(4)), sfCount((g + w).toFixed(4))), unit: '%', rel: 0.002, slip: x => Math.abs(x - g / w * 100) < 0.05 ? 'Divide by the mass of the whole solution, not the water.' : '' })], hint: 'Divide by the solution mass.', solution: `${g.toFixed(4)} ÷ ${(g + w).toFixed(4)} × 100 = <b>${sfHTML(pc, Math.min(sfCount(g.toFixed(4)), sfCount((g + w).toFixed(4))))}%</b>.`, video: 'concentrations', skill: 'calc' };
   },
   mvPct() {
     const g = rnd(1.5, 6, 4), V = pick([50, 100]), pc = g / V * 100;
     return { tag: 'Mass-volume percent (m/v)', prompt: `<b>${g.toFixed(4)} g NaCl</b> is dissolved to make <b>${V}.00 mL</b> of solution. What is the m/v %?`, eq: 'm/v % = grams solute ÷ mL solution × 100',
-      parts: [num(pc, { sf: 4, unit: '%' })], hint: 'Grams of solute divided by mL of solution, × 100.', solution: `${g.toFixed(4)} ÷ ${V}.00 × 100 = <b>${sfHTML(pc, 4)}%</b>.`, video: 'concentrations', skill: 'calc' };
+      parts: [num(pc, { sf: Math.min(sfCount(g.toFixed(4)), sfCount(V.toFixed(2))), unit: '%' })], hint: 'Grams of solute divided by mL of solution, × 100.', solution: `${g.toFixed(4)} ÷ ${V}.00 × 100 = <b>${sfHTML(pc, Math.min(sfCount(g.toFixed(4)), sfCount(V.toFixed(2))))}%</b>.`, video: 'concentrations', skill: 'calc' };
   },
   glass() {
     const q = pick([['You need to deliver exactly 10.00 mL of Solution A into a flask. Which piece of glassware should you use?', 'Volumetric pipet', ['Beaker', 'Transfer pipet', 'Erlenmeyer flask'], 'A <b>volumetric pipet</b> delivers one exact volume (to 0.01 mL).'],
@@ -1718,7 +1803,7 @@ const K10a = {
   scheme2() {
     const rx = pick(RX);
     return { tag: 'Reaction type (scheme 2)', prompt: `You mix ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [choice(S2, rx.s2)],
-      hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. An uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
+      hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. Something burning in O₂ → combustion (a special redox your lab manual lists on its own). Any other uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   station() {
     const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
@@ -1734,7 +1819,7 @@ const K10a = {
       hint: 'Reactants → products. Type -> for the arrow. Write the phase after each formula, like NaCl(aq).', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
   },
   scheme1() {
-    const rx = pick(RX);
+    const rx = pick(RX.filter(x => x.s2 !== 5 && !(x.r.length === 2 && x.r.includes('O2(g)') && x.p.length === 1)));
     return { tag: 'Reaction type (scheme 1)', prompt: 'Classify this reaction by its pattern:', art: eqn(rxHTML(rx, true)), parts: [choice(S1, rx.s1)], hint: 'A + B → AB combination; AB → A + B decomposition; A + BC → AC + B single displacement; AB + CD → AD + CB double displacement; fuel + O₂ combustion.', solution: `<b>${S1[rx.s1]}</b>.`, video: 'reactions', skill: 'concept' };
   },
   ppt() {
@@ -1743,7 +1828,7 @@ const K10a = {
       hint: 'Swap partners (double displacement), balance the charges, then check which product is insoluble on the green sheet.', solution: `${eqn(rxHTML(rx, true))} The insoluble product is <b>${fhtml(rx.ppt)}</b>.`, video: 'netionic', skill: 'concept' };
   },
   balance() {
-    const rx = pick(RX);
+    const rx = pick(RX.filter(x => x.s2 !== 5));
     return { tag: 'Balance it', prompt: 'Balance the equation. Use the smallest whole numbers (write 1 where needed).', parts: [{ type: 'coef', vals: rx.c, terms: [...rx.r, ...rx.p], nr: rx.r.length, ans: rxHTML(rx, true) }], hint: 'Balance polyatomic ions as a unit. Save H and O (or the element that appears alone) for last.', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'calc' };
   },
   gas() {
@@ -1769,7 +1854,7 @@ const K11a = {
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.05, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.02).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.12, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
@@ -1785,7 +1870,7 @@ const K11a = {
     const th = rnd(9, 18, 2), act = +(th * rnd(0.55, 1.12, 3)).toFixed(2), py = act / th * 100;
     return { tag: 'Percent yield', prompt: `The theoretical yield was <b>${th.toFixed(2)} g</b> of alum and the student collected <b>${act.toFixed(2)} g</b>. What is the percent yield? Is it reasonable?`, eq: '% yield = actual ÷ theoretical × 100',
       parts: [num(py, { sf: Math.min(sfCount(th.toFixed(2)), sfCount(act.toFixed(2))), unit: '%' }), choice(['Reasonable (100% or less)', 'Not reasonable: over 100% means the crystals were still wet or impure'], py > 100 ? 1 : 0, { label: 'Is it reasonable?' })],
-      hint: 'Actual ÷ theoretical × 100. More than 100% can’t be real product.', solution: `${act.toFixed(2)} ÷ ${th.toFixed(2)} × 100 = <b>${py.toFixed(1)}%</b>. ${py > 100 ? 'Over 100%: the product was probably still <b>wet</b> or impure.' : 'Under 100% is reasonable (some product is always lost).'}`, video: 'yield', skill: 'calc' };
+      hint: 'Actual ÷ theoretical × 100. More than 100% can’t be real product.', solution: `${act.toFixed(2)} ÷ ${th.toFixed(2)} × 100 = <b>${sfHTML(py, Math.min(sfCount(th.toFixed(2)), sfCount(act.toFixed(2))))}%</b>. ${py > 100 ? 'Over 100%: the product was probably still <b>wet</b> or impure.' : 'Under 100% is reasonable (some product is always lost).'}`, video: 'yield', skill: 'calc' };
   }
 };
 
@@ -1821,7 +1906,7 @@ const K12a = {
   acidMass() {
     const g = rnd(0.8, 3.5, 2), V = pick([0.250, 0.500, 0.750]), M = g / 36.46 / V, pH = -Math.log10(M), sf = Math.min(3, sfCount(g.toFixed(2)));
     return { tag: 'pH of a strong acid', prompt: `<b>${g.toFixed(2)} g HCl</b> is dissolved in water to make <b>${V.toFixed(3)} L</b> of solution. What is the pH?`, eq: PH_EQ,
-      parts: [num(pH, { dp: sf, unit: '', tol: 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf)} M. pH = −log(${sfStr(M, sf)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
+      parts: [num(pH, { dp: sf, unit: '', tol: sf < 3 ? 0.02 : 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf)} M. pH = −log(${sfStr(M, sf)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
   },
   baseMass() {
     const g = rnd(2.0, 6.0, 2), V = pick([0.500, 0.750, 1.00]), M = g / 121.63 / V, oh = 2 * M, pOH = -Math.log10(oh), pH = 14 - pOH, sf = 3;
@@ -1851,8 +1936,8 @@ const K12b = {
   citric() {
     const Mb = rnd(0.09001, 0.11499, 5), Vi = offLine(0.5, 4, 2), Vf = +(Vi + rnd(5, 13, 2)).toFixed(2), Vb = Vf - Vi, C = Mb * Vb / 1000 / 3 / 0.01000;
     return { tag: 'Molarity of citric acid', prompt: `A 10.00 mL soda sample was titrated with <b>${Mb.toFixed(5)} M NaOH</b>. The buret went from <b>${Vi.toFixed(2)} mL</b> to <b>${Vf.toFixed(2)} mL</b>. What is the molarity of citric acid in the soda?`, art: RXN_CIT, eq: 'Molarity (M) = mol solute ÷ L solution',
-      parts: [num(C, { sf: 4, unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
-      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, 4)} M</b>.`, video: 'titration', skill: 'calc' };
+      parts: [num(C, { sf: Math.min(4, sfCount(Vb.toFixed(2))), unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
+      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, Math.min(4, sfCount(Vb.toFixed(2))))} M</b>.`, video: 'titration', skill: 'calc' };
   },
   terms() {
     const q = pick([['In this titration, which chemical is the <b>titrant</b> (the one with a known molarity, added from the buret)?', 'NaOH (sodium hydroxide)', ['Citric acid', 'Oxalic acid', 'Phenolphthalein'], 'The <b>titrant</b> is NaOH: it goes in the buret and its molarity is known.'],
@@ -1890,42 +1975,73 @@ function makeQ(labId, kind) {
 
 /* ===================== PhET Lab Bench ===================== */
 const PHET_URL = (s, scr) => `https://phet.colorado.edu/sims/html/${s}/latest/${s}_all.html${scr ? '?screens=' + scr : ''}`;
+// Every direction below was checked against the live PhET simulation (Nov 2026).
+// setup: shown once above the tasks. steps: numbered clicks for one task. q: the question students answer.
+const anyNum = (unit, label) => ({ type: 'num', v: null, free: true, unit, label, ans: 'what the sim shows' });
 const PHET = [
-  { id: 'density', sim: 'density', screens: { 1: 'Intro' }, labs: ['1a'], title: 'Density', blurb: 'Mass, volume and displacement in a pool of water.', tasks: [
-    { scr: 1, q: 'Pick <b>Custom</b> and drag the mass and volume sliders to <b>any</b> values. Type what they show, then calculate the density.', parts: [{ type: 'num', v: null, free: true, unit: 'kg', label: 'Mass', ans: 'what the sim shows' }, { type: 'num', v: null, free: true, unit: 'L', label: 'Volume', ans: 'what the sim shows' }, { type: 'num', dep: v => { const m = vlNum(v[0]), V = vlNum(v[1]); return m > 0 && V > 0 ? num(m / V, { unit: 'kg/L', rel: 0.012 }) : null; }, unit: 'kg/L', label: 'Density', ans: 'mass ÷ volume' }], sol: 'Density = mass ÷ volume. Check it against the density the sim shows. (1 kg/L is the same as 1 g/mL.)' },
+  { id: 'density', sim: 'density', screens: { 1: 'Intro' }, labs: ['1a'], title: 'Density', blurb: 'Mass, volume and displacement in a pool of water.',
+    setup: ['The sim opens on the <b>Intro</b> screen with a wood block floating in a pool.', 'The <b>material menu</b> (says “Wood”) and the <b>Mass</b> and <b>Volume</b> sliders are in the box at the top right.', 'The pool’s water level reading (like “102.00 L”) is on the left side of the pool.'],
+    tasks: [
+    { scr: 1, steps: ['Open the material menu (top right) and pick <b>Custom</b>.', 'Drag the <b>Mass</b> slider and the <b>Volume</b> slider to any values you like.', 'Type the mass and volume shown in the boxes next to the sliders.'], q: 'Calculate the density of your block.', parts: [anyNum('kg', 'Mass'), anyNum('L', 'Volume'), { type: 'num', dep: v => { const m = vlNum(v[0]), V = vlNum(v[1]); return m > 0 && V > 0 ? num(m / V, { unit: 'kg/L', rel: 0.012 }) : null; }, unit: 'kg/L', label: 'Density', ans: 'mass ÷ volume' }], sol: 'Density = mass ÷ volume. Check your answer against the <b>Density</b> bar at the top of the sim. (1 kg/L is the same as 1 g/mL.)' },
+    { scr: 1, steps: ['Open the material menu and pick <b>Aluminum</b>. The block sinks.', 'Read the pool level on the left.', 'Drag the block out of the water onto the ground, and read the pool level again.'], q: 'The change in the water level equals…', parts: [choice(['the volume of the block', 'the mass of the block', 'the density of the block'], 0)], sol: 'The water level changes by the <b>volume of the block</b> (compare it to the Volume box). That’s the displacement method from Exp 1a.' },
+    { scr: 1, steps: ['Pick <b>Custom</b> again.', 'Slide the <b>Mass</b> down (keep the volume the same) until the block <b>floats</b>.'], q: 'Water has a density of 1.00 kg/L. What is true about the density of a block that floats?', parts: [choice(['It is less than 1.00 kg/L', 'It is more than 1.00 kg/L', 'It is exactly 1.00 kg/L'], 0)], sol: 'Less dense than water → it <b>floats</b>. More dense → it sinks.' }] },
 
-    { scr: 1, q: 'Drop a sinking block into the pool and watch the pool’s volume reading. The rise in water level equals…', parts: [choice(['the volume of the block', 'the mass of the block', 'the density of the block'], 0)], sol: 'The water rises by the <b>volume of the block</b>. That’s the displacement method from Exp 1a.' },
-    { scr: 1, q: 'Water has a density of 1.00 kg/L. Slide the mass down until your block <b>floats</b>. What is true about its density?', parts: [choice(['It is less than 1.00 kg/L', 'It is more than 1.00 kg/L', 'It is exactly 1.00 kg/L'], 0)], sol: 'Less dense than water → it <b>floats</b>. More dense → it sinks.' }] },
+  { id: 'molarity', sim: 'molarity', labs: ['9a'], title: 'Molarity', blurb: 'Change moles of solute and liters of solution.',
+    setup: ['<b>Important:</b> tick <b>Solution Values</b> (bottom left). Without it, the sim shows no numbers.', 'Leave the solute on <b>Drink mix</b> for Tasks 1 and 2 (it never runs out of room to dissolve).', 'Left slider = <b>Solute Amount</b> (moles). Middle slider = <b>Solution Volume</b> (liters). The meter on the right is the molarity.'],
+    tasks: [
+    { steps: ['Drag the <b>Solute Amount</b> and <b>Solution Volume</b> sliders to any values.', 'Type the moles and liters shown next to the sliders.'], q: 'Calculate the molarity. Then check it against the meter on the right.', parts: [anyNum('mol', 'Solute'), anyNum('L', 'Volume'), { type: 'num', dep: v => { const n = vlNum(v[0]), V = vlNum(v[1]); return n > 0 && V > 0 ? num(n / V, { unit: 'M', rel: 0.012 }) : null; }, unit: 'M', label: 'Molarity', ans: 'mol ÷ L' }], sol: 'Molarity = mol solute ÷ L solution. Your answer should match the meter.' },
+    { steps: ['Don’t touch the Solute Amount slider.', 'Slide the <b>Solution Volume</b> up, like adding water.', 'Type the moles and the new volume.'], q: 'Calculate the new molarity.', parts: [anyNum('mol', 'Solute'), anyNum('L', 'New volume'), { type: 'num', dep: v => { const n = vlNum(v[0]), V = vlNum(v[1]); return n > 0 && V > 0 ? num(n / V, { unit: 'M', rel: 0.012 }) : null; }, unit: 'M', label: 'New molarity', ans: 'mol ÷ L' }], sol: 'Same moles, more volume → a lower molarity. That is dilution: M₁V₁ = M₂V₂.' },
+    { steps: ['Open the <b>Solute</b> menu (bottom middle) and pick <b>Potassium permanganate</b>.', 'Drag the <b>Solute Amount</b> slider all the way up.'], q: 'Black crystals pile up and the sim says “Saturated!”. What does that tell you?', parts: [choice(['The solution is saturated: no more solute can dissolve', 'The solution is diluted', 'The solute turned into a gas'], 0)], sol: 'Solid that won’t dissolve means the solution is <b>saturated</b>. The meter stops rising once it is saturated.' }] },
 
-  { id: 'molarity', sim: 'molarity', labs: ['9a'], title: 'Molarity', blurb: 'Change moles of solute and liters of solution.', tasks: [
-    { q: 'Drag the solute and volume sliders to <b>any</b> values. Type what they show, then calculate the molarity. (Check it against the sim’s concentration meter.)', parts: [{ type: 'num', v: null, free: true, unit: 'mol', label: 'Solute', ans: 'what the sim shows' }, { type: 'num', v: null, free: true, unit: 'L', label: 'Volume', ans: 'what the sim shows' }, { type: 'num', dep: v => { const n = vlNum(v[0]), V = vlNum(v[1]); return n > 0 && V > 0 ? num(n / V, { unit: 'M', rel: 0.012 }) : null; }, unit: 'M', label: 'Molarity', ans: 'mol ÷ L' }], sol: 'Molarity = mol solute ÷ L solution. Your answer should match the meter.' },
+  { id: 'beers', sim: 'beers-law-lab', screens: { 2: 'Beer’s Law' }, labs: ['9a'], title: 'Beer’s Law Lab', blurb: 'A standard curve, just like your density vs. molarity graph.',
+    setup: ['The sim opens on the <b>Beer’s Law</b> screen.', 'Click the <b>red button</b> on the light (left side) to turn the light on.', 'On the green meter (top right), pick <b>Absorbance</b>.'],
+    tasks: [
+    { scr: 2, steps: ['Keep the solution on <b>Drink mix</b>.', 'Drag the <b>Concentration</b> slider (bottom) to a few different spots.', 'Each time, read the absorbance on the green meter.'], q: 'How does absorbance change as the concentration goes up?', parts: [choice(['It goes up in a straight line with concentration', 'It goes down as concentration goes up', 'It doesn’t change'], 0)], sol: 'Absorbance goes up <b>in a straight line</b> with concentration. That straight line is a standard curve: measure an unknown, then use y = mx + b to find its concentration (like Exp 9a).' }] },
 
-    { q: 'Keep the same moles and slide the volume <b>up</b>, like adding water. Type the moles and the new volume, then the new molarity.', parts: [{ type: 'num', v: null, free: true, unit: 'mol', label: 'Solute', ans: 'what the sim shows' }, { type: 'num', v: null, free: true, unit: 'L', label: 'New volume', ans: 'what the sim shows' }, { type: 'num', dep: v => { const n = vlNum(v[0]), V = vlNum(v[1]); return n > 0 && V > 0 ? num(n / V, { unit: 'M', rel: 0.012 }) : null; }, unit: 'M', label: 'New molarity', ans: 'mol ÷ L' }], sol: 'Same moles, more volume → a lower molarity. That is dilution: M₁V₁ = M₂V₂.' },
+  { id: 'ph', sim: 'ph-scale', screens: { 1: 'Macro' }, labs: ['12a'], title: 'pH Scale', blurb: 'Household liquids, pH and [H₃O⁺].',
+    setup: ['The sim opens on the <b>Macro</b> screen with water in the beaker.', '<b>Drag the purple probe</b> (bottom left, under the pH scale) into the liquid. The meter shows “—” until the probe is in the liquid.'],
+    tasks: [
+    { scr: 1, steps: ['Open the liquid menu at the top (says “Water”) and pick any liquid, like <b>Orange Juice</b>. The beaker refills by itself.', 'Read the pH on the meter and type it.'], q: 'Calculate [H<sub>3</sub>O<sup>+</sup>] from the pH you read.', parts: [{ type: 'num', v: null, free: true, unit: '', label: 'pH you read', ans: 'what the meter shows' }, { type: 'num', dep: vals => { const p = parseEntry(vals[0]); if (!p) return null; const x = toNum(p.d); return num(Math.pow(10, -x), { sf: Math.max(1, p.dp), unit: 'M', rel: 0.06 }); }, unit: 'M', label: '[H<sub>3</sub>O<sup>+</sup>]', ans: '10^(−pH)' }], sol: '[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup>. The decimal places in the pH = the sig figs in the concentration (pH 3.50 → 2 sig figs).' },
+    { scr: 1, steps: ['Pick an acid (pH below 7), like <b>Orange Juice</b> or <b>Soda Pop</b>.', 'Drag the handle of the <b>Water</b> faucet (top right) to add water. Watch the pH meter.'], q: 'What happens to the pH of an acid as you dilute it?', parts: [choice(['It moves toward 7', 'It moves away from 7', 'It stays the same'], 0)], sol: 'Diluting an acid lowers [H<sub>3</sub>O<sup>+</sup>], so the pH <b>rises toward 7</b>.' }] },
 
-    { q: 'Pick any solute and add solute until crystals appear at the bottom. What does that tell you?', parts: [choice(['The solution is saturated: no more solute can dissolve', 'The solution is diluted', 'The solute turned into a gas'], 0)], sol: 'Solid that won’t dissolve means the solution is <b>saturated</b>.' }] },
-  { id: 'beers', sim: 'beers-law-lab', screens: { 2: 'Beer’s Law' }, labs: ['9a'], title: 'Beer’s Law Lab', blurb: 'A standard curve, just like your density vs. molarity graph.', tasks: [
-    { scr: 2, q: 'On the <b>Beer’s Law</b> screen, keep the same solution and wavelength. Raise the concentration a few times and watch the absorbance. How does absorbance change?', parts: [choice(['It goes up in a straight line with concentration', 'It goes down as concentration goes up', 'It doesn’t change'], 0)], sol: 'Absorbance goes up <b>in a straight line</b> with concentration. That straight line is a standard curve: measure an unknown, then use y = mx + b to find its concentration (like Exp 9a).' }] },
-  { id: 'ph', sim: 'ph-scale', screens: { 1: 'Macro' }, labs: ['12a'], title: 'pH Scale', blurb: 'Household liquids, pH and [H₃O⁺].', tasks: [
-    { scr: 1, q: 'On the <b>Macro</b> screen, choose any household liquid. Type the pH the meter shows, then calculate [H<sub>3</sub>O<sup>+</sup>] from it.', parts: [{ type: 'num', v: null, free: true, unit: '', label: 'pH you read', ans: 'what the meter shows' }, { type: 'num', dep: vals => { const p = parseEntry(vals[0]); if (!p) return null; const x = toNum(p.d); return num(Math.pow(10, -x), { sf: Math.max(1, p.dp), unit: 'M', rel: 0.06 }); }, unit: 'M', label: '[H<sub>3</sub>O<sup>+</sup>]', ans: '10^(−pH)' }], sol: '[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup>. Decimal places in pH = sig figs in the concentration. Turn on the sim’s <b>Micro</b> screen to check your number.' },
-    { scr: 1, q: 'Add water to the liquid in the beaker. What happens to the pH of an acid as you dilute it?', parts: [choice(['It moves toward 7', 'It moves away from 7', 'It stays the same'], 0)], sol: 'Diluting an acid lowers [H<sub>3</sub>O<sup>+</sup>], so the pH <b>rises toward 7</b>.' }] },
-  { id: 'shapes', sim: 'molecule-shapes', screens: { 1: 'Model', 2: 'Real Molecules' }, labs: ['6a'], title: 'Molecule Shapes', blurb: 'Build models and see their shapes and angles.', tasks: [
-    { scr: 1, q: 'On the <b>Model</b> screen, build a central atom with <b>3 single bonds and 1 lone pair</b>. Turn on “Molecule Geometry”. What is the shape?', parts: [geoChoice('trigonalpyramidal')], sol: '3 bonds + 1 lone pair → <b>trigonal pyramidal</b> (like NH₃).' },
-    { scr: 1, q: 'Now use <b>2 bonds and 2 lone pairs</b>. What is the shape?', parts: [geoChoice('bent')], sol: '2 bonds + 2 lone pairs → <b>bent</b> (like H₂O).' },
-    { scr: 2, q: 'On the <b>Real Molecules</b> screen, pick <b>H₂O</b> and turn on bond angles. About what angle is shown?', parts: [choice(ANGLES, 4)], sol: 'Water’s real bond angle is <b>about 104.5°</b>. The lone pairs squeeze it below 109.5°.' }] },
-  { id: 'gas', sim: 'gas-properties', screens: { 1: 'Ideal' }, labs: ['8a'], title: 'Gas Properties', blurb: 'Pressure, volume, temperature and moles.', tasks: [
-    { scr: 1, q: 'On the <b>Ideal</b> screen, pump in some gas. Hold the <b>volume</b> constant and heat the gas. What happens to the pressure?', parts: [choice(['It goes up', 'It goes down', 'It stays the same'], 0)], sol: 'Hotter particles hit the walls harder and more often → pressure <b>goes up</b> (P ∝ T).' },
-    { scr: 1, q: 'Keep the temperature and volume constant and pump in more particles. What happens to the pressure?', parts: [choice(['It goes up', 'It goes down', 'It stays the same'], 0)], sol: 'More moles of gas → more collisions → pressure <b>goes up</b> (P ∝ n). In Exp 8a, more Mg → more H₂ → more gas volume.' }] },
-  { id: 'balance', sim: 'balancing-chemical-equations', screens: { 1: 'Introduction' }, labs: ['10a'], title: 'Balancing Chemical Equations', blurb: 'Balance with the scales and bar charts.', tasks: [
-    { scr: 1, q: 'On the <b>Introduction</b> screen, balance <b>Make Ammonia</b>. Type the coefficients.', parts: [{ type: 'coef', vals: [1, 3, 2], terms: ['N2', 'H2', 'NH3'], nr: 2, ans: 'N₂ + 3H₂ → 2NH₃' }], sol: '<b>1</b> N₂ + <b>3</b> H₂ → <b>2</b> NH₃' },
-    { scr: 1, q: 'Balance <b>Combust Methane</b>.', parts: [{ type: 'coef', vals: [1, 2, 1, 2], terms: ['CH4', 'O2', 'CO2', 'H2O'], nr: 2, ans: 'CH₄ + 2O₂ → CO₂ + 2H₂O' }], sol: '<b>1</b> CH₄ + <b>2</b> O₂ → <b>1</b> CO₂ + <b>2</b> H₂O. A combustion reaction (Exp 10a).' }] },
-  { id: 'rpl', sim: 'reactants-products-and-leftovers', screens: { 2: 'Molecules' }, labs: ['11a', '12a', '12b'], title: 'Reactants, Products and Leftovers', blurb: 'Limiting reactants with real molecules.', tasks: [
-    { scr: 2, q: 'On the <b>Molecules</b> screen, choose <b>Make Water</b> (2H₂ + O₂ → 2H₂O). Start with <b>4 H₂</b> and <b>3 O₂</b>. How many H₂O form, and how many O₂ are left over?', parts: [num(4, { tol: 0, unit: '', label: 'H₂O made', ans: '4' }), num(1, { tol: 0, unit: '', label: 'O₂ left over', ans: '1' })], sol: '4 H₂ need only 2 O₂ → <b>4 H₂O</b>, with <b>1 O₂</b> left. H₂ is the limiting reactant.' }] },
-  { id: 'isotopes', sim: 'isotopes-and-atomic-mass', screens: { 2: 'Mixtures' }, labs: ['3z', '3a'], title: 'Isotopes and Atomic Mass', blurb: 'Mix isotopes and watch the average mass.', tasks: [
-    { scr: 2, q: 'On the <b>Mix Isotopes</b> screen, pick carbon. Put in <b>3 atoms of carbon-12</b> and <b>1 atom of carbon-13</b>. What average atomic mass does the sim show?', parts: [num(12.25, { unit: 'amu', tol: 0.01, label: 'Average atomic mass', ans: '12.25' })], sol: '75% ¹²C + 25% ¹³C: 0.75(12.000) + 0.25(13.003) = <b>12.25 amu</b>. Same math as the lead isotopes in Found or Forgery.' }] },
-  { id: 'hatom', sim: 'models-of-the-hydrogen-atom', labs: ['3a', '3z'], title: 'Models of the Hydrogen Atom', blurb: 'Bohr model and emission lines.', tasks: [
-    { q: 'Choose the <b>Bohr</b> model and shine white light. When the electron falls from a higher level to a lower level, what happens?', parts: [choice(['A photon of light is emitted', 'A photon is absorbed', 'The atom loses a proton'], 0)], sol: 'Falling to a lower level <b>emits a photon</b>. Each drop makes one line in the emission spectrum (what the spectroscope shows).' }] },
-  { id: 'energy', sim: 'energy-forms-and-changes', screens: { 1: 'Intro' }, labs: ['7a'], title: 'Energy Forms and Changes', blurb: 'Heat iron, brick, water and olive oil.', tasks: [
-    { scr: 1, q: 'On the <b>Intro</b> screen, heat a block of <b>iron</b> and a beaker of <b>water</b> with the same burner setting. Which warms up faster?', parts: [choice(['Iron: it has a lower specific heat', 'Water: it has a lower specific heat', 'They warm at the same rate'], 0)], sol: '<b>Iron</b> warms faster. Water’s specific heat (4.184 J/g·°C) is high, so it takes more heat to change its temperature: q = m·c·ΔT.' }] }
+  { id: 'shapes', sim: 'molecule-shapes', screens: { 1: 'Model', 2: 'Real Molecules' }, labs: ['6a'], title: 'Molecule Shapes', blurb: 'Build models and see their shapes and angles.',
+    setup: ['The <b>Model</b> screen starts with a molecule already built.', 'To build your own, click the yellow <b>Remove All</b> button first.', 'Drag the model to spin it and see it in 3D.'],
+    tasks: [
+    { scr: 1, steps: ['Click <b>Remove All</b>.', 'Click the <b>single bond</b> (top button in the Bonding box) <b>3 times</b>.', 'Click the <b>Lone Pair</b> button <b>once</b>.', 'Tick <b>Molecule Geometry</b> (bottom left) to see the name.'], q: 'What is the shape?', parts: [geoChoice('trigonalpyramidal')], sol: '3 bonds + 1 lone pair → <b>trigonal pyramidal</b> (like NH₃).' },
+    { scr: 1, steps: ['Click <b>Remove All</b>.', 'Add <b>2 single bonds</b> and <b>2 lone pairs</b>.'], q: 'What is the shape?', parts: [geoChoice('bent')], sol: '2 bonds + 2 lone pairs → <b>bent</b> (like H₂O).' },
+    { scr: 2, steps: ['Open the <b>Real Molecules</b> screen (button above this task).', '<b>H₂O</b> is already picked. Tick <b>Show Bond Angles</b> (top right).'], q: 'About what bond angle is shown for water?', parts: [choice(ANGLES, 4)], sol: 'Water’s real bond angle is <b>about 104.5°</b>. The lone pairs squeeze it below 109.5°. (The Model screen shows the ideal 109.5°; real molecules are a little smaller.)' }] },
+
+  { id: 'gas', sim: 'gas-properties', screens: { 1: 'Ideal' }, labs: ['8a'], title: 'Gas Properties', blurb: 'Pressure, volume, temperature and moles.',
+    setup: ['The sim opens on the <b>Ideal</b> screen with an empty box.', 'In the <b>Particles</b> box (top right), click <b>▶▶</b> next to <b>Heavy</b> twice to add 100 particles.', 'The thermometer (K) and pressure gauge (atm) are on top of the box.'],
+    tasks: [
+    { scr: 1, steps: ['Under <b>Hold Constant</b>, pick <b>Volume (V)</b>.', 'Read the pressure.', 'Push the <b>Heat</b> slider on the bucket (under the box) <b>up and hold it</b> for a few seconds. (It springs back when you let go.)'], q: 'What happens to the pressure when you heat the gas at constant volume?', parts: [choice(['It goes up', 'It goes down', 'It stays the same'], 0)], sol: 'Hotter particles hit the walls harder and more often → pressure <b>goes up</b> (P ∝ T).' },
+    { scr: 1, steps: ['Under <b>Hold Constant</b>, pick <b>Temperature (T)</b>. (The volume stays fixed unless you move the box’s left wall.)', 'Read the pressure.', 'Click <b>▶▶</b> next to Heavy again to add 50 more particles.'], q: 'What happens to the pressure when you add more gas particles?', parts: [choice(['It goes up', 'It goes down', 'It stays the same'], 0)], sol: 'More moles of gas → more collisions → pressure <b>goes up</b> (P ∝ n). In Exp 8a, more Mg → more H₂ → more gas.' }] },
+
+  { id: 'balance', sim: 'balancing-chemical-equations', screens: { 1: 'Intro' }, labs: ['10a'], title: 'Balancing Chemical Equations', blurb: 'Balance with the scales and bar charts.',
+    setup: ['The sim opens on the <b>Intro</b> screen.', 'Pick a reaction with the buttons along the blue bar at the bottom.', 'Change a coefficient with the tiny <b>▲ ▼ arrows</b> above and below each number.', 'The <b>View</b> menu (top right) can show balance scales or bar charts to help you count atoms.'],
+    tasks: [
+    { scr: 1, steps: ['Pick <b>Make Ammonia</b>.', 'Use the arrows until both boxes show the same atoms.'], q: 'Type the balanced coefficients.', parts: [{ type: 'coef', vals: [1, 3, 2], terms: ['N2', 'H2', 'NH3'], nr: 2, ans: 'N₂ + 3H₂ → 2NH₃' }], sol: '<b>1</b> N₂ + <b>3</b> H₂ → <b>2</b> NH₃' },
+    { scr: 1, steps: ['Pick <b>Combust Methane</b>.', 'Balance it with the arrows.'], q: 'Type the balanced coefficients.', parts: [{ type: 'coef', vals: [1, 2, 1, 2], terms: ['CH4', 'O2', 'CO2', 'H2O'], nr: 2, ans: 'CH₄ + 2O₂ → CO₂ + 2H₂O' }], sol: '<b>1</b> CH₄ + <b>2</b> O₂ → <b>1</b> CO₂ + <b>2</b> H₂O. A combustion reaction (Exp 10a).' }] },
+
+  { id: 'rpl', sim: 'reactants-products-and-leftovers', screens: { 2: 'Molecules' }, labs: ['11a', '12a', '12b'], title: 'Reactants, Products and Leftovers', blurb: 'Limiting reactants with real molecules.',
+    setup: ['The sim opens on the <b>Molecules</b> screen with <b>Make Water</b> picked (2H₂ + O₂ → 2H₂O).', 'Use the <b>▲ ▼</b> arrows under “Before Reaction” to set how many of each reactant you start with.'],
+    tasks: [
+    { scr: 2, steps: ['<b>Predict first:</b> with 4 H₂ and 3 O₂, how much water forms and what is left over?', 'Then set H₂ to <b>4</b> and O₂ to <b>3</b> and check the “After Reaction” box.'], q: 'How many H₂O form, and how many O₂ are left over?', parts: [num(4, { tol: 0, unit: '', label: 'H₂O made', ans: '4' }), num(1, { tol: 0, unit: '', label: 'O₂ left over', ans: '1' })], sol: '4 H₂ need only 2 O₂ → <b>4 H₂O</b>, with <b>1 O₂</b> left. H₂ is the limiting reactant.' }] },
+
+  { id: 'isotopes', sim: 'isotopes-and-atomic-mass', screens: { 2: 'Mixtures' }, labs: ['3z', '3a'], title: 'Isotopes and Atomic Mass', blurb: 'Mix isotopes and watch the average mass.',
+    setup: ['The sim opens on the <b>Mixtures</b> screen.', 'Click <b>C</b> (carbon) on the small periodic table (top right). The buckets change to Carbon-12 and Carbon-13.', 'Drag atoms from the buckets into the black box. The eraser (under the box) empties it.'],
+    tasks: [
+    { scr: 2, steps: ['Drag any number of <b>carbon-12</b> atoms and any number of <b>carbon-13</b> atoms into the black box.', 'Count them and type the counts.', 'Calculate the average atomic mass (carbon-12 = 12.000 amu, carbon-13 = 13.003 amu) before you look at the <b>Average Atomic Mass</b> box.'], q: 'What is the average atomic mass of your mix?', parts: [anyNum('', 'Carbon-12 atoms'), anyNum('', 'Carbon-13 atoms'), { type: 'num', dep: v => { const a = vlNum(v[0]), b = vlNum(v[1]); return a >= 0 && b >= 0 && a + b > 0 ? num((12.000 * a + 13.003 * b) / (a + b), { unit: 'amu', tol: 0.006 }) : null; }, unit: 'amu', label: 'Average atomic mass', ans: '(12.000 × n₁₂ + 13.003 × n₁₃) ÷ total' }], sol: 'Average = Σ (fraction × mass). For 3 carbon-12 and 1 carbon-13: 0.75(12.000) + 0.25(13.003) = <b>12.25 amu</b>. Same math as the lead isotopes in Found or Forgery.' }] },
+
+  { id: 'hatom', sim: 'models-of-the-hydrogen-atom', screens: { 2: 'Energy Levels' }, labs: ['3a', '3z'], title: 'Models of the Hydrogen Atom', blurb: 'Bohr model and emission lines.',
+    setup: ['The sim opens on the <b>Energy Levels</b> screen with the <b>Bohr</b> model picked.', 'Click the <b>red button</b> on the light (left side) to turn it on.', 'Click the <b>+</b> on the <b>Spectrometer</b> bar (bottom) to open it.'],
+    tasks: [
+    { scr: 2, steps: ['Watch the <b>Electron Energy Level</b> panel: the electron jumps up to a higher n.', 'When it falls back down, watch the Spectrometer.'], q: 'When the electron falls from a higher level to a lower level, what happens?', parts: [choice(['A photon of light is emitted', 'A photon is absorbed', 'The atom loses a proton'], 0)], sol: 'Falling to a lower level <b>emits a photon</b>. Each drop makes one line in the emission spectrum, the lines you saw in the spectroscope.' }] },
+
+  { id: 'energy', sim: 'energy-forms-and-changes', screens: { 1: 'Intro' }, labs: ['7a'], title: 'Energy Forms and Changes', blurb: 'Heat iron, brick, water and olive oil.',
+    setup: ['The sim opens on the <b>Intro</b> screen.', 'Tick <b>Link Heaters</b> (top right) so both burners heat the same amount.', 'The thermometer (top left) can be dragged onto any object to read it.'],
+    tasks: [
+    { scr: 1, steps: ['Drag the <b>Iron</b> block onto the left burner and the <b>Water</b> beaker onto the right burner.', 'Push a burner’s slider up to <b>Heat</b> and hold it.', 'Drag a thermometer onto each one and compare.'], q: 'Which warms up faster?', parts: [choice(['Iron: it has a lower specific heat', 'Water: it has a lower specific heat', 'They warm at the same rate'], 0)], sol: '<b>Iron</b> warms faster. Water’s specific heat (4.184 J/g·°C) is high, so it takes more heat to change its temperature: q = m·c·ΔT.' }] }
 ];
 UNIT_ALIASES['kg/L'] = ['kg/l', 'g/ml', 'kgl-1'];
 
@@ -2285,11 +2401,12 @@ function turnIn() {
 /* ---------- PhET bench ---------- */
 function renderBench() {
   const set = labSet(), sims = PHET.filter(s => s.labs.some(l => set.includes(l)));
-  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><img class="sc-pic" src="assets/sims/${s.id}.webp" alt="" onerror="this.remove()"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small><small> ${s.tasks.filter((t, i) => P.benchDone[s.id + i]).length}/${s.tasks.length} tasks</small></button>`).join('');
+  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><img class="sc-pic" src="assets/sims/${s.id}.webp" alt="" onerror="this.remove()"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small>${(() => { const d = s.tasks.filter((t, i) => P.benchDone[s.id + i]).length; return `<span class="sc-status${d === s.tasks.length ? ' done' : ''}">${d}/${s.tasks.length} tasks</span>`; })()}<span class="sc-go" aria-hidden="true">Open →</span></button>`).join('');
   if (!state.sim || !sims.some(s => s.id === state.sim)) { $('simArea').innerHTML = '<div class="empty">Pick a simulation to open it here.</div>'; return; }
   const s = PHET.find(x => x.id === state.sim), scr0 = (s.tasks.find(t => t.scr) || {}).scr;
-  $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note">${scr0 ? `Opens right on the <b>${s.screens[scr0]}</b> screen. ` : ''}<a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open the simulation full screen ↗</a></p>` +
-    s.tasks.map((t, i) => `<div class="task${P.benchDone[s.id + i] ? ' done' : ''}" data-task="${i}"><p class="tq">Task ${i + 1}. ${t.q}</p>${t.scr && Object.keys(s.screens).length > 1 ? `<button type="button" class="btn small" data-tscreen="${t.scr}">Open the ${s.screens[t.scr]} screen</button>` : ''}<div class="parts">${partsHTML(t.parts, `b${s.id}${i}`, false)}</div><div class="check-row"><button type="button" class="btn primary" data-tcheck="${i}">Check</button></div><div class="feedback"></div></div>`).join('');
+  $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note sim-howto"><b>Tap the simulation</b> to use it. Tap <b>Done: scroll the page</b> to scroll again. <a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open it full screen ↗</a></p>` +
+    (s.setup ? `<div class="sim-setup"><h4>Set up the sim first</h4><ol>${s.setup.map(x => `<li>${x}</li>`).join('')}</ol></div>` : '') +
+    s.tasks.map((t, i) => `<div class="task${P.benchDone[s.id + i] ? ' done' : ''}" data-task="${i}"><p class="tq"><span class="tnum">Task ${i + 1}</span>${P.benchDone[s.id + i] ? '<span class="tdone">Done</span>' : ''}</p>${t.steps ? `<ol class="tsteps">${t.steps.map(x => `<li>${x}</li>`).join('')}</ol>` : ''}${t.scr && Object.keys(s.screens || {}).length > 1 ? `<button type="button" class="btn small" data-tscreen="${t.scr}">Open the ${s.screens[t.scr]} screen</button>` : ''}<p class="tqq">${t.q}</p><div class="parts">${partsHTML(t.parts, `b${s.id}${i}`, false)}</div><div class="check-row"><button type="button" class="btn primary" data-tcheck="${i}">Check</button></div><div class="feedback"></div></div>`).join('');
   const sf = $('simArea').querySelector('.simframe');
   if (sf) { sf.querySelector('.sim-shield').onclick = () => sf.classList.add('live'); sf.querySelector('.sim-release').onclick = () => sf.classList.remove('live'); sf.addEventListener('mouseleave', () => sf.classList.remove('live')); }
   paintIcons($('simArea'));
@@ -2305,7 +2422,7 @@ function checkTask(i) {
     try { window.ddTrack && window.ddTrack({ game: 'labpractical', course: '3A', mode: 'PhET Bench', topic: `PhET ${s.title} · task ${i + 1}`, correct: true }); } catch (e) {}
   } else { fb.className = 'feedback bad'; fb.innerHTML = 'Not quite. Look at the sim again and fix the red part.'; }
   renderStats(); save(); checkAch();
-  const card = $('simGrid').querySelector(`[data-sim="${s.id}"] small:last-child`); if (card) card.textContent = ` ${s.tasks.filter((x, k) => P.benchDone[s.id + k]).length}/${s.tasks.length} tasks`;
+  const card = $('simGrid').querySelector(`[data-sim="${s.id}"] .sc-status`); if (card) { const d = s.tasks.filter((x, k) => P.benchDone[s.id + k]).length; card.textContent = `${d}/${s.tasks.length} tasks`; card.classList.toggle('done', d === s.tasks.length); }
 }
 
 /* ===================== Virtual Lab: hands-on benches ===================== */
@@ -2498,7 +2615,7 @@ function mixResult(A, B) {
 let buildingMock = false;
 const lvl = () => (buildingMock || (mock && mock.phase !== 'done') || VL.mock ? 'int' : (P && P.level) || 'int');
 function paintLvl() { document.querySelectorAll('.lvlpick .chip').forEach(b => { const on = b.dataset.lvl === ((P && P.level) || 'int'); b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('role', 'radio'); }); }
-const OBSKW = { ppt: ['precipitat', 'solid', 'cloud', 'ppt', 'milky', 'turbid', 'settl'], gas: ['bubbl', 'fizz', 'gas', 'effervesc', 'smell', 'odor', 'litmus', 'foam'], neutral: ['warm', 'heat', 'hot', 'temperature', 'exotherm'], redox: ['coat', 'deposit', 'plat', 'solid', 'color', 'fade', 'dark', 'brown', 'gray', 'grey'], none: ['no change', 'nothing', 'no reaction', 'no visible', 'no observ', 'stays clear', 'stayed clear', 'no evidence'] };
+const OBSKW = { ppt: ['precipitat', 'solid', 'cloud', 'ppt', 'milky', 'turbid', 'settl'], gas: ['bubbl', 'fizz', 'gas', 'effervesc', 'smell', 'odor', 'litmus', 'foam'], neutral: ['warm', 'heat', 'hot', 'temperature', 'exotherm'], redox: ['coat', 'deposit', 'plat', 'solid', 'color', 'fade', 'dark', 'brown', 'gray', 'grey'], none: ['no change', 'nothing', 'no reaction', 'no visible', 'no observ', 'stays clear', 'stayed clear', 'no evidence', 'no precipitate', 'no solid', 'no bubbles', 'clear', 'colorless', 'unchanged', 'did not change', 'didn t change'] };
 const obsPart = (r, o = {}) => Object.assign({ type: 'text', kw: OBSKW[r.kind].map(w => (w.includes(' ') ? w : w)), accept: [], ans: r.text.replace(/: .*$/, '.') }, o);
 function balanceRx(r, p) {
   const terms = [...r, ...p].map(x => parseFormula(x.replace(/\((s|l|g|aq)\)$/, ''))), els = [...new Set(terms.flatMap(t => Object.keys(t)))], n = terms.length, c = Array(n).fill(1);
@@ -2609,7 +2726,7 @@ const BENCH_PH = {
     { title: 'Add a product', say: 'Drag a <b>household product</b> into the test tube.', act: s => !!s.item, auto: true },
     { title: 'Add the indicator', say: 'Drag the <b>red cabbage juice</b> into the tube. About what pH is it?', act: s => s.ind, parts: s => [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], sol: s => `${CABBAGE[cabIdx(s.pH)][1]} → about <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.` },
     { title: 'Measure the pH', skip: () => !USE_PH_METER, say: 'Drag the <b>pH meter</b> into the tube and record the reading.', act: s => s.meter, parts: s => [num(s.pH, { dp: 2, unit: '', tol: 0.001, label: 'pH' })], rec: (s, v) => { s.pHR = v[0]; }, sol: s => `Copy the display: <b>${s.pH.toFixed(2)}</b>.` },
-    { title: 'Acid or base?', say: s => `${USE_PH_METER ? '' : `A pH meter in the stockroom read <b>${s.pH.toFixed(2)}</b>. `}Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. Below 7 is acidic, above 7 is basic.` },
+    { title: 'Acid or base?', say: s => `${USE_PH_METER ? '' : `A pH meter in the stockroom read <b>${s.pH.toFixed(2)}</b>. `}Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. In this lab: below 6.5 is acidic, 6.5 to 7.5 is about neutral, above 7.5 is basic.` },
     { title: 'Calculate', say: s => `${USE_PH_METER ? 'Use your pH' : `The measured pH was <b>${s.pH.toFixed(2)}</b>. Use it`} to calculate <b>${s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}</b>.`, eq: PH_EQ, parts: s => { const v = s.calc === 'h3o' ? Math.pow(10, -s.pHR) : Math.pow(10, -(14 - s.pHR)); return [num(v, { sf: 2, unit: 'M', rel: 0.06, label: s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]' })]; }, sol: s => (s.calc === 'h3o' ? `[H₃O⁺] = 10<sup>−${s.pHR.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pHR), 2)} M</b>` : `pOH = 14 − ${s.pHR.toFixed(2)} = ${(14 - s.pHR).toFixed(2)}; [OH⁻] = 10<sup>−${(14 - s.pHR).toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -(14 - s.pHR)), 2)} M</b>`) + ' (2 decimal places in pH → 2 sig figs).' }
   ]
 };
@@ -2669,7 +2786,7 @@ function titrationSVG(v, s) {
 const buretZoom = v => `<svg viewBox="0 0 340 340" role="img" aria-label="Zoomed-in view of the buret meniscus. The numbers increase going down.">${zoomScale({ cx: 170, cy: 170, R: 150, minor: 0.1, label: 1, value: v, fill: 'liquid', topDown: true, min: 0, max: 50, unit: 'mL' })}</svg>`;
 const BENCH_TITRATE = {
   id: 'titrate', labs: ['12b'], title: 'Titrate the Soda', blurb: 'Drip NaOH into soda until the first light pink that stays.',
-  setup() { const vi = offLine(0.4, 3.6, 2), vb = rnd(6.5, 12.5, 2), Mb = rnd(0.0960, 0.1040, 4); return { vi, v: vi, ve: +(vi + vb).toFixed(2), Mb, soda: false, flask: false, ind: false, done: false, flash: 0 }; },
+  setup() { const vi = offLine(0.4, 3.6, 2), vb = rnd(6.5, 12.5, 2), Mb = rnd(0.1000, 0.1080, 4); return { vi, v: vi, ve: +(vi + vb).toFixed(2), Mb, soda: false, flask: false, ind: false, done: false, flash: 0 }; },
   scene(s) {
     const ctl = s.ind && VL.step >= 3 && !s.done ? `<div class="vl-ctl"><button type="button" class="btn" id="tFast">Open stopcock <small>(hold)</small></button><button type="button" class="btn" id="tDrop">Add 1 drop</button><button type="button" class="btn primary" id="tStop">Light pink stays: stop</button></div>` : '';
     return `<div class="vl-shelf">${!s.soda ? shelfBtn('soda', VLI.bottle('#e8f1e3', 'SODA'), '10.00 mL soda (pipet)') : ''}${s.soda && !s.ind ? shelfBtn('phen', VLI.dropper('#f7f7fb'), 'Phenol­phthalein') : ''}<span class="vl-hint">NaOH: <b>${s.Mb.toFixed(4)} M</b> (standardized)</span></div>
@@ -2848,7 +2965,7 @@ const HANDS = {
     return { lab: '1a', title: 'Making Measurements (hands-on)', hands: { bench: b, s, snap: () => `Metal: ${s.onBal ? s.m.toFixed(4) + ' g' : 'not weighed'} · water: ${s.poured ? s.vi.toFixed(1) : '–'} → ${s.inCyl ? s.vf.toFixed(1) : '–'} mL` }, versions: {
       A: handQ('1a', 'Weigh the metal sample. Record its mass.', [livePart(() => (s.onBal ? num(s.m, { dp: 4, unit: 'g', tol: 0.00006 }) : null), { unit: 'g' })], () => `<b>${s.m.toFixed(4)} g</b>: copy every digit.`, 'read'),
       B: handQ('1a', 'Add water to the cylinder, read it, then slide the metal in and read it again. What is the volume of the metal?', [livePart(() => (s.inCyl ? num(V(), { dp: 1, unit: 'mL', tol: 0.25 }) : null), { unit: 'mL' })], () => `${s.vf.toFixed(1)} − ${s.vi.toFixed(1)} = <b>${V().toFixed(1)} mL</b>.`, 'read'),
-      C: handQ('1a', 'Find the density of the metal by water displacement.', [livePart(() => (s.inCyl && s.onBal ? num(s.m / V(), { sf: sfCount(V().toFixed(1)), unit: 'g/mL', rel: 0.035 }) : null), { unit: 'g/mL' })], () => `${s.m.toFixed(4)} g ÷ ${V().toFixed(1)} mL = <b>${sfHTML(s.m / V(), sfCount(V().toFixed(1)))} g/mL</b>.`, 'calc') } };
+      C: handQ('1a', 'Find the density of the metal by water displacement.', [livePart(() => (s.inCyl && s.onBal ? (() => { const sf = sfCount(V().toFixed(1)), r = x => Number(x.toPrecision(sf)), lo = Math.min(r(s.m / (V() + 0.2)), s.m / (V() + 0.2)), hi = Math.max(r(s.m / (V() - 0.2)), s.m / (V() - 0.2)); return num((lo + hi) / 2, { sf, unit: 'g/mL', tol: (hi - lo) / 2 + 1e-9, ans: fmtSF(s.m / V(), sf).html }); })() : null), { unit: 'g/mL' })], () => `${s.m.toFixed(4)} g ÷ ${V().toFixed(1)} mL = <b>${sfHTML(s.m / V(), sfCount(V().toFixed(1)))} g/mL</b>.`, 'calc') } };
   },
   '9a'() {
     const b = BENCH_SALT, s = b.setup(); Object.assign(s, { v: offLine(5.2, 9.6, 2), filled: true, fixed: true });
@@ -2856,12 +2973,12 @@ const HANDS = {
     return { lab: '9a', title: 'Solutions and Dilutions (hands-on)', hands: { bench: b, s, snap: () => `NaCl solution: ${s.v.toFixed(2)} mL · empty ${s.tareM.toFixed(4)} g · full ${s.onBal ? full().toFixed(4) + ' g' : 'not weighed'}` }, versions: {
       A: handQ('9a', 'Weigh the cylinder of NaCl solution. Use the empty mass on its label to find the <b>mass of the solution</b>.', [livePart(() => (s.onBal ? num(m(), { dp: 4, unit: 'g', tol: 0.00011 }) : null), { unit: 'g' })], () => `${full().toFixed(4)} − ${s.tareM.toFixed(4)} = <b>${m().toFixed(4)} g</b>.`, 'calc'),
       B: handQ('9a', 'Read the volume of the NaCl solution and find its mass (subtract the empty mass). Calculate its <b>density</b>.', [livePart(() => (s.onBal ? num(d(), { sf: sfCount(s.v.toFixed(2)), unit: 'g/mL', rel: 0.006 }) : null), { unit: 'g/mL' })], () => `${m().toFixed(4)} g ÷ ${s.v.toFixed(2)} mL = <b>${sfHTML(d(), sfCount(s.v.toFixed(2)))} g/mL</b>.`, 'calc'),
-      C: handQ('9a', 'Find the density of the NaCl solution, then use the standard curve <b>y = 0.0435x + 0.9984</b> to find its concentration (mol/L).', [livePart(() => (s.onBal ? num((d() - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.04 }) : null), { unit: 'M' })], () => `d = ${d().toFixed(4)} g/mL → x = (d − 0.9984) ÷ 0.0435 = <b>${sfHTML((d() - 0.9984) / 0.0435, 3)} M</b>.`, 'calc') } };
+      C: handQ('9a', 'Find the density of the NaCl solution, then use the standard curve <b>y = 0.0435x + 0.9984</b> to find its concentration (mol/L).', [livePart(() => { if (!s.onBal) return null; const mm = m(), xs = [s.v - 0.02, s.v, s.v + 0.02].flatMap(v => [mm / v, Number((mm / v).toPrecision(3)), Number((mm / v).toPrecision(4))]).map(dd => (dd - 0.9984) / 0.0435), lo = Math.min(...xs), hi = Math.max(...xs); return num((lo + hi) / 2, { sf: 3, unit: 'M', tol: (hi - lo) / 2 + 0.011, ans: fmtSF((d() - 0.9984) / 0.0435, 3).html }); }, { unit: 'M' })], () => `d = ${d().toFixed(4)} g/mL (keep the extra digits until the end) → x = (d − 0.9984) ÷ 0.0435 = <b>${sfHTML((d() - 0.9984) / 0.0435, 3)} M</b>.`, 'calc') } };
   },
   '10a'() {
     const b = BENCH_MIX, s = b.setup(), keys = Object.keys(VR), all = [];
     for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) all.push([keys[i], keys[j], mixResult(keys[i], keys[j])]);
-    const ppt = pick(all.filter(x => x[2].kind === 'ppt')), other = pick(all.filter(x => x[2].kind === 'gas' || x[2].kind === 'neutral' || x[2].kind === 'redox')), third = pick(all.filter(x => x !== ppt && x !== other && x[2].kind !== 'none'));
+    const ppt = pick(all.filter(x => x[2].kind === 'ppt' && !JSON.stringify(mixEq(x[0], x[1])).includes('Ag2O'))), other = pick(all.filter(x => x[2].kind === 'gas' || x[2].kind === 'neutral' || x[2].kind === 'redox')), third = pick(all.filter(x => x !== ppt && x !== other && x[2].kind !== 'none'));
     const nm = x => `${fhtml(x[0])} and ${fhtml(x[1])}`;
     return { lab: '10a', title: 'Types of Reactions (hands-on)', hands: { bench: b, s, snap: () => `A: ${nm(ppt)} · B: ${nm(other)} · C: ${nm(third)}` }, versions: {
       A: handQ('10a', `Mix <b>${nm(ppt)}</b> in the test tube. Predict the products and write the <b>balanced equation with phases</b>.`, [eqPart(mixEq(ppt[0], ppt[1]), { label: 'Balanced equation with phases' })], () => `${ppt[2].text}${eqn(rxHTML(mixEq(ppt[0], ppt[1]), true))}`, 'concept'),
@@ -2872,7 +2989,7 @@ const HANDS = {
     const b = BENCH_PH, s = b.setup(), h = pick(HOUSE.filter(x => cabIdx((x[1] + x[2]) / 2) !== 2 && cabIdx(x[1]) === cabIdx(x[2]))); s.item = h; s.pH = rnd(h[1], h[2], 2); s.pHR = s.pH;
     return { lab: '12a', title: 'pH of Household Items (hands-on)', hands: { bench: b, s, snap: () => `${h[0]}: indicator turns ${CABBAGE[cabIdx(s.pH)][1].toLowerCase()} (pH ${s.pH.toFixed(2)})` }, versions: {
       A: Object.assign(handQ('12a', `Add red cabbage juice to the ${h[0].toLowerCase()}. About what is its pH?`, [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], () => `${CABBAGE[cabIdx(s.pH)][1]} → <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.`, 'read'), { cab: true }),
-      B: Object.assign(handQ('12a', `Add red cabbage juice to the ${h[0].toLowerCase()}. Is it acidic, about neutral, or basic?`, [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], () => `${CABBAGE[cabIdx(s.pH)][1]} → pH ${CABBAGE[cabIdx(s.pH)][2]} → <b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>.`, 'concept'), { cab: true }),
+      B: Object.assign(handQ('12a', `Add red cabbage juice to the ${h[0].toLowerCase()}. Is it acidic, about neutral, or basic?`, [choice(ACIDITY, CABBAGE[cabIdx(s.pH)][3])], () => `${CABBAGE[cabIdx(s.pH)][1]} → pH ${CABBAGE[cabIdx(s.pH)][2]} → <b>${ACIDITY[CABBAGE[cabIdx(s.pH)][3]]}</b>.`, 'concept'), { cab: true }),
       C: handQ('12a', `The pH of the ${h[0].toLowerCase()} was measured as <b>${s.pH.toFixed(2)}</b>. Calculate [H<sub>3</sub>O<sup>+</sup>].`, [num(Math.pow(10, -s.pH), { sf: 2, unit: 'M', rel: 0.06 })], () => `10<sup>−${s.pH.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pH), 2)} M</b>.`, 'calc') } };
   },
   '12b'() {
@@ -2899,7 +3016,7 @@ const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${s.
 function renderVLab() {
   const set = labSet(), list = VBENCH.filter(b => b.labs.some(l => set.includes(l)));
   P.vlab = P.vlab || {};
-  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><img class="sc-pic" src="assets/vlab/${b.id}.webp" alt="" onerror="this.remove()"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><small> ${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</small></button>`).join('');
+  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><img class="sc-pic" src="assets/vlab/${b.id}.webp" alt="" onerror="this.remove()"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><span class="sc-status${P.vlab[b.id] ? ' done' : ''}">${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</span><span class="sc-go" aria-hidden="true">Start →</span></button>`).join('');
   if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
   vlRenderAll();
 }
@@ -3242,7 +3359,7 @@ function setVideoFor(key, lab) {
   $('videoList').innerHTML = keys.map(k => `<button type="button" class="lesson-card${k === key ? ' active' : ''}" data-video="${k}"><img src="https://i.ytimg.com/vi/${VIDEOS[k].id}/mqdefault.jpg" alt="" loading="lazy"><span><b>${VIDEOS[k].title}</b><small>${VIDEOS[k].why}</small></span></button>`).join('');
 }
 function renderRef() {
-  const sol = [['Soluble', 'Na⁺, K⁺, NH₄⁺ (Group 1), NO₃⁻, C₂H₃O₂⁻: always soluble'], ['Soluble', 'Cl⁻, Br⁻, I⁻: except with Ag⁺, Pb²⁺, Hg₂²⁺'], ['Soluble', 'SO₄²⁻: except with Ca²⁺, Sr²⁺, Ba²⁺, Pb²⁺'], ['Insoluble', 'OH⁻: except Group 1, NH₄⁺ (Ca²⁺, Sr²⁺, Ba²⁺ slightly)'], ['Insoluble', 'CO₃²⁻, PO₄³⁻, S²⁻: except Group 1 and NH₄⁺']];
+  const sol = [['Soluble', 'Group 1 (Li⁺, Na⁺, K⁺…) and NH₄⁺: except Li⁺ is slightly soluble with CO₃²⁻, PO₄³⁻ and F⁻'], ['Soluble', 'ClO₄⁻, ClO₃⁻, NO₃⁻, C₂H₃O₂⁻ (CH₃COO⁻): no exceptions'], ['Soluble', 'Cl⁻, Br⁻, I⁻: except with Ag⁺, Hg₂²⁺, Pb²⁺'], ['Soluble', 'F⁻: except with Mg²⁺, Ca²⁺, Sr²⁺, Ba²⁺, Pb²⁺'], ['Soluble', 'SO₃²⁻, SO₄²⁻: except with Ca²⁺, Sr²⁺, Ba²⁺, Ag⁺, Pb²⁺'], ['Insoluble', 'CO₃²⁻, PO₄³⁻: except Group 1 and NH₄⁺'], ['Insoluble', 'CrO₄²⁻, C₂O₄²⁻: except Group 1 and NH₄⁺'], ['Insoluble', 'O²⁻, S²⁻: except Group 1, NH₄⁺, Ca²⁺, Sr²⁺, Ba²⁺'], ['Insoluble', 'OH⁻: except Group 1 and NH₄⁺ (slightly soluble with Ca²⁺, Sr²⁺, Ba²⁺)']];
   $('refBody').innerHTML = `<p class="small-note">On the real practical, any equation or table you need is given at the station, except the ones in “Know by heart”.</p>
   <h3>Know by heart (not given)</h3><ul><li>Density = mass ÷ volume</li><li>M₁V₁ = M₂V₂</li><li>Molarity = mol solute ÷ L solution</li><li>ΔT = final − initial; K = °C + 273.15</li><li>Record analog readings one digit past the smallest line; copy every digit on a digital display</li></ul>
   <h3>Equations usually given at the station</h3><ul><li>V = l × w × h &nbsp; · &nbsp; V<sub>cylinder</sub> = π r² h</li><li>q = m × c × ΔT &nbsp; · &nbsp; q<sub>reaction</sub> + q<sub>solution</sub> = 0 &nbsp; · &nbsp; c<sub>water</sub> = 4.184 J/g·°C</li><li>PV = nRT, R = 0.08206 L·atm/(mol·K) &nbsp; · &nbsp; P<sub>total</sub> = P<sub>gas</sub> + P<sub>water</sub> &nbsp; · &nbsp; 1 atm = 760 mmHg, 1 in Hg = 25.4 mmHg</li><li>% mass = g element ÷ g compound × 100 &nbsp; · &nbsp; % error = (experimental − accepted) ÷ accepted × 100</li><li>pH = −log[H<sub>3</sub>O<sup>+</sup>] &nbsp; · &nbsp; pOH = −log[OH<sup>−</sup>] &nbsp; · &nbsp; pH + pOH = 14 &nbsp; · &nbsp; [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup></li><li>c = λν, E = hν = hc/λ</li></ul>
