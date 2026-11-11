@@ -329,7 +329,7 @@ body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
 .score .pct{font-size:.6em;margin-left:8px;opacity:.75}
 .simgrid.mini{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}.simgrid.mini .simcard{padding:7px 10px;border-radius:12px}.simgrid.mini .simcard small{display:none}.simgrid.mini .simcard b{font-size:.92rem}.simgrid.mini .simcard .labno{font-size:.66rem}
 .rrow .bd{display:block;color:#656c83;font-weight:700}
-.ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}
+.ptbox{margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:#fffbe6}.ptbox>summary{cursor:pointer;padding:8px 12px;font-weight:750;color:#6b5410;list-style-position:inside}.pt-scroll{overflow-x:auto;padding:6px;background:#fff;border-radius:10px}.pt-img{display:block;width:100%;min-width:640px;height:auto}.pt-full{display:inline-block;margin:4px 12px 8px;font-size:.9rem;font-weight:700}.gsbox{background:#e9f7ee}.gsbox>summary{color:#1f6b3f}.gs-img{min-width:520px;max-width:900px}
 .eqpic{display:block}.eqpic>svg{display:none}.eqpic.noimg>svg{display:block}.eqpic.noimg>img.art.equip{display:none}.eqpic>img.art.equip{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto}.eq-choice .eqpic{flex:none;width:64px}
 .art.equip{max-width:230px}.eq-choice{display:flex;align-items:center;gap:10px}.eq-choice .art.equip{width:64px;height:70px;margin:0;flex:none}.eq-choice span{font-family:var(--font-display);font-weight:600;font-size:1.05rem}
 
@@ -1865,13 +1865,13 @@ const K10a = {
     const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
     const others = shuffle(RX.filter(x => x.tube && x.obs !== rx.obs && x.s2 !== rx.s2)).slice(0, 3).map(x => x.obs), opts = shuffle([rx.obs, ...others]);
     const beg = lvl() === 'beg', parts = [choice(opts, opts.indexOf(rx.obs), { label: 'Observation', w: 2 }), choice(S2, rx.s2, { label: 'Type of reaction', w: 2 }), beg ? balPart(rx, { label: 'Balance the equation', w: 6 }) : eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
-    return { tag: 'Types of reactions station', prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
+    return { tag: 'Types of reactions station', gs: !beg, prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
       hint: 'Swap partners (double displacement) or let the metal replace the ion (single displacement). Fix each formula from the ion charges, check the solubility rules for (s) vs (aq), then balance.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   predict() {
     const rx = pick(RX.filter(x => x.r.length === 2 && x.p.length && x.s2 !== 5 && x.s2 !== 4));
     if (lvl() === 'beg') return { tag: 'Balance the reaction', prompt: `${rxPlain(rx.r)} react. ${rx.obs} The products are given: balance the equation with the smallest whole numbers (write 1 where needed).`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [balPart(rx)], hint: 'Balance polyatomic ions as a unit. Save H and O for last.', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
-    return { tag: 'Predict and balance', prompt: `Predict the products and write the <b>balanced equation with phases</b> for: <b>${rxPlain(rx.r)}</b>. ${rx.obs}`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [eqPart(rx)],
+    return { tag: 'Predict and balance', gs: true, prompt: `Predict the products and write the <b>balanced equation with phases</b> for: <b>${rxPlain(rx.r)}</b>. ${rx.obs}`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [eqPart(rx)],
       hint: 'Reactants → products. Type -> for the arrow. Write the phase after each formula, like NaCl(aq).', solution: eqn(rxHTML(rx, true)), video: 'balance', skill: 'concept' };
   },
   scheme1() {
@@ -1880,7 +1880,7 @@ const K10a = {
   },
   ppt() {
     const rx = pick(RX.filter(x => x.ppt));
-    return { tag: 'Predict the precipitate', prompt: `${rxPlain(rx.r)} are mixed and a solid forms. Use your solubility rules: what is the formula of the precipitate?`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts: [{ type: 'formula', accept: [rx.ppt, rx.ppt + '(s)'], ans: fhtml(rx.ppt) }],
+    return { tag: 'Predict the precipitate', gs: true, prompt: `${rxPlain(rx.r)} are mixed and a solid forms. Use your solubility rules: what is the formula of the precipitate?`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts: [{ type: 'formula', accept: [rx.ppt, rx.ppt + '(s)'], ans: fhtml(rx.ppt) }],
       hint: 'Swap partners (double displacement), balance the charges, then check which product is insoluble on the green sheet.', solution: `${eqn(rxHTML(rx, true))} The insoluble product is <b>${fhtml(rx.ppt)}</b>.`, video: 'netionic', skill: 'concept' };
   },
   balance() {
@@ -1894,12 +1894,12 @@ const K10a = {
   },
   netIonic() {
     const rx = pick(RX.filter(x => x.bad));
-    if (lvl() !== 'beg') { const sp = SPECT[rx.r.join('+')]; if (sp) return { tag: 'Spectator ions', prompt: 'Write the complete ionic equation in your head (or on paper). Which ions are <b>spectators</b>? List every one.', art: eqn(rxHTML(rx, true)), parts: [{ type: 'ions', spec: sp[0], react: sp[1], none: !sp[0].length && false, ph: 'e.g. K+ and NO3-', ans: sp[0].length ? sp[0].map(x => ION_LABEL[x]).join(' and ') : 'none' }], hint: 'Split everything that is (aq) into ions. Ions that look the same on both sides (still dissolved) are spectators.', solution: `Spectators: <b>${sp[0].map(x => ION_LABEL[x]).join(', ')}</b>. Net ionic: ${rx.net}`, video: 'netionic', skill: 'concept' }; }
-    return { tag: 'Net ionic equation', prompt: 'Which is the correct net ionic equation for this reaction?', art: eqn(rxHTML(rx, true)), parts: [choiceShuffled(rx.net, rx.bad)], hint: 'Split strong electrolytes (aq) into ions, keep solids, liquids and gases together, then cancel spectators.', solution: `<b>${rx.net}</b>`, video: 'netionic', skill: 'concept' };
+    if (lvl() !== 'beg') { const sp = SPECT[rx.r.join('+')]; if (sp) return { tag: 'Spectator ions', gs: true, prompt: 'Write the complete ionic equation in your head (or on paper). Which ions are <b>spectators</b>? List every one.', art: eqn(rxHTML(rx, true)), parts: [{ type: 'ions', spec: sp[0], react: sp[1], none: !sp[0].length && false, ph: 'e.g. K+ and NO3-', ans: sp[0].length ? sp[0].map(x => ION_LABEL[x]).join(' and ') : 'none' }], hint: 'Split everything that is (aq) into ions. Ions that look the same on both sides (still dissolved) are spectators.', solution: `Spectators: <b>${sp[0].map(x => ION_LABEL[x]).join(', ')}</b>. Net ionic: ${rx.net}`, video: 'netionic', skill: 'concept' }; }
+    return { tag: 'Net ionic equation', gs: true, prompt: 'Which is the correct net ionic equation for this reaction?', art: eqn(rxHTML(rx, true)), parts: [choiceShuffled(rx.net, rx.bad)], hint: 'Split strong electrolytes (aq) into ions, keep solids, liquids and gases together, then cancel spectators.', solution: `<b>${rx.net}</b>`, video: 'netionic', skill: 'concept' };
   },
   states() {
     const rx = pick(RX.filter(x => x.ppt)), prods = rx.p, i = rint(0, prods.length - 1), st = prods[i].match(/\((s|l|g|aq)\)$/)[1];
-    return { tag: 'States of matter', prompt: `${rxPlain(rx.r)} are mixed. ${rx.obs} What state should you write for <b>${fhtml(prods[i].replace(/\((s|l|g|aq)\)$/, ''))}</b>?`, parts: [choice(['(s)', '(l)', '(g)', '(aq)'], ['s', 'l', 'g', 'aq'].indexOf(st))], hint: 'The solid you see is the insoluble product (s). Soluble ionic compounds stay dissolved (aq).', solution: `<b>(${st})</b>. ${eqn(rxHTML(rx, true))}`, video: 'netionic', skill: 'concept' };
+    return { tag: 'States of matter', gs: true, prompt: `${rxPlain(rx.r)} are mixed. ${rx.obs} What state should you write for <b>${fhtml(prods[i].replace(/\((s|l|g|aq)\)$/, ''))}</b>?`, parts: [choice(['(s)', '(l)', '(g)', '(aq)'], ['s', 'l', 'g', 'aq'].indexOf(st))], hint: 'The solid you see is the insoluble product (s). Soluble ionic compounds stay dissolved (aq).', solution: `<b>(${st})</b>. ${eqn(rxHTML(rx, true))}`, video: 'netionic', skill: 'concept' };
   }
 };
 
@@ -2464,6 +2464,10 @@ function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.dd
 const PT_SRC = 'assets/yellow-sheet-periodic-table.webp';
 const PT_IMG = `<img class="pt-img" src="${PT_SRC}" alt="Yellow Sheet periodic table with element names, atomic numbers, average atomic masses and electronegativities" loading="lazy">`;
 const ptBox = () => `<details class="ptbox"><summary>Periodic table (Yellow Sheet)</summary><div class="pt-scroll">${PT_IMG}</div><a class="pt-full" href="${PT_SRC}" target="_blank" rel="noopener">Open full size</a></details>`;
+/* ---------- Green Sheet solubility page (for precipitate, phase and net ionic questions) ---------- */
+const GS_SRC = 'assets/green-sheet-solubility.webp';
+const solBox = () => `<details class="ptbox gsbox"><summary>Solubility rules (Green Sheet)</summary><div class="pt-scroll"><img class="pt-img gs-img" src="${GS_SRC}" alt="Green Sheet: solubility in water, strong acids and bases, gas evolution reactions" loading="lazy"></div><a class="pt-full" href="${GS_SRC}" target="_blank" rel="noopener">Open full size</a></details>`;
+const needsSol = q => q.gs !== false && (q.gs || /solubility|green sheet|insoluble/i.test(`${q.prompt} ${q.hint || ''}`));
 /* ---------- rendering a question and its answer parts ---------- */
 function qHTML(q, opt = {}) {
   let t = `<p class="prompt">${q.prompt}</p>`;
@@ -2472,6 +2476,7 @@ function qHTML(q, opt = {}) {
   if (q.ref) t += `<div class="ref">${q.ref}</div>`;
   if (q.cab) t += cabBox();
   if (q.pt !== false && (q.pt || /g\/mol|molar mass/i.test(`${q.prompt} ${q.hint || ''} ${q.solution || ''}`))) t += ptBox();
+  if (needsSol(q)) t += solBox();
   if (opt.mock) q.parts.forEach(p => { if (p.type === 'choice') t += `${p.label ? `<p class="small-note"><b>${p.label}</b></p>` : ''}<ol class="chooselist" type="a">${p.options.map(o => `<li>${o}</li>`).join('')}</ol>`; });
   return t;
 }
@@ -2524,11 +2529,18 @@ function toggleLab(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.ad
 function newQuestion() {
   const pool = [...state.sel].filter(id => labSet().includes(id));
   if (!pool.length) { $('emptyBox').hidden = false; $('playArea').hidden = true; state.q = null; return; }
-  const weights = pool.map(id => 1 / (1 + ((P.lab[id] || {}).c || 0) * 0.15));
-  let r = Math.random() * weights.reduce((a, b) => a + b, 0), lab = pool[0];
-  for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r <= 0) { lab = pool[i]; break; } }
-  let q; state.recent = state.recent || []; for (let i = 0; i < 8; i++) { q = makeQ(lab); if (!state.recent.includes(famOf(lab, q.kind)) || i > 6) break; }
-  state.recent = [famOf(lab, q.kind), ...state.recent].slice(0, 3);
+  // Never the same kind of question twice in a row (same skill counts even from a different lab).
+  // Look back as far as the selected labs allow: up to the last 3 families, at least the last one.
+  const recent = state.recent = state.recent || [];
+  const freshK = (id, d) => Object.keys(labById(id).K).filter(k => !recent.slice(0, d).includes(famOf(id, k)));
+  let depth = 3; while (depth > 0 && !pool.some(id => freshK(id, depth).length)) depth--;
+  const labs = depth ? pool.filter(id => freshK(id, depth).length) : pool;
+  const weights = labs.map(id => 1 / (1 + ((P.lab[id] || {}).c || 0) * 0.15));
+  let r = Math.random() * weights.reduce((a, b) => a + b, 0), lab = labs[0];
+  for (let i = 0; i < labs.length; i++) { r -= weights[i]; if (r <= 0) { lab = labs[i]; break; } }
+  const kinds = depth ? freshK(lab, depth) : Object.keys(labById(lab).K);
+  let q; for (let i = 0; i < 6; i++) { q = makeQ(lab, pick(kinds)); if (!state.q || q.tag !== state.q.tag) break; }
+  state.recent = [famOf(lab, q.kind), ...recent].slice(0, 3);
   Object.assign(state, { q, tries: 0, helped: false, done: false, logged: false });
   $('emptyBox').hidden = true; $('playArea').hidden = false;
   $('playTitle').textContent = 'Practice';
@@ -2601,7 +2613,11 @@ const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '1
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
   '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
   '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
-  '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula', '4a.formula': 'empirical', '5a.formula': 'empirical', '4a.pctCu': 'masspct', '5a.percent': 'masspct', '5a.pctFormula': 'masspct' };
+  '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula', '4a.formula': 'empirical', '5a.formula': 'empirical', '4a.pctCu': 'masspct', '5a.percent': 'masspct', '5a.pctFormula': 'masspct',
+  // same skill in different labs: error analysis, mass by difference, technique, flame, gas ID, precipitate/phases, solution %
+  '1a.errors': 'errors', '5a.errors': 'errors', '7a.errors': 'errors', '8a.errors': 'errors', '9a.errors': 'errors', '12b.errors': 'errors',
+  '4a.massS': 'balance', '5a.massO': 'balance', '0a.safety': 'technique', '5a.why': 'technique', '12b.technique': 'technique', '3z.flameWhy': 'flame',
+  '10a.gas': 'gasid', '10a.gasTest': 'gasid', '10a.ppt': 'ppt', '10a.states': 'ppt', '9a.massPct': 'solpct', '9a.mvPct': 'solpct' };
 const famOf = (lab, kind) => FAM[lab + '.' + kind] || lab + '.' + kind;
 const HFAM = { '0a': ['cyl', 'balance', 'density'], '1a': ['cyl', 'balance', 'density'], '9a': ['balance', 'density'], '10a': ['rxn', 'rxtype'], '12a': ['cabbage', 'ph'], '12b': ['buret', 'titr'], '6a': ['vsepr', '6a.valence'] };
 const MOCK_N = 10, MOCK_GEN = 2;
@@ -3015,9 +3031,9 @@ const BENCH_MIX = {
   steps: [
     { title: 'Mix two chemicals', say: s => (s.lvl === 'beg' ? 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then pick what you observed.' : 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then <b>write your observation</b> in your own words.'), act: s => !!s.res, parts: s => [s.lvl === 'beg' ? choice(OBS6, s.res.obs, { label: 'What did you observe?' }) : obsPart(s.res, { label: 'Observation (in your own words)' })], rec: s => { s.seen = true; }, sol: s => { s.seen = true; setTimeout(() => vlSet('vlPop', BENCH_MIX.pop(s)), 0); return s.res.text; } },
     { title: 'Classify it', say: 'What type of reaction is this?', parts: s => [choice(TYPE5, s.res.type)], sol: s => `<b>${TYPE5[s.res.type]}</b>. ${s.res.kind === 'ppt' ? 'A solid formed from two solutions.' : s.res.kind === 'neutral' ? 'Acid + base → water + a salt, and heat.' : s.res.kind === 'gas' && s.res.gas !== 'H2' ? 'A gas formed from two solutions.' : s.res.kind === 'none' ? 'No evidence of a chemical change.' : 'An uncombined element (Zn) changes into an ion.'}` },
-    { title: 'Predict and balance', skip: s => s.lvl === 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Predict the products and write the <b>balanced equation with phases</b>. Type -> for the arrow.', parts: s => [eqPart(mixEq(s.added[0], s.added[1]), { label: 'Balanced equation with phases' })], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
+    { title: 'Predict and balance', gs: true, skip: s => s.lvl === 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Predict the products and write the <b>balanced equation with phases</b>. Type -> for the arrow.', parts: s => [eqPart(mixEq(s.added[0], s.added[1]), { label: 'Balanced equation with phases' })], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
     { title: 'Balance it', skip: s => s.lvl !== 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Here are the products. Balance the equation with the smallest whole numbers (write 1 where needed).', parts: s => [balPart(mixEq(s.added[0], s.added[1]))], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
-    { title: 'Name the product', skip: s => s.lvl !== 'beg' || !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
+    { title: 'Name the product', gs: s => s.res.kind === 'ppt', skip: s => s.lvl !== 'beg' || !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
   ]
 };
 
@@ -3407,7 +3423,7 @@ function vlSteps() {
     h += `<li class="now" id="vlNow"><b>${st.title}</b><p>${vlTxt(st.say, s)}</p>`;
     if (ready && st.parts) {
       VL.parts = st.parts(s);
-      h += `${st.eq ? `<div class="eqline">${vlTxt(st.eq, s)}</div>` : ''}${st.ref ? `<div class="ref">${st.ref(s)}</div>` : ''}${st.pt ? ptBox() : ''}<div class="parts">${partsHTML(VL.parts, 'vl' + i, false)}</div>
+      h += `${st.eq ? `<div class="eqline">${vlTxt(st.eq, s)}</div>` : ''}${st.ref ? `<div class="ref">${st.ref(s)}</div>` : ''}${st.pt ? ptBox() : ''}${(typeof st.gs === 'function' ? st.gs(s) : st.gs) ? solBox() : ''}<div class="parts">${partsHTML(VL.parts, 'vl' + i, false)}</div>
       <div class="check-row"><button type="button" class="btn primary" id="vlCheck">Check</button>${VL.tries ? '<button type="button" class="btn" id="vlShow">Show answer</button>' : ''}</div><div class="feedback" id="vlFb" role="status" aria-live="polite"></div>`;
     } else if (!ready) h += '<p class="vl-wait">Do this on the bench ←</p>';
     h += '</li>';
