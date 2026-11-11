@@ -2350,6 +2350,160 @@ Object.assign(K3z, {
   }
 });
 
+/* ---- Emission spectra & simple wavelength (Exp 3a and Exp 3z; adapted from the MyOpenMath Lab Practical Practice) ---- */
+// visible lines (nm) as a low-resolution spectroscope shows them
+const SPEC = { Hydrogen: [410, 434, 486, 656], Helium: [447, 471, 502, 588, 668], Sodium: [589], Mercury: [405, 436, 546, 578], Lithium: [460, 610, 671] };
+const SYM = { Hydrogen: 'H', Helium: 'He', Sodium: 'Na', Mercury: 'Hg', Lithium: 'Li' };
+const LCOL = [['Violet', 400, 449], ['Blue', 450, 494], ['Green', 495, 569], ['Yellow', 570, 589], ['Orange', 590, 619], ['Red', 620, 700]];
+const colorOf = nm => LCOL.find(c => nm >= c[1] && nm <= c[2])[0];
+function nmRGB(nm) { // approximate color of a wavelength, for drawing lines
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = (440 - nm) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = (510 - nm) / 20; } else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = (645 - nm) / 65; } else r = 1;
+  const f = nm < 420 ? 0.45 + 0.55 * (nm - 380) / 40 : nm > 680 ? 0.45 + 0.55 * (720 - nm) / 40 : 1, h = v => Math.round(255 * Math.pow(Math.max(0, v * f), 0.8)).toString(16).padStart(2, '0');
+  return '#' + h(r) + h(g) + h(b);
+}
+// spectroscope view: bright lines on black over a 400–700 nm scale (minor ticks every 10 nm); optional arrow over one line
+function spectroSVG(lines, o = {}) {
+  const x = nm => 30 + (nm - 400) * 460 / 300, top = o.label || o.arrow != null ? 22 : 8, bh = o.compact ? 30 : 56;
+  let t = `<svg class="art" viewBox="0 0 520 ${top + bh + (o.compact ? 36 : 54)}" role="img" aria-label="${esc(o.aria || 'A spectroscope view of bright lines over a wavelength scale')}">`;
+  if (o.label) t += `<text x="30" y="16" font-size="15" font-weight="800" fill="#4f5a74">${o.label}</text>`;
+  t += `<rect x="30" y="${top}" width="460" height="${bh}" fill="#121424" rx="4"/>`;
+  lines.forEach(nm => { t += `<rect x="${(x(nm) - 2).toFixed(1)}" y="${top + 3}" width="4" height="${bh - 6}" fill="${nmRGB(nm)}"/>`; });
+  if (o.arrow != null) t += `<path d="M${x(o.arrow).toFixed(1)} ${top - 1} l-7 -12 h14 z" fill="#ff8c2a" stroke="#2f3a52" stroke-width="1"/>`;
+  const y0 = top + bh + 2;
+  for (let n = 400; n <= 700; n += 10) { const big = n % 50 === 0; t += `<line x1="${x(n).toFixed(1)}" y1="${y0}" x2="${x(n).toFixed(1)}" y2="${y0 + (big ? 14 : 8)}" stroke="#2f3a52" stroke-width="${big ? 2 : 1}"/>`; if (n % 100 === 0) t += `<text x="${x(n).toFixed(1)}" y="${y0 + 30}" text-anchor="middle" font-size="${o.compact ? 13 : 16}" font-weight="700" fill="#2f3a52">${n}</text>`; }
+  if (!o.compact) t += `<text x="490" y="${y0 + 48}" text-anchor="end" font-size="13" fill="#4f5a74">wavelength (nm)</text>`;
+  return t + '</svg>';
+}
+const SPEC_BANK = {
+  spectro() {
+    const el = chance(0.5) ? 'Hydrogen' : pick(Object.keys(SPEC)), ls = SPEC[el], nm = pick(ls), c = colorOf(nm); // hydrogen half the time: the classic spectrum
+    return { tag: 'Read the spectroscope', prompt: `This is the ${el.toLowerCase()} emission spectrum seen through a low-resolution spectroscope. How should the wavelength of the line marked with the arrow (the <b>${c.toLowerCase()}</b> line) be recorded?`,
+      art: spectroSVG(ls, { arrow: nm, aria: `${el} emission spectrum with an arrow over the ${c.toLowerCase()} line` }),
+      parts: [num(nm, { dp: 0, unit: 'nm', tol: 3, ans: String(nm) })], hint: 'The small marks are every 10 nm, so estimate one more digit: the ones place (like 487 nm).', solution: `The line sits at about <b>${nm} nm</b>. Marks every 10 nm → record to the nearest 1 nm (the estimated digit). Anything within a few nm is a fair reading.`, video: 'light', skill: 'read' };
+  },
+  lineColor() {
+    const c = pick(LCOL), nm = rint(c[1] + (c[1] === 400 ? 5 : 6), c[2] - (c[2] === 700 ? 10 : 6)), opts = LCOL.map(x => x[0]), k = opts.indexOf(c[0]);
+    return { tag: 'Wavelength → color', prompt: `A bright line in an emission spectrum is at <b>${nm} nm</b>. What color is it?`,
+      parts: [attachWhy(choice(opts, k), LCOL.filter(x => x !== c).map(x => [x[0], `${x[0]} light is about ${x[1]}–${x[2]} nm.`, [' ' + x[0].toLowerCase() + ' ']]))],
+      hint: 'Visible light runs from about 400 nm (violet) to 700 nm (red): violet, blue, green, yellow, orange, red.', solution: `${nm} nm falls in the <b>${c[0].toLowerCase()}</b> range (about ${c[1]}–${c[2]} nm).`, video: 'light', skill: 'concept' };
+  },
+  energyCompare() {
+    const [a, b] = sample(LCOL, 2), na = rint(a[1] + 6, a[2] - 6), nb = rint(b[1] + 6, b[2] - 6), opts = shuffle([a[0], b[0]]), hiC = na < nb ? a[0] : b[0], loC = hiC === a[0] ? b[0] : a[0];
+    const kwOf = c => [' ' + c.toLowerCase() + ' '];
+    return { tag: 'Wavelength and energy', prompt: `An emission spectrum has a <b>${a[0].toLowerCase()} line at ${na} nm</b> and a <b>${b[0].toLowerCase()} line at ${nb} nm</b>.`,
+      art: spectroSVG([na, nb], { aria: `Two lines: ${na} nm and ${nb} nm` }),
+      parts: [attachWhy(choice(opts, opts.indexOf(hiC), { label: 'Which line’s photons have more energy?' }), [[loC, 'Longer wavelength means less energy per photon. Look for the shorter wavelength.', kwOf(loC)]]),
+        attachWhy(choice(opts, opts.indexOf(loC), { label: 'Which line has the lower frequency?' }), [[hiC, 'Shorter wavelength means higher frequency (c = λν). Look for the longer wavelength.', kwOf(hiC)]])],
+      hint: 'Shorter wavelength → higher frequency → more energy. Violet end = high energy, red end = low energy.', solution: `${Math.min(na, nb)} nm is shorter, so the <b>${hiC.toLowerCase()}</b> line has more energy per photon. The ${Math.max(na, nb)} nm <b>${loC.toLowerCase()}</b> line has the longer wavelength, so the lower frequency and less energy. It comes from a smaller electron drop.`, video: 'light', skill: 'concept' };
+  },
+  fingerprint() {
+    const shown = Object.keys(SPEC), el = pick(shown);
+    return { tag: 'Emission spectrum fingerprint', prompt: 'Each element gives off its own pattern of bright lines. A sample’s light is viewed through the spectroscope (the <b>Unknown</b> below). Which element is it? Compare with the known spectra.',
+      art: spectroSVG(SPEC[el], { label: 'Unknown', aria: 'Unknown emission spectrum' }), ref: shown.map(e => spectroSVG(SPEC[e], { compact: true, label: `${e} (${SYM[e]})`, aria: `${e} emission spectrum` })).join(''),
+      parts: [attachWhy(choice(shown, shown.indexOf(el), { ph: 'Element name' }), shown.filter(e => e !== el).map(e => [e, `${e}’s lines are at ${SPEC[e].join(', ')} nm. Every line has to match, not just one.`, [' ' + e.toLowerCase() + ' ']]))],
+      hint: 'Line up every line, not just one. The unknown must match all of an element’s lines.', solution: `The lines at ${SPEC[el].join(', ')} nm match <b>${el.toLowerCase()} (${SYM[el]})</b>. No other element has that same set, so a spectrum works like a fingerprint.`, video: 'light', skill: 'read' };
+  }
+};
+const HY = [[656, 3, 'Red'], [486, 4, 'Blue-green'], [434, 5, 'Violet'], [410, 6, 'Violet']]; // n → 2 (Balmer) lines
+Object.assign(SPEC_BANK, {
+  // two elements in one sample (a mixture): name both
+  fingerprintMix() {
+    const all = Object.keys(SPEC), pair = sample(all, 2), lines = [...new Set([...SPEC[pair[0]], ...SPEC[pair[1]]])].sort((x, y) => x - y);
+    const pairTxt = p => `${p[0]} and ${p[1].toLowerCase()}`, wrong = sample(all.flatMap((x, i) => all.slice(i + 1).map(y => [x, y])).filter(p => !(p.includes(pair[0]) && p.includes(pair[1]))), 3), opts = shuffle([pair, ...wrong]).map(pairTxt);
+    const words = e => [e.toLowerCase(), ' ' + SYM[e].toLowerCase() + ' '];
+    return { tag: 'Unknown mixture', prompt: 'This unknown sample is a <b>mixture of two elements</b>. Compare its lines with the known spectra. Which <b>two</b> elements are in it?',
+      art: spectroSVG(lines, { label: 'Unknown', aria: 'Unknown emission spectrum' }), ref: all.map(e => spectroSVG(SPEC[e], { compact: true, label: `${e} (${SYM[e]})`, aria: `${e} emission spectrum` })).join(''),
+      parts: [attachWhy(choice(opts, opts.indexOf(pairTxt(pair)), { kw: [words(pair[0]), words(pair[1])], nokw: all.filter(e => !pair.includes(e)).map(e => e.toLowerCase()), kwNote: 'Name both elements. Every line in the unknown has to belong to one of them.', ph: 'Name both elements' }),
+        wrong.map(p => [pairTxt(p), `Check every line: ${p.filter(e => !pair.includes(e)).map(e => `${e.toLowerCase()} would add lines at ${SPEC[e].join(', ')} nm`).join(', and ')}, and some lines in the unknown would be left over.`, []]))],
+      hint: 'Take one element at a time. If all of its lines are in the unknown, it’s in the mix. The two elements together must account for every line.', solution: `<b>${pair[0]} (${SYM[pair[0]]})</b>: ${SPEC[pair[0]].join(', ')} nm, plus <b>${pair[1].toLowerCase()} (${SYM[pair[1]]})</b>: ${SPEC[pair[1]].join(', ')} nm. Together they make every line in the unknown.`, video: 'light', skill: 'read' };
+  },
+  // a sample labeled hydrogen: genuine, contaminated, or not hydrogen at all
+  fingerprintCheck() {
+    const kind = pick(['pure', 'extra', 'fake']), other = pick(['Sodium', 'Helium', 'Mercury', 'Lithium']);
+    const lines = kind === 'pure' ? SPEC.Hydrogen : kind === 'extra' ? [...SPEC.Hydrogen, ...SPEC[other]] : SPEC[other];
+    const O = ['Yes: every line matches hydrogen and nothing is extra', 'No: it is hydrogen, but extra lines show something else is mixed in', 'No: the lines don’t match hydrogen at all'], ok = ['pure', 'extra', 'fake'].indexOf(kind);
+    const KW = [{ kw: [['yes', ' pure', 'match', 'same', 'genuine', ' real', 'only hydrogen', 'just hydrogen']], nokw: [' no ', 'extra line', 'mix', 'contamin', 'impur', 'not hydrogen', 'fake', 'different'] },
+      { kw: [['extra', 'mix', 'contamin', 'impur', 'other', 'another', 'more lines', 'something else', 'additional', ' and ']], nokw: ['yes', 'not hydrogen', 'no hydrogen', 'not at all', 'fake'] },
+      { kw: [['not hydrogen', 'no hydrogen', 'not at all', 'don t match', 'doesn t match', 'do not match', 'does not match', 'different', 'fake', 'none of', 'no match', 'isn t hydrogen', 'is not hydrogen', 'helium', 'sodium', 'mercury', 'lithium']], nokw: ['yes', 'extra', 'mix', 'contamin', 'also hydrogen', 'is hydrogen but'] }][ok];
+    const WHY = ['Look again: there are lines that aren’t in hydrogen’s spectrum, or hydrogen’s lines are missing.', 'Look for hydrogen’s four lines (410, 434, 486, 656 nm). Then check for lines that aren’t hydrogen’s.', 'Hydrogen’s four lines (410, 434, 486, 656 nm): are they all there?'];
+    return { tag: 'Is it really hydrogen?', prompt: 'A gas tube is labeled <b>“hydrogen.”</b> Its spectrum (Sample) is shown above hydrogen’s known spectrum. Is the sample pure hydrogen? Explain using the lines.',
+      art: spectroSVG(lines.sort((x, y) => x - y), { label: 'Sample', aria: 'Sample emission spectrum' }) + spectroSVG(SPEC.Hydrogen, { compact: true, label: 'Hydrogen (H), known', aria: 'Hydrogen emission spectrum' }),
+      parts: [attachWhy(choice(O, ok, Object.assign({ obs: 1, kwNote: 'Say whether it matches, and what the lines show.' }, KW)), O.filter((_, i) => i !== ok).map(o => [o, WHY[O.indexOf(o)], []]))],
+      hint: 'Pure hydrogen shows exactly hydrogen’s lines: all four, and nothing else.', solution: kind === 'pure' ? '<b>Yes.</b> All four hydrogen lines (410, 434, 486, 656 nm) are there and there are no others.' : kind === 'extra' ? `<b>No.</b> All four hydrogen lines are there, but the extra line${SPEC[other].length > 1 ? 's' : ''} at ${SPEC[other].join(', ')} nm match${SPEC[other].length > 1 ? '' : 'es'} <b>${other.toLowerCase()}</b>, so the tube is contaminated.` : `<b>No.</b> Hydrogen’s lines aren’t there. These lines (${SPEC[other].join(', ')} nm) match <b>${other.toLowerCase()}</b>.`, video: 'light', skill: 'read' };
+  },
+  // hydrogen's lines and the electron drops that make them
+  hydrogenLines() {
+    const k = rint(0, 2), L = HY[k], askDrop = chance(0.5), opts = ['Red (656 nm)', 'Blue-green (486 nm)', 'Violet (434 nm)'];
+    if (askDrop) return { tag: 'Hydrogen spectrum', prompt: `In the hydrogen emission spectrum, the <b>${L[2].toLowerCase()} line at ${L[0]} nm</b> comes from an electron falling to n = 2. From which level does it fall? (n = 3, 4 or 5)`, art: spectroSVG(SPEC.Hydrogen, { arrow: L[0], aria: 'Hydrogen emission spectrum' }),
+      parts: [num(L[1], { dp: 0, unit: '', tol: 0.01, ans: String(L[1]), label: 'Starting level n =' })], hint: 'Bigger drop → more energy → shorter wavelength. Red is the smallest drop (3 → 2); violet is the biggest of these (5 → 2).', solution: `The ${L[0]} nm line is the <b>n = ${L[1]} → 2</b> drop. 3 → 2 red (656 nm), 4 → 2 blue-green (486 nm), 5 → 2 violet (434 nm).`, video: 'light', skill: 'concept' };
+    const big = chance(0.5), right = big ? 2 : 0;
+    return { tag: 'Hydrogen spectrum', prompt: `Three hydrogen lines come from electrons falling to n = 2 from n = 3, 4 and 5. Which line comes from the <b>${big ? 'biggest' : 'smallest'}</b> energy drop?`, art: spectroSVG(SPEC.Hydrogen.slice(1), { aria: 'Hydrogen lines at 434, 486 and 656 nm' }),
+      parts: [attachWhy(choice(opts, right), opts.filter((_, i) => i !== right).map(o => [o, `${o} isn’t the ${big ? 'shortest' : 'longest'} wavelength of the three. ${big ? 'More energy means a shorter wavelength.' : 'Less energy means a longer wavelength.'}`, []]))],
+      hint: 'Energy and wavelength go opposite ways: biggest drop → shortest wavelength.', solution: big ? 'The <b>violet (434 nm)</b> line: shortest wavelength, most energy, the 5 → 2 drop.' : 'The <b>red (656 nm)</b> line: longest wavelength, least energy, the 3 → 2 drop.', video: 'light', skill: 'concept' };
+  }
+});
+Object.assign(K3z, { spectro: SPEC_BANK.spectro, lineColor: SPEC_BANK.lineColor, energyCompare: SPEC_BANK.energyCompare, fingerprint: SPEC_BANK.fingerprint, fingerprintMix: SPEC_BANK.fingerprintMix, fingerprintCheck: SPEC_BANK.fingerprintCheck, hydrogenLines: SPEC_BANK.hydrogenLines });
+Object.assign(K3a, {
+  spectro: SPEC_BANK.spectro, lineColor: SPEC_BANK.lineColor, fingerprint: SPEC_BANK.fingerprint, fingerprintMix: SPEC_BANK.fingerprintMix, fingerprintCheck: SPEC_BANK.fingerprintCheck, hydrogenLines: SPEC_BANK.hydrogenLines,
+  speed() {
+    const four = sample(EM, 4).map(cap1), right = 'All travel at the same speed', opts = shuffle([...four, right]);
+    return { tag: 'Speed of light', prompt: `Which of these types of electromagnetic radiation travels the <b>fastest</b> (in a vacuum)? ${four.join(', ')}?`,
+      parts: [attachWhy(choice(opts, opts.indexOf(right), { kw: [['same', 'equal', 'speed of light', 'all of them', 'all travel', 'none', 'no difference', '2 998', '3 00 x 10', '3 x 10']], nokw: ['radio', 'microwave', 'infrared', 'visible', 'ultraviolet', ' uv ', 'x ray', 'gamma'], kwNote: 'Name the fastest one, or say if they are the same.' }),
+        four.map(e => { const pl = /s$/.test(e); return [e, `${e} ${/gamma|x-ray/i.test(e) ? `${pl ? 'carry' : 'carries'} more energy, but energy isn’t speed` : /radio|micro/i.test(e) ? `${pl ? 'have' : 'has'} a long wavelength, but that doesn’t slow ${pl ? 'them' : 'it'} down` : `${pl ? 'are' : 'is'} light like the rest`}. In a vacuum, every type of light travels at c = 2.998 × 10⁸ m/s.`, [' ' + normWords(e).split(' ')[0].replace(/s$/, '')]]; }))],
+      hint: 'Wavelength, frequency and energy change across the spectrum. Does speed?', solution: '<b>They all travel at the same speed</b>: the speed of light, c = 2.998 × 10<sup>8</sup> m/s. Only wavelength, frequency and energy differ.', video: 'light', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 6a: model kit color key (element ↔ ball color) ---- */
+const KIT_NAME = { H: 'Hydrogen', C: 'Carbon', O: 'Oxygen', Cl: 'Chlorine', N: 'Nitrogen', Br: 'Bromine', I: 'Iodine' };
+Object.assign(K6a, {
+  kitColor() {
+    const els = Object.keys(KIT), e = pick(els), toColor = chance(0.5), colors = els.map(x => cap1(KIT[x]));
+    if (toColor) return { tag: 'Model kit colors', prompt: `In the molecular model kit, what color ball stands for <b>${KIT_NAME[e].toLowerCase()} (${e})</b>?`,
+      parts: [attachWhy(choice(colors, els.indexOf(e), { ph: 'Color' }), els.filter(x => x !== e).map(x => [cap1(KIT[x]), `${cap1(KIT[x])} balls are ${KIT_NAME[x].toLowerCase()} (${x}).`, [' ' + KIT[x] + ' ']]))],
+      hint: 'Kit color key: white H, black C, red O, blue N, green Cl, orange Br, purple I.', solution: `${KIT_NAME[e]} (${e}) is <b>${KIT[e]}</b>.`, video: 'lewis', skill: 'concept' };
+    return { tag: 'Model kit colors', prompt: `In the molecular model kit, which element does a <b>${KIT[e]}</b> ball stand for?`,
+      parts: [textPart([KIT_NAME[e], e], { ans: `${KIT_NAME[e]} (${e})`, whyText: els.filter(x => x !== e).map(x => [[KIT_NAME[x].toLowerCase(), x.toLowerCase()], `${KIT_NAME[x]} (${x}) is ${KIT[x]}, not ${KIT[e]}.`]) })],
+      hint: 'Kit color key: white H, black C, red O, blue N, green Cl, orange Br, purple I.', solution: `A ${KIT[e]} ball is <b>${KIT_NAME[e].toLowerCase()} (${e})</b>.`, video: 'lewis', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 7a: units for q = mcΔT ---- */
+const QUNITS = {
+  m: ['mass (m)', ['g', 'grams', 'gram'], 'g', 'Mass comes from the balance, in grams (g).'],
+  c: ['specific heat (c)', ['J/g°C', 'J/(g·°C)', 'J/g C', 'J g-1 C-1', 'joules per gram degree celsius', 'joules per gram celsius', 'joules per gram per degree celsius', 'J/g·K', 'J/gK'], 'J/g·°C', 'Specific heat is joules per gram per degree: J/g·°C (4.184 J/g·°C for water).'],
+  dT: ['change in temperature (ΔT)', ['°C', 'C', 'degrees celsius', 'celsius', 'degrees c', 'K', 'kelvin'], '°C', 'ΔT is a temperature change, in °C (a change of 1 °C is the same size as 1 K).'],
+  q: ['heat (q)', ['J', 'joules', 'joule', 'kJ', 'kilojoules'], 'J', 'Heat is energy, in joules (J).']
+};
+Object.assign(K7a, {
+  units() {
+    const keys = shuffle(Object.keys(QUNITS)), WRONGU = { spec: ['j g c', 'j g k', 'j gc', 'j gk'], g: ['g', 'grams', 'gram'], ml: ['ml'], j: ['j', 'joules', 'joule'], c: ['c', 'celsius', 'degrees c', 'degrees celsius'], gml: ['g ml', 'g cm3'], mol: ['mol', 'moles'], cal: ['cal j', 'calories'] };
+    const NOTE = { spec: 'J/g·°C is the unit of specific heat (c).', g: 'g is the unit of mass (m).', ml: 'mL is a volume. In q = mcΔT you need the mass in grams.', j: 'J is the unit of heat (q).', c: '°C is the unit of ΔT.', gml: 'g/mL is density, not part of q = mcΔT.', mol: 'Moles aren’t in q = mcΔT.', cal: 'cal/J is a conversion factor, not a unit for this equation.' };
+    return { tag: 'Units in q = mcΔT', prompt: 'Give the common unit for each quantity in <b>q = m × c × ΔT</b>.', eq: 'q = m × c × ΔT',
+      parts: keys.map(k => { const u = QUNITS[k]; return textPart(u[1], { ans: u[2], label: cap1(u[0]), ph: 'Unit', whyText: Object.keys(WRONGU).filter(w => !u[1].some(a => WRONGU[w].includes(normWords(a)))).map(w => [WRONGU[w], NOTE[w]]) }); }),
+      hint: 'Think about what each letter measures: heat energy, mass, heat per gram per degree, and a temperature change.', solution: keys.map(k => QUNITS[k][3]).join('<br>'), video: 'calorimetry', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 12a: recording pH between two standards ---- */
+const CAB_STD = { 1: '#c8213a', 2: '#d23c62', 3: '#dd5590', 4: '#b85aa8', 5: '#9a52b2', 6: '#8a4bb0', 7: '#7650b8', 8: '#3d6fd6', 9: '#2d8fbf', 10: '#20a99c', 11: '#3fb36a', 12: '#8cc63a', 13: '#e8cf2f' };
+const mixHex = (a, b) => '#' + [1, 3, 5].map(i => Math.round((parseInt(a.substr(i, 2), 16) + parseInt(b.substr(i, 2), 16)) / 2).toString(16).padStart(2, '0')).join('');
+function threeTubes(cols, labels, aria) {
+  let t = `<svg class="art" viewBox="0 0 360 260" role="img" aria-label="${esc(aria)}">`;
+  cols.forEach((c, i) => { const x = 40 + i * 110; t += `<path d="M${x} 20 L${x} 190 Q${x} 214 ${x + 25} 214 Q${x + 50} 214 ${x + 50} 190 L${x + 50} 20" fill="#fff" stroke="#8aa6c8" stroke-width="3"/><path d="M${x + 2} 80 L${x + 2} 190 Q${x + 2} 212 ${x + 25} 212 Q${x + 48} 212 ${x + 48} 190 L${x + 48} 80 Z" fill="${c}"/><text x="${x + 25}" y="244" text-anchor="middle" font-size="17" font-weight="800" fill="#2f3a52">${labels[i]}</text>`; });
+  return t + '</svg>';
+}
+Object.assign(K12a, {
+  standards() {
+    const a = pick([1, 2, 3, 4, 7, 8, 9, 10, 11, 12]), mid = mixHex(CAB_STD[a], CAB_STD[a + 1]), who = pick(['Dante', 'Mai', 'Rosa', 'Jordan', 'Priya', 'Luis']);
+    return { tag: 'Compare to the standards', cab: true, prompt: `${who} adds red cabbage juice to a household product and holds the test tube between the two closest-matching <b>standard solutions</b>. Its color is between the two. How should ${who} record the pH of the test tube?`,
+      art: threeTubes([CAB_STD[a], mid, CAB_STD[a + 1]], [`pH ${a}`, 'Test tube', `pH ${a + 1}`], `Standard at pH ${a}, the test tube, and standard at pH ${a + 1}`),
+      parts: [num(a + 0.5, { dp: 1, unit: '', tol: 0.21, ans: (a + 0.5).toFixed(1), slip: x => x === a || x === a + 1 ? 'The color is between the two standards, so the pH is between them too. Estimate between them.' : '' })],
+      hint: 'The standards are whole pH units apart. If the color falls between them, estimate between them (one decimal place), like reading between marks on a scale.', solution: `It falls between pH ${a} and pH ${a + 1}, so record about <b>pH ${(a + 0.5).toFixed(1)}</b>.`, video: 'ph', skill: 'read' };
+  }
+});
+
 /* ---- Exp 5a: weighings agree within ±0.001 g → the manual says use the HIGHER weighing ---- */
 Object.assign(K5a, {
   errors() {
@@ -2523,7 +2677,7 @@ const LABS = [
   { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar', 'errors'] },
   { id: '2a', name: 'Atomic Mass', blurb: 'Fresnocitium beads: abundance and weighted average', K: K2a, badge: 'scale', cur: 0, other: 1, mock: ['natureAvg', 'abundance', 'isoMass', 'avgAtomic', 'weighted', 'compare', 'bigger', 'errors'] },
   { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 1 },
-  { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests and average atomic mass', K: K3z, badge: 'target', cur: 1 },
+  { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests, emission spectra and average atomic mass', K: K3z, badge: 'target', cur: 1 },
   { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data, Cu/S mass ratio', K: K4a, badge: 'scale', cur: 1, mock: ['massS', 'ratio', 'excess', 'pctDiff', 'idea'] },
   { id: '4b', name: 'Rolling for Compound Initiative', blurb: 'Naming compounds and writing formulas', K: K4b, badge: 'book', cur: 1 },
   { id: '5a', name: 'Empirical Formula', blurb: 'Crucible data, percent composition', K: K5a, badge: 'percent', cur: 1 },
@@ -2943,7 +3097,7 @@ function genStation() {
 // "family" of each question kind, so one mock never shows two near-identical questions (two buret readings, two hydrate molar masses...)
 const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '12b.buret': 'buret', '12b.used': 'buret', '0a.balance': 'balance', '0a.massWater': 'balance',
   '0a.equipName': 'equip', '0a.equipUse': 'equip', '5a.equipment': 'equip', '9a.glass': 'equip', '11a.parts': 'equip', '1a.ruler': 'ruler', '1a.rulerMM': 'ruler', '1a.rectVolume': 'vol', '1a.cylVolume': 'vol',
-  '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light',
+  '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light', '3a.speed': 'light', '3a.lineColor': 'light', '3z.lineColor': 'light', '3z.energyCompare': 'light', '3a.spectro': 'spectro', '3z.spectro': 'spectro', '3a.fingerprint': 'spectro', '3z.fingerprint': 'spectro', '3a.fingerprintMix': 'spectro', '3z.fingerprintMix': 'spectro', '3a.fingerprintCheck': 'spectro', '3z.fingerprintCheck': 'spectro', '3a.hydrogenLines': 'light', '3z.hydrogenLines': 'light', '12a.standards': 'cabbage',
   '2a.avgAtomic': 'avgmass', '2a.weighted': 'avgmass', '2a.natureAvg': '2a.peratom', '2a.isoMass': '2a.peratom', '2a.abundance': '2a.abund', '2a.table': '2a.abund', '2a.compare': '2a.idea', '2a.trials': '2a.idea', '2a.bigger': '2a.idea', '2a.errors': 'errors',
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
   '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.qIce': 'heat', '4a.ratio': '4a.ratio', '4a.pctDiff': 'pcterr', '4a.excess': 'balance', '3a.rydberg': 'light', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
