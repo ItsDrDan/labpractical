@@ -2392,11 +2392,11 @@ Object.assign(K0a, {
 });
 
 /* ---------------- lab list ---------------- */
-// cur: on Dr. Dan's current (Fall 2026) lab list. Other labs are from earlier versions of the CHEM 3A manual.
+// cur: on Dr. Dan's current (Fall 2026) lab list. other: in the current manual but only on other professors' lists. The rest are from earlier versions of the CHEM 3A manual.
 const LABS = [
   { id: '0a', name: 'Lab Exploration', blurb: 'Equipment names, glassware and balances', K: K0a, badge: 'burette', cur: 1, mock: ['cyl', 'buret', 'volumetric', 'balance', 'massWater', 'equipName', 'safety'] },
   { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar', 'errors'] },
-  { id: '2a', name: 'Atomic Mass', blurb: 'Fresnocitium beads: abundance and weighted average', K: K2a, badge: 'scale', cur: 0, mock: ['natureAvg', 'abundance', 'isoMass', 'avgAtomic', 'weighted', 'compare', 'bigger', 'errors'] },
+  { id: '2a', name: 'Atomic Mass', blurb: 'Fresnocitium beads: abundance and weighted average', K: K2a, badge: 'scale', cur: 0, other: 1, mock: ['natureAvg', 'abundance', 'isoMass', 'avgAtomic', 'weighted', 'compare', 'bigger', 'errors'] },
   { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 0 },
   { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests and average atomic mass', K: K3z, badge: 'target', cur: 1 },
   { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data', K: K4a, badge: 'scale', cur: 0 },
@@ -2650,7 +2650,7 @@ const partAns = p => (p.type === 'choice' ? (p.ans || p.options[p.ok]) : p.ans !
 /* ---------- practice mode ---------- */
 function renderLabTiles() {
   const set = labSet();
-  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur ? '' : '<span class="oldtag">earlier manual</span>'}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
+  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur ? '' : `<span class="oldtag">${l.other ? 'not on Dr. Dan’s list' : 'earlier manual'}</span>`}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
 }
 function toggleLab(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderLabTiles(); save(); if (!state.q || state.done || !state.sel.has(state.q.lab)) newQuestion(); }
 function newQuestion() {
