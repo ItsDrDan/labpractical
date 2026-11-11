@@ -2462,7 +2462,7 @@ function load() { try { P = Object.assign(fresh(), JSON.parse(localStorage.getIt
 function save() { try { P.sel = [...state.sel]; localStorage.setItem(STORE, JSON.stringify(P)); } catch (e) {} }
 function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { if (!el.dataset.painted && window.ddIcon) { el.insertAdjacentHTML('afterbegin', ico(el.dataset.icon)); el.dataset.painted = 1; } }); }
 const labPick = () => P.labPick || { kind: 'all' };
-const labIds = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).labs || LABS.map(l => l.id); if (k.kind === 'link') return k.labs && k.labs.length ? k.labs : LABS.map(l => l.id); return null; };
+const labIds = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o && o.labs.length ? o.labs : LABS.map(l => l.id); } if (k.kind === 'link') return k.labs && k.labs.length ? k.labs : LABS.map(l => l.id); return null; };
 const labSet = () => { const k = labPick(), li = labIds(); if (li) return li.filter(id => labById(id)); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
 const labPickName = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o ? `${o.name}’s class` : 'Your class'; } if (k.kind === 'link') return k.prof ? `${k.prof}’s class` : 'Your class’s labs'; return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
 const profOf = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).name || ''; if (k.kind === 'link') return k.prof || ''; if (k.kind === 'sec') return k.sec === '25787' ? 'Dr. Dan / Professor Xiong' : 'Dr. Dan'; if (k.kind === 'dan') return 'Dr. Dan'; return ''; };
@@ -3673,7 +3673,7 @@ function openLabPicker() {
   const opt = (val, title, sub) => `<label class="lp-opt"><input type="radio" name="lp" value="${val}" ${val === cur ? 'checked' : ''}><span><b>${title}</b><small>${sub}</small></span></label>`;
   $('lpBody').innerHTML = `<p class="small-note">Your choice is saved on this device, so you only pick once.</p>
     ${SECTIONS.map(x => opt('sec:' + x.key, esc(x.name), `${x.labs.length} labs`)).join('')}
-    ${OTHER.map(x => { const n = x.labs.filter(id => labById(id)).length, miss = missingLabs(x.labs); return opt('prof:' + x.key, esc(x.name) + ' · CHEM 3A', `${n} labs, from the ${esc(x.term)} syllabus${miss.length ? ` (${esc(miss.join(', '))} not in the game yet)` : ''}`); }).join('')}
+    ${OTHER.map(x => { const n = x.labs.filter(id => labById(id)).length, miss = missingLabs(x.labs); return opt('prof:' + x.key, esc(x.name) + ' · CHEM 3A', !x.labs.length ? 'All labs (ask your professor which ones you do)' : `${n} labs, from the ${esc(x.term)} syllabus${miss.length ? ` (${esc(miss.join(', '))} not in the game yet)` : ''}`); }).join('')}
     ${k.kind === 'link' ? opt('link', esc(labPickName()), `${labSet().length} labs, set by your professor’s link`) : ''}
     ${opt('all', 'All CHEM 3A labs', 'Every lab in the game, old and new')}
     ${opt('custom', 'My professor isn’t listed: let me choose my labs', 'Check the labs your class did')}

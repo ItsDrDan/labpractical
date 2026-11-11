@@ -117,7 +117,10 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:24px}
   function pickProf() {
     var p = prof(), other = $('prof').value === 'other';
     $('otherBox').hidden = !other;
-    if (p) {
+    if (p && !p.labs.length) {
+      boxes.forEach(function (b) { b.checked = false; });
+      $('profNote').textContent = 'No public syllabus to read your labs from, so check your labs below.';
+    } else if (p) {
       boxes.forEach(function (b) { b.checked = p.labs.indexOf(b.value) !== -1 && !b.disabled; });
       var miss = p.labs.filter(function (id) { return !inGame(id); });
       $('profNote').innerHTML = 'Labs checked from your <a href="' + p.syllabus + '" target="_blank" rel="noopener">' + esc(p.term) + ' syllabus</a>. Change them if they’re off.' +

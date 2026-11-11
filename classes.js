@@ -24,9 +24,20 @@ window.SR_CLASSES = {
       labs: ['0a', '1a', '2a', '3a', '4a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a'] },
     { key: 'halloran', name: 'Professor Halloran', term: 'Spring 2026', sections: ['19320', '19321'],
       syllabus: 'https://fresnocitycollege.simplesyllabus.com/en-US/doc/2az8jbk4x',
-      labs: ['0a', '1a', '2a', '4a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12b'] }
+      labs: ['0a', '1a', '2a', '4a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12b'] },
+    { key: 'mushibe', name: 'Professor Mushibe', term: 'Fall 2025', sections: ['43899', '43976'],
+      syllabus: 'https://fresnocitycollege.simplesyllabus.com/en-US/doc/ynxoue7yh',
+      labs: ['1a', '3a', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a'] }
   ]
 };
+
+/* Professors added by hand (no public syllabus to read). tools/update_classes.py leaves this list alone.
+   labs: [] means they check their own labs on setup.html. */
+window.SR_EXTRA_PROFS = [
+  { key: 'lacey', name: 'Professor Lacey', term: '', sections: [], syllabus: '', labs: [] }
+];
+(function () { var c = window.SR_CLASSES, have = {}; c.profs.forEach(function (p) { have[p.key] = 1; });
+  (window.SR_EXTRA_PROFS || []).forEach(function (p) { if (!have[p.key]) c.profs.push(p); }); })();
 
 /* Every lab in the CHEM 3A Lab Manual (old and current). inGame: 0 = no practice questions yet.
    Keep in step with LABS in index.html. */
