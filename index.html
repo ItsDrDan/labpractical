@@ -2432,7 +2432,7 @@ const DAN_LABS = ['0a', '1a', '3z', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '
 // Dr. Dan's Fall 2026 CHEM 3A sections (checked in Canvas). Each Canvas link can add ?sec=25784 or ?sec=25787. Update each semester.
 const SECTIONS = [
   { key: '25784', alt: ['1', '25786'], name: 'Dr. Dan · CHEM 3A · 25784/25786', labs: ['0a', '1a', '3z', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '12a', '12b'] },
-  { key: '25787', alt: ['2', '25788'], name: 'Dr. Dan and Professor Xiong’s Lab Section · 25787/25788', labs: ['0a', '1a', '3a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a', '12b'] }
+  { key: '25787', alt: ['2', '25788'], name: 'Dr. Dan and Professor Xiong’s Lab Section · 25787/25788', labs: ['0a', '1a', '2a', '3a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a', '12b'] }
 ];
 // Other professors' lab lists from their public Simple Syllabus syllabi (classes.js). Links: ?prof=uvarov or ?sec=25790.
 const OTHER = ((window.SR_CLASSES || {}).profs || []).filter(x => x && x.key && Array.isArray(x.labs));
@@ -2463,6 +2463,7 @@ function save() { try { P.sel = [...state.sel]; localStorage.setItem(STORE, JSON
 function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { if (!el.dataset.painted && window.ddIcon) { el.insertAdjacentHTML('afterbegin', ico(el.dataset.icon)); el.dataset.painted = 1; } }); }
 const labPick = () => P.labPick || { kind: 'all' };
 const labIds = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o && o.labs.length ? o.labs : LABS.map(l => l.id); } if (k.kind === 'link') return k.labs && k.labs.length ? k.labs : LABS.map(l => l.id); return null; };
+const rawIds = () => { const k = labPick(); return k.kind === 'sec' ? (SECTIONS.find(x => x.key === k.sec) || {}).labs || [] : labIds() || []; };
 const labSet = () => { const k = labPick(), li = labIds(); if (li) return li.filter(id => labById(id)); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
 const labPickName = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o ? `${o.name}’s class` : 'Your class'; } if (k.kind === 'link') return k.prof ? `${k.prof}’s class` : 'Your class’s labs'; return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
 const profOf = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).name || ''; if (k.kind === 'link') return k.prof || ''; if (k.kind === 'sec') return k.sec === '25787' ? 'Dr. Dan / Professor Xiong' : 'Dr. Dan'; if (k.kind === 'dan') return 'Dr. Dan'; return ''; };
@@ -3660,7 +3661,7 @@ function setMode(m) {
 function setCompact(on) { P.compact = !!on; document.body.classList.toggle('compact', !!on); save(); renderLabset(); }
 function renderLabset() {
   const n = labSet().length, k = labPick();
-  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'Pick your professor or choose your labs' : 'Change labs'}</button>${missingLabs(labIds()).length ? `<span class="small-note">Not in the game yet: ${esc(missingLabs(labIds()).join(', '))}</span>` : ''}${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
+  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'Pick your professor or choose your labs' : 'Change labs'}</button>${missingLabs(rawIds()).length ? `<span class="small-note">Not in the game yet: ${esc(missingLabs(rawIds()).join(', '))}</span>` : ''}${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
   $('setToggle').onclick = openLabPicker; const hb = $('howBtn'); if (hb) hb.onclick = () => setCompact(false);
 }
 function applyLabPick(pick) {
@@ -3672,7 +3673,7 @@ function openLabPicker() {
   const cur = k.kind === 'sec' ? 'sec:' + k.sec : k.kind === 'prof' ? 'prof:' + k.prof : k.kind;
   const opt = (val, title, sub) => `<label class="lp-opt"><input type="radio" name="lp" value="${val}" ${val === cur ? 'checked' : ''}><span><b>${title}</b><small>${sub}</small></span></label>`;
   $('lpBody').innerHTML = `<p class="small-note">Your choice is saved on this device, so you only pick once.</p>
-    ${SECTIONS.map(x => opt('sec:' + x.key, esc(x.name), `${x.labs.length} labs`)).join('')}
+    ${SECTIONS.map(x => opt('sec:' + x.key, esc(x.name), `${x.labs.filter(id => labById(id)).length} labs`)).join('')}
     ${OTHER.map(x => { const n = x.labs.filter(id => labById(id)).length, miss = missingLabs(x.labs); return opt('prof:' + x.key, esc(x.name) + ' · CHEM 3A', !x.labs.length ? 'All labs (ask your professor which ones you do)' : `${n} labs, from the ${esc(x.term)} syllabus${miss.length ? ` (${esc(miss.join(', '))} not in the game yet)` : ''}`); }).join('')}
     ${k.kind === 'link' ? opt('link', esc(labPickName()), `${labSet().length} labs, set by your professor’s link`) : ''}
     ${opt('all', 'All CHEM 3A labs', 'Every lab in the game, old and new')}
