@@ -1000,9 +1000,10 @@ function optHit(o, t, raw, fuzzy) {
 function gradeTyped(p, raw) {
   const t = ' ' + normWords(raw) + ' ';
   if (!t.trim()) return { score: 0, ok: false, empty: true, note: '' };
-  if (p.kw) { const ok = p.kw.every(g => g.some(w => t.includes(w))) && !(p.nokw || []).some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : p.kwNote || '' }; }
+  const whyTyped = () => { const h = (p.whyKw || []).find(([ws]) => ws.some(w => t.includes(w))); return h ? h[1] : ''; };
+  if (p.kw) { const ok = p.kw.every(g => g.some(w => t.includes(w))) && !(p.nokw || []).some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : whyTyped() || p.kwNote || '' }; }
   let hits = p.options.map(o => optHit(o, t, raw, false)); if (!hits.some(Boolean)) hits = p.options.map(o => optHit(o, t, raw, true)); const n = hits.filter(Boolean).length, ok = hits[p.ok] && n === 1;
-  return { score: ok ? 1 : 0, ok, note: ok ? '' : n > 1 ? 'Give just one answer.' : '' };
+  return { score: ok ? 1 : 0, ok, note: ok ? '' : n > 1 ? 'Give just one answer.' : (n === 1 && p.why && p.why[hits.findIndex(Boolean)]) || whyTyped() };
 }
 // spectator ions: every listed ion must be named, and no ion that reacts
 const ION_WORDS = { Na: ['na', 'sodium'], Cl: ['cl', 'chloride'], K: ['k', 'potassium'], NO3: ['no3', 'nitrate'], SO4: ['so4', 'sulfate', 'sulphate'], Ba: ['ba', 'barium'], Ca: ['ca', 'calcium'], CO3: ['co3', 'carbonate'], PO4: ['po4', 'phosphate'], Pb: ['pb', 'lead'], I: ['iodide'], Ag: ['ag', 'silver'], Cu: ['cu', 'copper'], OH: ['oh', 'hydroxide'], H: ['h', 'h3o', 'hydrogen ion', 'hydronium'], NH4: ['nh4', 'ammonium'], Zn: ['zn', 'zinc'] };
@@ -1025,7 +1026,7 @@ function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'num') return gradeNum(p, val, unitVal, needUnit);
   if (p.type === 'choice') { const ok = String(val) === String(p.ok); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.why && p.why[val]) || '' }; }
   if (p.type === 'text' && p.kw) { const t = ' ' + normWords(val) + ' ', ok = p.kw.some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Describe what you saw: a solid, bubbles, a smell, heat, a coating, a color change, or no change.' }; }
-  if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
+  if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.whyText) { const tw = ' ' + normWords(val) + ' ', h = p.whyText.find(([ws]) => ws.some(w => tw.includes(' ' + w + ' '))); if (h) return { score: 0, ok: false, note: h[1] }; } if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
   if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
   if (p.type === 'coef') { const got = String(val).split(',').map(s => parseInt(s, 10)); const ok = p.vals.every((c, i) => (got[i] || (got[i] === 0 ? 0 : 1)) === c); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Count each element on both sides. Use the smallest whole numbers.' }; }
@@ -2013,16 +2014,81 @@ const DIR3 = {
   low: { kw: [[' low', 'smaller', ' less ', 'decreas', ' under', 'fewer', ' down ']], nokw: [' high', 'bigger', 'larger', 'greater', 'increas', ' more ', 'no change', 'unchanged', ' same', 'no effect', 'not change', 'not affect'] },
   none: { kw: [['no change', 'unchanged', ' same', 'no effect', 'not change', 'not affect', 'doesn t change', 'does not change', 'won t change', 'unaffected', 'stays', 'nothing']], nokw: [' high', ' low', 'bigger', 'smaller', 'increas', 'decreas'] }
 };
-const dirPart = (dir, label, words) => choice(words || ['Too high', 'Too low', 'Unchanged'], ['high', 'low', 'none'].indexOf(dir), Object.assign({ label, kwNote: 'Say which way: too high, too low, or unchanged.' }, DIR3[dir]));
-const resPart = (dir, label) => dirPart(dir, label, ['Higher', 'Lower', 'No change']);
-// meas: [[option, kw words]...]; the first is the right one
+// ---- per-choice feedback: why a wrong choice is wrong (works for picked and typed answers) ----
+const sentencesOf = html => String(html).split(/(?<=\.)\s+(?=[A-Z<])/);
+function attachWhy(p, wrongs) { // wrongs: [[option text, why, typed keywords]]
+  p.why = {}; p.whyKw = [];
+  wrongs.forEach(([txt, why, kw]) => { const i = p.options.indexOf(txt); if (i >= 0) p.why[i] = why; if (kw && kw.length) p.whyKw.push([kw, why]); });
+  return p;
+}
+const dirPart = (dir, label, words, s) => {
+  const keys = ['high', 'low', 'none'], ok = keys.indexOf(dir), p = choice(words || ['Too high', 'Too low', 'Unchanged'], ok, Object.assign({ label, kwNote: 'Say which way: too high, too low, or unchanged.' }, DIR3[dir]));
+  if (!s) return p;
+  const msg = k => dir === 'none' ? `It doesn’t change. ${s}` : k === 'none' ? `It does change. ${s}` : `Other way. ${s}`;
+  return attachWhy(p, ['none', 'high', 'low'].filter(k => k !== dir).map(k => [p.options[keys.indexOf(k)], msg(k), DIR3[k].kw[0]]));
+};
+const resPart = (dir, label, s) => dirPart(dir, label, ['Higher', 'Lower', 'No change'], s);
 function errQ(o) {
-  const parts = [];
-  if (o.meas) { const opts = o.meas.map(m => m[0]); parts.push(choice(opts, 0, { label: 'Which measured value is directly affected?', kw: [o.meas[0][1]], nokw: o.meas.slice(1).flatMap(m => m[1]).filter(w => !o.meas[0][1].includes(w)), kwNote: 'Name the measurement from your data table.' })); }
-  if (o.dir) parts.push(dirPart(o.dir, `That measured value would be…`));
-  parts.push(resPart(o.res, `The ${o.result} would come out…`));
+  const parts = [], s1 = sentencesOf(o.sol)[0];
+  if (o.meas) {
+    const right = o.meas[0][0], p = choiceShuffled(right, o.meas.slice(1).map(m => m[0]), { label: 'Which measured value is directly affected?', kw: [o.meas[0][1]], nokw: o.meas.slice(1).flatMap(m => m[1]).filter(w => !o.meas[0][1].includes(w)), kwNote: 'Name the measurement from your data table.' });
+    parts.push(attachWhy(p, o.meas.slice(1).map(m => [m[0], `This mistake doesn’t change the ${m[0].replace(/<[^>]+>/g, '').replace(/ \(.*\)$/, '').replace(/^the /i, '').replace(/^./, c => c.toLowerCase())}. ${s1}`, m[1].filter(w => !o.meas[0][1].includes(w))])));
+  }
+  if (o.dir) parts.push(dirPart(o.dir, `That measured value would be…`, null, s1));
+  parts.push(resPart(o.res, `The ${o.result} would come out…`, o.sol));
   return { tag: 'Error analysis', prompt: o.prompt, ref: o.ref, eq: o.eq, parts, hint: o.hint || 'Write the equation for the result. Is the affected value on top (numerator) or on the bottom (denominator)?', solution: o.sol, video: o.video, skill: 'concept', pt: true };
 }
+// wrong-choice explanations for the concept questions, looked up by the wrong option's text
+const WRONG_WHY = {
+  'Add the water to the acid': ['Water poured into concentrated acid can boil and spatter acid on you. Always add acid to water, slowly.', ['water to acid', 'water into acid', 'water to the acid', 'water into the acid']],
+  'Pour them together quickly': ['Mixing fast releases a lot of heat at once. Add the acid to the water slowly, with swirling.', ['quick', 'fast', 'at once']],
+  'Rub it with a paper towel': ['Rubbing grinds the chemical into your eye. Flush at the eyewash for 15 minutes.', ['rub', 'towel', 'wipe']],
+  'Wait to see if it hurts': ['Damage starts right away. Go to the eyewash immediately.', ['wait']],
+  'Pick it up with your hands and throw it in the trash': ['Bare hands get cut, and glass in the regular trash can cut the custodians. Brush and dustpan into the broken glass box.', ['hand', 'trash']],
+  'Leave it for the next class': ['Broken glass gets cleaned up right away so nobody gets cut.', ['leave']],
+  'Down the sink with lots of water': ['Chemicals never go down the drain unless your instructor says so. Use the waste container.', ['sink', 'drain']],
+  'In the trash can': ['The trash is for paper towels, not chemicals. Use the waste container.', ['trash']],
+  'At your lab partner so they can watch': ['Heated contents can shoot out like a geyser. Point the tube away from everyone.', ['partner', 'toward']],
+  'Straight up, right under your face': ['If it bumps, it sprays right into your face. Angle it away from everyone.', ['face']],
+  'Put your nose right over the tube and breathe in': ['Concentrated vapors like NH₃ can burn your nose and lungs. Waft them toward you instead.', ['nose', 'sniff', 'breathe']],
+  'Taste a tiny drop': ['Never taste anything in lab. Waft the vapors toward you.', ['taste']],
+  'By mouth, like a straw': ['You could swallow the chemical. Always use a pipet bulb or pump.', ['mouth', 'straw', 'suck']],
+  'Pour the liquid into the top': ['Pouring can’t set the volume on the line. Draw it up with a bulb and put the bottom of the meniscus on the line.', ['pour']],
+  'Directly on the countertop': ['A hot crucible burns the counter and can crack. Set it on the wire mesh.', ['counter', 'table', 'bench']],
+  'On a paper towel': ['A hot crucible can scorch or light paper. Use the wire mesh.', ['paper', 'towel']],
+  'Citric acid': ['Citric acid neutralizes base spills. An acid spill needs a base: sodium bicarbonate.', ['citric']],
+  'More acid': ['More acid makes it worse. Neutralize an acid with a weak base: baking soda.', ['more acid']],
+  'To warm the tube': ['Your finger isn’t about temperature. It keeps the acid and water from pouring out until the stopper is under water.', ['warm', 'heat']],
+  'To let air into the tube': ['The opposite: air in the tube adds to the gas volume and makes R too high. Your finger keeps the liquid in.', ['let air', 'air in']],
+  'The water turns pink': ['There is no indicator here (pink is phenolphthalein, from the titration lab). Watch for the ribbon to disappear and the bubbles to stop.', ['pink', 'color']],
+  'The tube gets cold': ['Temperature isn’t the signal. The Mg is gone, bubbles stop, and the volume stops changing.', ['cold', 'cool']],
+  'Gas has no temperature': ['Every gas has a temperature, and PV = nRT needs it in K. The gas touches the water, so it is at the water’s temperature.', ['no temp']],
+  'The water is always 25 °C': ['Lab water isn’t always 25 °C, so you measure it. The gas is assumed to match the water.', ['25', 'always']],
+  'To make it heavier': ['Cleaning removes material, so it gets lighter. It removes the oxide coating so only Mg is weighed.', ['heav']],
+  'To dry it': ['The ribbon isn’t wet. Steel wool scrapes off the dull oxide coating.', ['dry']],
+  'Bright, dark pink': ['Dark pink means extra NaOH went in: you overshot. The endpoint is the first faint pink that lasts.', ['bright', 'dark', 'hot pink']],
+  'The solution turns clear after being pink': ['Pink that fades back to clear means you aren’t there yet. The endpoint is pink that stays.', ['clear', 'colorless', 'fade', 'disappear']],
+  'To warm the buret': ['Rinsing doesn’t change the temperature. It replaces leftover water with NaOH so the NaOH isn’t diluted.', ['warm', 'heat']],
+  'To make the endpoint pink': ['Phenolphthalein makes the pink. Rinsing keeps the NaOH from being diluted by leftover water.', ['endpoint pink', 'make it pink', 'turn pink']],
+  'To measure the NaOH': ['You measure with the buret readings, not the waste beaker. Running some out pushes the air bubble out of the tip.', ['measure']],
+  'To cool the NaOH': ['It isn’t about temperature. It clears the air bubble from the tip.', ['cool', 'cold']],
+  'Yes: more water means more NaOH': ['Water isn’t a reactant. Only the moles of oxalic acid decide how much NaOH reacts.', ['more naoh', 'needs more', 'need more']],
+  'Yes: more water means less NaOH': ['Water isn’t a reactant, so the NaOH needed stays the same.', ['less naoh', 'needs less', 'need less']],
+  'To catch spills': ['The paper is for seeing color, not catching drips. The faint pink shows up against white.', ['spill', 'catch', 'drip']],
+  'To keep the flask warm': ['Paper doesn’t matter for temperature. White paper makes the faint pink easier to see.', ['warm']],
+  'One short, rigid connector': ['A short rigid connector is a single bond. A double bond needs two long flexible connectors.', ['short', 'rigid', 'one']],
+  'Two short, rigid connectors': ['Short rigid connectors can’t bend to make two bonds between the same atoms. Use two long flexible ones.', ['short', 'rigid']],
+  'Four: like carbon': ['Carbon makes 4 bonds. Nitrogen has 5 valence electrons, so it makes 3 bonds plus one lone pair.', ['four', ' 4']],
+  'Two: like oxygen': ['Oxygen makes 2 bonds. Nitrogen makes 3: 5 valence electrons + 3 shared = an octet.', ['two', ' 2']],
+  'All the balls are the same color': ['Each color is a different element, so the colors won’t match. Check that every hole is filled.', ['color']],
+  'The model lies flat on the table': ['Most molecules are 3-D (tetrahedral, pyramidal), so they won’t lie flat. Every hole filled = correct.', ['flat']],
+  'The metal burns and the smoke is colored': ['The color is light given off by excited electrons, not colored smoke.', ['smoke', 'burn']],
+  'The flame’s color depends only on how hot the burner is': ['Same burner, different metals, different colors. The color comes from each element’s own electron energy levels.', ['hot', 'temperature', 'burner']]
+};
+function conceptPart(right, wrongs, o) { return attachWhy(choiceShuffled(right, wrongs, o), wrongs.filter(w => WRONG_WHY[w]).map(w => [w, WRONG_WHY[w][0], WRONG_WHY[w][1]])); }
+// what each gas test shows, for a wrong gas typed in Exp 10a
+const GAS_TEST = { h2: ['h2', 'hydrogen'], nh3: ['nh3', 'ammonia'], co2: ['co2', 'carbon dioxide'], o2: ['o2', 'oxygen'] };
+const GAS_SHOW = { h2: 'H₂ pops with a lit match', nh3: 'NH₃ turns red litmus blue and smells sharp', co2: 'CO₂ doesn’t pop and has no smell (carbonate + acid)', o2: 'O₂ relights a glowing splint' };
 const pickErr = (list, eq) => errQ(Object.assign({ eq }, pick(list)));
 
 /* ---- Exp 1a ---- */
@@ -2039,7 +2105,7 @@ Object.assign(K1a, {
 /* ---- Exp 3z ---- */
 Object.assign(K3z, {
   flameWhy() {
-    return { tag: 'Why flames have colors', prompt: 'In a flame test, why does each metal give off its own color of light? Explain with electrons and energy levels.', parts: [choice(['Heat excites electrons to higher energy levels; when they fall back down they emit light of specific energies (colors)', 'The metal burns and the smoke is colored', 'The flame’s color depends only on how hot the burner is'], 0, { kw: [['electron'], ['fall', 'drop', 'return', 'relax', 'go back', 'goes back', 'come back', 'comes back', 'emit', 'releas', 'give off', 'gives off', 'lower level', 'lower energy']], kwNote: 'Mention the electrons, and what happens when they fall back down.' })],
+    return { tag: 'Why flames have colors', prompt: 'In a flame test, why does each metal give off its own color of light? Explain with electrons and energy levels.', parts: [conceptPart('Heat excites electrons to higher energy levels; when they fall back down they emit light of specific energies (colors)', ['The metal burns and the smoke is colored', 'The flame’s color depends only on how hot the burner is'], { kw: [['electron'], ['fall', 'drop', 'return', 'relax', 'go back', 'goes back', 'come back', 'comes back', 'emit', 'releas', 'give off', 'gives off', 'lower level', 'lower energy']], kwNote: 'Mention the electrons, and what happens when they fall back down.' })],
       hint: 'Think Bohr model: what happens to an electron when it is heated, and then when it falls back?', solution: 'Heat <b>excites electrons</b> to higher energy levels. When they <b>fall back</b> to lower levels they <b>emit photons</b> of specific energies. Each element has its own energy levels, so its own colors.', video: 'light', skill: 'concept' };
   }
 });
@@ -2074,7 +2140,7 @@ Object.assign(K6a, {
   egGeom() {
     const m = pick(KIT_MOLS), lp = m[4] - m[2].length;
     return { tag: 'Electron groups', prompt: `For <span class="fbig">${fhtml(m[0])}</span> (central atom ${m[1]}): how many <b>electron groups</b> are around the central atom, and what is the <b>electron group geometry</b>?`, art: modelSVG(m[3], m[1], m[2], `A ball-and-stick model of ${m[0]}`),
-      parts: [num(m[4], { unit: '', tol: 0, ans: String(m[4]), label: 'Electron groups' }), choice(EGG, egIdx(m[4]), { label: 'Electron group geometry' })],
+      parts: [num(m[4], { unit: '', tol: 0, ans: String(m[4]), label: 'Electron groups' }), attachWhy(choice(EGG, egIdx(m[4]), { label: 'Electron group geometry' }), EGG.map((g, i) => [g, `${g} means ${[2, 3, 4][i]} electron groups. ${fhtml(m[0])} has ${m[4]} around ${m[1]}: ${m[2].length} bonded atom${m[2].length > 1 ? 's' : ''} + ${lp} lone pair${lp === 1 ? '' : 's'}.`]).filter((x, i) => i !== egIdx(m[4])))],
       hint: 'Each bonded atom is one group (a double or triple bond still counts once), and each lone pair is one group.', solution: `${m[2].length} bonded atom${m[2].length > 1 ? 's' : ''} + ${lp} lone pair${lp === 1 ? '' : 's'} = <b>${m[4]}</b> electron groups → <b>${EGG[egIdx(m[4])].toLowerCase()}</b> electron group geometry (molecular geometry: ${GEO_NAMES[m[3]].toLowerCase()}).`, video: 'lewis', skill: 'concept' };
   },
   connectors() {
@@ -2083,7 +2149,7 @@ Object.assign(K6a, {
       ['A nitrogen (blue) ball has one hole plugged. How many bonds does nitrogen make in the kit, and why?', ['Three: N has 5 valence electrons, so it needs 3 bonds (plus 1 lone pair) for an octet', 'Four: like carbon', 'Two: like oxygen'], 'N makes <b>3 bonds</b> and keeps one lone pair. That is why one hole is plugged.', [['3', 'three']], ['four', '4 ', 'two', '2 ']],
       ['How do you know your model is built correctly?', ['Every hole on every ball has a connector in it', 'All the balls are the same color', 'The model lies flat on the table'], 'The manual: the model is right when <b>every hole is filled</b>.', [['hole', 'every', 'all filled', 'filled']], ['color', 'flat']]
     ]);
-    return { tag: 'Using the model kit', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Short rigid = single bond. Long flexible = double or triple.', solution: q[2], video: 'lewis', skill: 'concept' };
+    return { tag: 'Using the model kit', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Short rigid = single bond. Long flexible = double or triple.', solution: q[2], video: 'lewis', skill: 'concept' };
   }
 });
 
@@ -2097,7 +2163,7 @@ Object.assign(K7a, {
       ref: tableHTML([['Mass of calorimeter (empty)', `${cal.toFixed(4)} g`], ['Initial temperature', `${Ti.toFixed(1)} °C`], ['Final temperature', `${Tf.toFixed(1)} °C`], ['Mass of calorimeter and solution', `${tot.toFixed(4)} g`]]),
       parts: [num(m, { dp: 4, unit: 'g', tol: 0.00011, label: 'Mass of solution (m)' }), num(d, { dp: 1, unit: '°C', tol: 0.051, label: 'Change in temperature (ΔT)', slip: x => Math.abs(x + d) < 0.06 ? 'ΔT = final − initial. Watch the sign.' : '' }),
         num(q, { sf: sfq, unit: 'J', label: 'Heat of solution, q<sub>solution</sub>', slip: x => Math.abs(x + q) < Math.abs(q) * 0.01 ? 'q<sub>solution</sub> has the same sign as ΔT.' : '' }), num(-q, { sf: sfq, unit: 'J', label: 'Heat of reaction, q<sub>reaction</sub>', slip: x => Math.abs(x - q) < Math.abs(q) * 0.01 ? 'q<sub>reaction</sub> = −q<sub>solution</sub>: flip the sign.' : '' }),
-        choice(['Exothermic', 'Endothermic'], exo ? 0 : 1, { label: 'The reaction is…' })],
+        attachWhy(choice(['Exothermic', 'Endothermic'], exo ? 0 : 1, { label: 'The reaction is…' }), [exo ? ['Endothermic', 'The water got warmer, so the reaction released heat into it: exothermic. (Endothermic would make the water colder.)', ['endo']] : ['Exothermic', 'The water got colder, so the reaction absorbed heat from it: endothermic. (Exothermic would warm the water.)', ['exo']]])],
       hint: 'Mass of solution = (calorimeter + solution) − empty calorimeter. ΔT = T<sub>f</sub> − T<sub>i</sub>. Then q = m·c·ΔT, and the reaction has the opposite sign.',
       solution: `m = ${tot.toFixed(4)} − ${cal.toFixed(4)} = ${m.toFixed(4)} g. ΔT = ${Tf.toFixed(1)} − ${Ti.toFixed(1)} = ${d.toFixed(1)} °C. q<sub>solution</sub> = ${m.toFixed(4)} × 4.184 × ${d.toFixed(1)} = <b>${sfHTML(q, sfq)} J</b>, so q<sub>reaction</sub> = <b>${sfHTML(-q, sfq)} J</b>. The water got ${exo ? 'warmer' : 'colder'}, so the reaction is <b>${exo ? 'exothermic' : 'endothermic'}</b>.`, video: 'calorimetry', skill: 'calc' };
   },
@@ -2127,7 +2193,7 @@ Object.assign(K8a, {
       ['Why is the temperature of the <b>water in the beaker</b> recorded as the temperature of the gas?', ['The gas sits in contact with that water, so it is at the same temperature', 'Gas has no temperature', 'The water is always 25 °C'], 'The H₂ is collected over the water and is assumed to be at the <b>same temperature as the water</b>.', [['same', 'equal', 'contact', 'touch', 'in the water', 'over water', 'surround', 'equilibrium']]],
       ['Why does the magnesium ribbon get cleaned with steel wool first?', ['To remove the oxide coating so only pure Mg is weighed and reacts', 'To make it heavier', 'To dry it'], 'Steel wool removes the <b>oxide coating</b>, so the mass you record is all Mg.', [['oxide', 'coating', 'tarnish', 'dull', 'impur', 'pure', 'dirt', 'clean', 'mgo', 'layer']]]
     ]);
-    return { tag: 'Gas collection setup', prompt: q[0], art: eqDraw(eqById('eudiometer')), parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Picture the tube upside down in the beaker of water.', solution: q[2], video: 'dalton', skill: 'concept' };
+    return { tag: 'Gas collection setup', prompt: q[0], art: eqDraw(eqById('eudiometer')), parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Picture the tube upside down in the beaker of water.', solution: q[2], video: 'dalton', skill: 'concept' };
   }
 });
 
@@ -2158,7 +2224,8 @@ Object.assign(K10a, {
       ['Na<sub>2</sub>CO<sub>3</sub> solution and HCl are mixed. It fizzes, but the gas does <b>not pop</b> with a match and has no smell.', ['co2', 'carbon dioxide', 'carbon dioxide gas'], 'CO<sub>2</sub>', 'Carbonate + acid makes H₂CO₃, which breaks down to <b>CO₂</b> + H₂O. CO₂ doesn’t burn, so no pop.'],
       ['Solid KClO<sub>3</sub> is heated in a test tube. A glowing splint held in the mouth of the tube <b>relights</b>.', ['o2', 'oxygen', 'oxygen gas'], 'O<sub>2</sub>', 'KClO₃ decomposes: 2KClO₃ → 2KCl + 3O₂. <b>Oxygen</b> makes a glowing splint relight.']
     ]);
-    return { tag: 'Identify the gas', prompt: `${g[0]} What gas formed? (Name or formula.)`, parts: [textPart(g[1], { ans: g[2] })], hint: 'Pop = flammable H₂. Red litmus → blue = a base (NH₃). No pop, no smell = CO₂. Splint relights = O₂.', solution: g[3], video: 'gasevolution', skill: 'concept' };
+    const right = Object.keys(GAS_TEST).find(k => GAS_TEST[k].some(w => g[1].includes(w)));
+    return { tag: 'Identify the gas', prompt: `${g[0]} What gas formed? (Name or formula.)`, parts: [textPart(g[1], { ans: g[2], whyText: Object.keys(GAS_TEST).filter(k => k !== right).map(k => [GAS_TEST[k], `${GAS_SHOW[k]}, but that isn’t what happened here. ${GAS_SHOW[right]}.`]) })], hint: 'Pop = flammable H₂. Red litmus → blue = a base (NH₃). No pop, no smell = CO₂. Splint relights = O₂.', solution: g[3], video: 'gasevolution', skill: 'concept' };
   }
 });
 
@@ -2172,7 +2239,7 @@ Object.assign(K12b, {
       ['A student uses about 15 mL of DI water to dissolve the oxalic acid instead of 10 mL. Does this change the moles of NaOH needed?', ['No: water is not a reactant, so the moles of acid (and NaOH needed) are the same', 'Yes: more water means more NaOH', 'Yes: more water means less NaOH'], 'Water is <b>not a reactant</b>. The moles of oxalic acid didn’t change, so the NaOH needed is the <b>same</b>.', [[' no ', 'no change', 'same', 'not change', 'doesn t', 'does not', 'not a reactant', 'nothing']], ['more naoh', 'less naoh', ' yes ']],
       ['Why put a white piece of paper under the Erlenmeyer flask?', ['To see the faint pink endpoint more easily', 'To catch spills', 'To keep the flask warm'], 'White paper makes the <b>faint pink</b> easier to see.', [['see', 'color', 'pink', 'endpoint', 'visible', 'notice', 'contrast']], ['spill', 'warm']]
     ]);
-    return { tag: 'Titration technique', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the procedure steps in the lab manual.', solution: q[2], video: 'titration', skill: 'concept' };
+    return { tag: 'Titration technique', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the procedure steps in the lab manual.', solution: q[2], video: 'titration', skill: 'concept' };
   },
   stdTable() {
     const MM = 126.07, m = rnd(0.1000, 0.1200, 4), Mtrue = rnd(0.095, 0.110, 4), molB = m / MM * 2, Vi = rnd(0.30, 2.80, 2), net = molB / Mtrue * 1000, Vf = +(Vi + net).toFixed(2), Vn = +(Vf - Vi).toFixed(2), M = molB / (Vn / 1000), sf = Math.min(4, sfCount(Vn.toFixed(2)));
@@ -2204,7 +2271,7 @@ Object.assign(K0a, {
       ['A crucible just came off the Bunsen burner. Where do you put it to cool?', ['On the wire mesh (gauze), moved with crucible tongs', 'Directly on the countertop', 'On a paper towel'], 'Hot things go on the <b>wire mesh</b>, moved with <b>tongs</b>. A hot crucible burns the counter or paper.', [['mesh', 'gauze', 'wire', 'clay triangle', 'triangle']], ['counter', 'paper']],
       ['A small amount of acid spills on the bench. What do you use to neutralize it before wiping it up?', ['Sodium bicarbonate (baking soda)', 'Citric acid', 'More acid'], 'Acid spills are neutralized with <b>sodium bicarbonate</b> (baking soda). Base spills use citric acid.', [['bicarbonate', 'baking soda', 'nahco3', 'sodium hydrogen carbonate']], ['citric']]
     ]);
-    return { tag: 'Safety & technique', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the Lab Safety Contract at the front of your manual.', solution: q[2], video: 'practical1', skill: 'concept' };
+    return { tag: 'Safety & technique', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the Lab Safety Contract at the front of your manual.', solution: q[2], video: 'practical1', skill: 'concept' };
   }
 });
 
