@@ -921,6 +921,20 @@ function splitNum(raw) {
   if (!m) return null;
   return { num: m[0].replace(/x10\^?/, 'e'), tail: c.slice(m[0].length) };
 }
+// common slips any calculation can make
+function autoSlip(spec, x) {
+  const v = spec.v; if (!isFinite(x) || !v) return '';
+  const near = (a, b, r = 0.012) => Math.abs(a - b) <= Math.abs(b) * r;
+  if (near(x, -v)) return 'Check the sign.';
+  if (spec.unit === '%' && near(x, v / 100)) return 'That’s a fraction. Multiply by 100 for a percent.';
+  if (spec.unit === '%' && near(x, v * 100) ) return 'You multiplied by 100 one time too many.';
+  if (spec.unit === '' && spec.dp != null && v > 0 && v < 14 && near(x, 14 - v, 0.004)) return 'That’s the other one of pH and pOH: pH + pOH = 14.';
+  for (const k of [3, 6, 9, 2, 1]) for (const sgn of [1, -1]) if (near(x, v * Math.pow(10, sgn * k))) return `Your answer is ${k === 1 ? '10' : k === 2 ? '100' : k === 3 ? '1000' : '10' + String(k).replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d])} times too ${sgn > 0 ? 'big' : 'small'}: check a unit conversion (mL ↔ L, g ↔ kg, J ↔ kJ, nm ↔ m) or the decimal point.`;
+  for (const f of [2, 3]) { if (near(x, v * f)) return `Your answer is ${f} times too big: check the mole ratio from the balanced equation.`; if (near(x, v / f)) return `Your answer is ${f} times too small: check the mole ratio from the balanced equation.`; }
+  if (near(x * v, 1, 0.012)) return 'It looks like you divided upside down.';
+  if (near(x, v, 0.05)) return 'Close. Use the unrounded numbers until the last step, and check each value you copied.';
+  return '';
+}
 function gradeNum(spec, raw, unitRaw, needUnit) {
   const sp = splitNum(raw), u = sp ? parseEntry(sp.num) : null;
   if (needUnit && spec.unit && !String(unitRaw || '').trim() && sp) { if (sp.tail) unitRaw = rawTail(raw); }
@@ -956,7 +970,7 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
   }
   const ok = !!valueOk && precOk && uOk;
   let note = '';
-  if (!valueOk) note = spec.slip ? (spec.slip(x) || '') : '';
+  if (!valueOk) note = (spec.slip ? spec.slip(x) || '' : '') || autoSlip(spec, x);
   else if (!precOk) note = precNote;
   else if (!uOk) note = `Units: write <b>${spec.unit}</b>.`;
   return { score: +score.toFixed(2), ok, valueOk: !!valueOk, precOk, uOk, note, bd };
@@ -1927,7 +1941,7 @@ const RX = [ // reactants, products(with states), coefficients, scheme2, scheme1
   { r: ['AgNO3(aq)', 'NaCl(aq)'], p: ['AgCl(s)', 'NaNO3(aq)'], c: [1, 1, 1, 1], s2: 0, s1: 3, obs: 'A white, curdy solid forms right away.', tube: { cloudy: '#ffffff', ppt: '#f2f2f2', liquid: '#eef3f8' }, net: 'Ag<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → AgCl(s)', bad: ['Na<sup>+</sup>(aq) + NO<sub>3</sub><sup>−</sup>(aq) → NaNO<sub>3</sub>(s)', 'Ag(s) + Cl<sub>2</sub>(g) → AgCl(s)'], ppt: 'AgCl' },
   { r: ['CuSO4(aq)', 'NaOH(aq)'], p: ['Cu(OH)2(s)', 'Na2SO4(aq)'], c: [1, 2, 1, 1], s2: 0, s1: 3, obs: 'A pale blue, jelly-like solid forms.', tube: { cloudy: '#7fb7ff', ppt: '#5a9cf0', liquid: '#cfe6ff' }, net: 'Cu<sup>2+</sup>(aq) + 2OH<sup>−</sup>(aq) → Cu(OH)<sub>2</sub>(s)', bad: ['Na<sup>+</sup>(aq) + SO<sub>4</sub><sup>2−</sup>(aq) → NaSO<sub>4</sub>(s)', 'Cu<sup>2+</sup>(aq) + OH<sup>−</sup>(aq) → CuOH(s)'], ppt: 'Cu(OH)2' },
   { r: ['Na2CO3(aq)', 'HCl(aq)'], p: ['NaCl(aq)', 'H2O(l)', 'CO2(g)'], c: [1, 2, 2, 1, 1], s2: 2, s1: 3, obs: 'Lots of fizzing: a colorless, odorless gas bubbles out.', tube: { bubbles: 26, liquid: '#eef6fb' }, net: 'CO<sub>3</sub><sup>2−</sup>(aq) + 2H<sup>+</sup>(aq) → H<sub>2</sub>O(l) + CO<sub>2</sub>(g)', bad: ['Na<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → NaCl(s)', '2H<sup>+</sup>(aq) → H<sub>2</sub>(g)'], gas: 'CO2', gasObs: 'fizzing when a carbonate is mixed with acid' },
-  { r: ['NH4Cl(aq)', 'NaOH(aq)'], p: ['NaCl(aq)', 'H2O(l)', 'NH3(g)'], c: [1, 1, 1, 1, 1], s2: 2, s1: 3, obs: 'A sharp smell comes off, and moist red litmus held over the tube turns blue.', tube: { liquid: '#eef6fb', paper: '#5d8df0', steam: 1 }, net: 'NH<sub>4</sub><sup>+</sup>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>O(l) + NH<sub>3</sub>(g)', bad: ['Na<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → NaCl(s)', 'H<sup>+</sup>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>O(l)'], gas: 'NH3', gasObs: 'a pungent smell, and moist red litmus paper turning blue' },
+  { r: ['NH4Cl(aq)', 'NaOH(aq)'], p: ['NaCl(aq)', 'H2O(l)', 'NH3(g)'], c: [1, 1, 1, 1, 1], s2: 2, s1: 3, obs: 'Moist red litmus held over the tube turns blue, and a sharp smell comes off (waft, don’t sniff).', tube: { liquid: '#eef6fb', paper: '#5d8df0', steam: 1 }, net: 'NH<sub>4</sub><sup>+</sup>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>O(l) + NH<sub>3</sub>(g)', bad: ['Na<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → NaCl(s)', 'H<sup>+</sup>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>O(l)'], gas: 'NH3', gasObs: 'a pungent smell, and moist red litmus paper turning blue' },
   { r: ['HCl(aq)', 'NaOH(aq)'], p: ['NaCl(aq)', 'H2O(l)'], c: [1, 1, 1, 1], s2: 1, s1: 3, obs: 'No visible change, but the test tube gets warm.', tube: { liquid: '#eef6fb' }, net: 'H<sup>+</sup>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>O(l)', bad: ['Na<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → NaCl(s)', 'HCl(aq) + OH<sup>−</sup>(aq) → Cl<sup>−</sup>(aq) + H<sub>2</sub>O(g)'] },
   { r: ['Zn(s)', 'HCl(aq)'], p: ['ZnCl2(aq)', 'H2(g)'], c: [1, 2, 1, 1], s2: 3, s1: 2, obs: 'The zinc fizzes. The gas collected in an upside-down test tube makes a “pop” with a lit match.', tube: { pellets: '#b8bfcc', bubbles: 20, liquid: '#f2f6fa' }, net: 'Zn(s) + 2H<sup>+</sup>(aq) → Zn<sup>2+</sup>(aq) + H<sub>2</sub>(g)', bad: ['Zn<sup>2+</sup>(aq) + 2Cl<sup>−</sup>(aq) → ZnCl<sub>2</sub>(s)', 'H<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) → HCl(g)'], gas: 'H2', gasObs: 'a “pop” sound when a lit match is held to the collected gas' },
   { r: ['Zn(s)', 'CuSO4(aq)'], p: ['ZnSO4(aq)', 'Cu(s)'], c: [1, 1, 1, 1], s2: 3, s1: 2, obs: 'The blue color fades and a reddish-brown coating forms on the zinc.', tube: { pellets: '#b8bfcc', coat: '#b5562a', liquid: '#dbe9ff' }, net: 'Zn(s) + Cu<sup>2+</sup>(aq) → Zn<sup>2+</sup>(aq) + Cu(s)', bad: ['Cu<sup>2+</sup>(aq) + SO<sub>4</sub><sup>2−</sup>(aq) → CuSO<sub>4</sub>(s)', 'Zn<sup>2+</sup>(aq) + Cu(s) → Zn(s) + Cu<sup>2+</sup>(aq)'] },
@@ -1989,7 +2003,7 @@ const K10a = {
   gas() {
     const rx = pick(RX.filter(x => x.gas));
     return { tag: 'Name that gas', prompt: `A reaction gives off a gas. You notice ${rx.gasObs}. What is the formula of the gas?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [{ type: 'formula', accept: [rx.gas, rx.gas + '(g)'], ans: fhtml(rx.gas) }],
-      hint: 'H₂ pops with a flame; O₂ relights a glowing splint; CO₂ fizzes from carbonate + acid; NH₃ smells sharp and turns red litmus blue.', solution: `<b>${fhtml(rx.gas)}</b>. ${eqn(rxHTML(rx, true))}`, video: 'gasevolution', skill: 'concept' };
+      hint: 'H₂ pops with a flame; O₂ relights a glowing splint; CO₂ fizzes from carbonate + acid; NH₃ turns moist red litmus blue (and smells sharp: waft, don’t sniff).', solution: `<b>${fhtml(rx.gas)}</b>. ${eqn(rxHTML(rx, true))}`, video: 'gasevolution', skill: 'concept' };
   },
   netIonic() {
     const rx = pick(RX.filter(x => x.bad));
@@ -2187,7 +2201,7 @@ const WRONG_WHY = {
 function conceptPart(right, wrongs, o) { return attachWhy(choiceShuffled(right, wrongs, o), wrongs.filter(w => WRONG_WHY[w]).map(w => [w, WRONG_WHY[w][0], WRONG_WHY[w][1]])); }
 // what each gas test shows, for a wrong gas typed in Exp 10a
 const GAS_TEST = { h2: ['h2', 'hydrogen'], nh3: ['nh3', 'ammonia'], co2: ['co2', 'carbon dioxide'], o2: ['o2', 'oxygen'] };
-const GAS_SHOW = { h2: 'H₂ pops with a lit match', nh3: 'NH₃ turns red litmus blue and smells sharp', co2: 'CO₂ doesn’t pop and has no smell (carbonate + acid)', o2: 'O₂ relights a glowing splint' };
+const GAS_SHOW = { h2: 'H₂ pops with a lit match', nh3: 'NH₃ turns moist red litmus blue (the manual’s test)', co2: 'CO₂ doesn’t pop and has no smell (carbonate + acid)', o2: 'O₂ relights a glowing splint' };
 const pickErr = (list, eq) => errQ(Object.assign({ eq }, pick(list)));
 
 /* ---- Exp 1a ---- */
@@ -2461,7 +2475,7 @@ Object.assign(K12b, {
     return { tag: 'Standardization table', prompt: 'Fill in the Part I (standardization) results for Trial 1. Oxalic acid dihydrate, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O, is 126.06 g/mol.', eq: 'H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O(aq) + 2NaOH(aq) → Na<sub>2</sub>C<sub>2</sub>O<sub>4</sub>(aq) + 4H<sub>2</sub>O(l)',
       ref: tableHTML([['Mass of oxalic acid', `${m.toFixed(4)} g`], ['Initial buret reading (NaOH)', `${Vi.toFixed(2)} mL`], ['Final buret reading (NaOH)', `${Vf.toFixed(2)} mL`]], ['', 'Trial 1']),
       parts: [num(molB, { sf: 4, unit: 'mol', label: 'Moles of sodium hydroxide', slip: x => Math.abs(x - molB / 2) < molB * 0.006 ? 'Use the 2 : 1 mole ratio: 2 mol NaOH per mol oxalic acid.' : '' }), num(Vn / 1000, { sf, unit: 'L', label: 'Net volume NaOH used (L)', slip: x => Math.abs(x - Vn) < 0.01 ? 'Convert mL to L (÷ 1000).' : Math.abs(x - Vf / 1000) < 1e-5 ? 'Net volume = final − initial reading.' : '' }), num(M, { sf, unit: 'M', label: 'Molarity of sodium hydroxide' })],
-      hint: 'g oxalic acid → mol oxalic acid → × 2 → mol NaOH. Net volume = final − initial (in L). M = mol ÷ L.', solution: `${m.toFixed(4)} g ÷ 126.06 g/mol × 2 = <b>${sfHTML(molB, 4)} mol NaOH</b>. Net volume = ${Vf.toFixed(2)} − ${Vi.toFixed(2)} = ${Vn.toFixed(2)} mL = <b>${sfHTML(Vn / 1000, sf)} L</b>. M = ${molB.toExponential(4)} ÷ ${(Vn / 1000).toFixed(5)} = <b>${sfHTML(M, sf)} M</b>.`, video: 'titration', skill: 'calc' };
+      hint: 'g oxalic acid → mol oxalic acid → × 2 → mol NaOH. Net volume = final − initial (in L). M = mol ÷ L.', solution: `${m.toFixed(4)} g ÷ 126.06 g/mol × 2 = <b>${sfHTML(molB, 4)} mol NaOH</b>. Net volume = ${Vf.toFixed(2)} − ${Vi.toFixed(2)} = ${Vn.toFixed(2)} mL = <b>${sfHTML(Vn / 1000, sf)} L</b>. M = ${fmtSF(molB, 5).html} ÷ ${(Vn / 1000).toFixed(5)} = <b>${sfHTML(M, sf)} M</b>.`, video: 'titration', skill: 'calc' };
   },
   errors() {
     return pickErr([
@@ -2511,9 +2525,90 @@ const LABS = [
   { id: '12b', name: 'Citric Acid in Soda', blurb: 'Burets, standardization, titration math', K: K12b, badge: 'titrate', cur: 1 }
 ];
 const labById = id => LABS.find(l => l.id === id);
+/* ---------- feedback for every wrong choice (picked or typed): why that choice doesn't fit ----------
+   Explains the wrong choice itself (a definition), never gives away the right answer; a hint if nothing fits. */
+Object.assign(WRONG_WHY, {
+  'Yes: a bigger object has a bigger density': ['Density is mass ÷ volume. A bigger piece has more mass AND more volume, so the ratio stays the same.', []],
+  'No: a bigger block must have a bigger density': ['Density is mass ÷ volume. A bigger piece has more mass AND more volume, so the ratio stays the same.', []],
+  'Yes: density changes with the shape of the object': ['Shape changes how the volume is arranged, not the mass ÷ volume ratio. Density is the same for any shape of one substance.', ['shape']],
+  'No: different sizes always mean different metals': ['Size doesn’t decide what a metal is. One metal can come in any size; its density stays the same.', ['size']],
+  'Group 2’s ratio is twice as big': ['Twice the copper reacts with twice the sulfur, so Cu ÷ S doesn’t change.', ['twice', 'double']],
+  'Group 2’s ratio is half as big': ['Twice the copper reacts with twice the sulfur, so Cu ÷ S doesn’t change.', ['half']],
+  'The crucible is too heavy to lift': ['A crucible is light. The real reason is what your fingers would add to the mass (and a hot crucible burns).', ['heavy']],
+  'Tongs make the crucible react faster': ['Tongs don’t change the reaction. Think about what gets onto the crucible when you touch it.', ['faster']],
+  'To burn off the oxygen': ['The oxygen is what the magnesium gains: the oxide should stay. Repeating the heating checks something else.', ['burn off']],
+  'To make the crucible lighter': ['The crucible itself doesn’t change mass. Repeating heat-cool-weigh checks whether the reaction is still going.', ['lighter']],
+  'Heat has mass': ['Heat is energy, not matter, so it adds no mass. Something from the air is joining the magnesium.', ['heat has mass']],
+  'The flame adds carbon to it': ['The flame doesn’t deposit carbon in the crucible. Something from the air reacts with the magnesium.', ['carbon']],
+  'The air in the room': ['In the calorimeter the surroundings are the water (the solution), not the room. The room is what the lid and cups keep heat away from.', ['air', 'room']],
+  'The solid that dissolves': ['The dissolving solid is the reaction (the system). Its surroundings are the water it releases heat to or takes heat from.', ['solid']],
+  'It makes the reaction faster': ['A lid doesn’t change the reaction’s speed. Think about heat moving between the cup and the room.', ['faster']],
+  'It stops the thermometer from breaking': ['The thermometer goes through the lid, but that isn’t its job. Think about heat moving between the cup and the room.', ['thermometer', 'break']],
+  'Plastic reacts with the water to make heat': ['The cups don’t react with water. They are there for the heat that is already in the solution.', ['react']],
+  'So you can weigh it more easily': ['Weighing works the same either way. The second cup is about heat, not mass.', ['weigh']],
+  'The water turns pink': ['Nothing in this setup turns pink (phenolphthalein is the titration lab). Watch the ribbon and the bubbles.', ['pink']],
+  'The tube gets cold': ['Temperature isn’t how you judge it. Watch the ribbon and the bubbles.', ['cold']],
+  'No change': ['Something in the setup did change. Think about how it affects what you measure.', ['no change', 'same']],
+  'Too high: the oxide makes extra H₂': ['MgO reacts with HCl but makes water, not H₂. So oxide on the ribbon means less H₂ for that mass.', ['too high', 'more', 'extra']],
+  'Water vapor makes the room pressure too low': ['The room pressure is read from the gauge and is correct. The issue is what is inside the tube with the H₂.', ['room pressure']],
+  'The HCl adds extra pressure': ['The HCl stays in solution. What else is in the gas above the water?', ['hcl']],
+  'Volumetric pipet': ['A volumetric pipet is a precise tool that delivers one exact volume (like 10.00 mL) into another container.', ['volumetric pipet']],
+  'Volumetric flask': ['A volumetric flask holds one exact volume when filled to its line. You make solutions in it; you don’t pour out a measured amount or titrate in it.', ['volumetric flask']],
+  'Buret': ['A buret adds a measured, changing amount (read to 0.01 mL), like the NaOH in a titration.', ['buret', 'burette']],
+  'Beaker': ['Beaker marks are rough and it splashes when swirled: good for holding and mixing, not for exact volumes or titrating.', ['beaker']],
+  'Erlenmeyer flask': ['Erlenmeyer marks are rough. It is for swirling and holding (like the sample in a titration), not for exact volumes.', ['erlenmeyer']],
+  'Graduated cylinder': ['A graduated cylinder reads only to the tenths or hundredths of a mL. It isn’t as exact as volumetric glassware for one fixed volume.', ['graduated', 'cylinder']],
+  'Transfer pipet': ['A plastic transfer pipet just moves liquid. Its marks are rough, so it can’t give an exact volume.', ['transfer', 'plastic']],
+  'Filter flask': ['A filter flask (side arm) is for vacuum filtration, not titration.', ['filter']],
+  'To turn the indicator pink': ['The pink comes at the endpoint of every titration. Standardizing is about the NaOH itself.', ['pink']],
+  'To find the mass of the soda': ['The soda is measured by volume (10.00 mL), not mass, and that is Part II. Standardizing is about the NaOH.', ['mass']],
+  'To make the soda less acidic': ['Standardizing happens before the soda, with oxalic acid. It finds something about the NaOH.', ['less acidic']],
+  'Colorless': ['Colorless means you haven’t reached the endpoint yet: the acid isn’t used up.', ['colorless', 'clear']],
+  'Dark purple': ['Dark pink or purple means you went past the endpoint (overshot). Redo that titration.', ['dark', 'purple', 'magenta']],
+  'Bright yellow': ['Phenolphthalein never turns yellow. It goes from colorless to pink.', ['yellow']],
+  'Citric acid': ['Citric acid is what you are finding (it is in the flask), not what you add from the buret.', ['citric']],
+  'Phenolphthalein': ['Phenolphthalein is the indicator: just 2–3 drops in the flask.', ['phenolphthalein']],
+  'Oxalic acid': ['Oxalic acid is weighed into the flask to standardize the NaOH. It isn’t added from the buret.', ['oxalic']],
+  'Reasonable (100% or less)': ['Over 100% would mean more alum than the aluminum can make. That only happens when the crystals are still wet or impure.', ['reasonable']],
+  'Not reasonable: over 100% means the crystals were still wet or impure': ['This yield isn’t over 100%. Losing some product in filtering and transfers is normal.', ['not reasonable', 'unreasonable']]
+});
+const WHY_DEF = {
+  geo: { Linear: '2 electron groups and no lone pairs (180°)', Bent: '2 bonded atoms plus lone pairs on the central atom', 'Trigonal planar': '3 bonded atoms and no lone pairs (120°)', 'Trigonal pyramidal': '3 bonded atoms plus 1 lone pair (about 107°)', Tetrahedral: '4 bonded atoms and no lone pairs (109.5°)' },
+  ang: { '180°': 'a linear shape (2 groups)', '120°': 'a trigonal planar shape (3 groups, no lone pairs)', '109.5°': 'a tetrahedral shape (4 bonded atoms, no lone pairs)', 'about 107°': 'a trigonal pyramid (3 bonded atoms + 1 lone pair)', 'about 104.5°': 'a bent shape with 2 lone pairs, like water' },
+  s2: { Precipitation: 'two solutions make a solid', 'Acid/base neutralization': 'an acid and a base make water (and a salt)', 'Gas evolution': 'a double displacement that gives off a gas', Redox: 'an uncombined element reacts or forms (like Zn metal or O₂)', Combustion: 'something burns in O₂', 'No reaction': 'nothing changes: no solid, gas, heat or color change' },
+  s1: { Combination: 'A + B → AB (two things join)', Decomposition: 'AB → A + B (one thing breaks apart)', 'Single displacement': 'A + BC → AC + B (an element swaps in)', 'Double displacement': 'AB + CD → AD + CB (partners swap)', Combustion: 'a fuel burns in O₂' },
+  st: { '(s)': 'a solid, like the precipitate you see', '(l)': 'a pure liquid, like the water made in a neutralization', '(g)': 'a gas that bubbles out', '(aq)': 'dissolved in water (soluble ionic compounds, acids and bases)' },
+  type: { 'Type I ionic (metal with one charge)': 'a metal with only one charge (Group 1, Group 2, Al, Zn, Ag)', 'Type II ionic (metal with more than one charge)': 'a metal that can have more than one charge (like Fe, Cu, Co, Sn, Pb), named with a Roman numeral', 'Molecular (nonmetals only)': 'only nonmetals, named with prefixes', 'Acid (starts with H)': 'a formula that starts with H (an acid in water)' },
+  yield: { 'Actual yield': 'the mass you really collect and weigh', 'Theoretical yield': 'the most you could make, calculated from the starting mass (not weighed)', 'Percent yield': 'actual ÷ theoretical × 100 (a percent, not a mass)' },
+  heat: { Exothermic: 'heat is released, so the water gets warmer (ΔT and q<sub>solution</sub> positive, q<sub>reaction</sub> negative)', Endothermic: 'heat is absorbed, so the water gets colder (ΔT and q<sub>solution</sub> negative, q<sub>reaction</sub> positive)', 'Went up': 'the final temperature is higher than the initial one', 'Went down': 'the final temperature is lower than the initial one' },
+  acid: { Acidic: 'red or pink (about pH 1–4)', 'About neutral': 'purple (about pH 5–7)', Basic: 'blue, blue-green, green or yellow (pH 8 and up)' }
+};
+const plainTxt = h => String(h).replace(/<[^>]+>/g, '');
+function whyFor(q, p) {
+  const key = q.lab + '.' + q.kind, out = {}, right = plainTxt(p.options[p.ok]);
+  p.options.forEach((o, i) => {
+    if (i === p.ok || (p.why && p.why[i])) return;
+    const t = plainTxt(o); let w = '';
+    if (WRONG_WHY[o] || WRONG_WHY[t]) w = (WRONG_WHY[o] || WRONG_WHY[t])[0];
+    else if (key === '3a.order') { const a = EM.indexOf(t.toLowerCase()), b = EM.indexOf(right.toLowerCase()); w = `${t} comes ${a < b ? 'before' : 'after'} that in the order ${EM.join(' → ')}. Left to right, energy and frequency go up and wavelength gets shorter.`; }
+    else if (key === '3a.bohr') w = /Absorbed/.test(t) ? 'Absorbing energy moves an electron <b>up</b>. Here it falls to a lower level.' : 'An electron gives off light when it falls <b>down</b>. Here it moves up.';
+    else if (key === '3z.whichMine' && PB[t]) w = `${t}’s lead averages ${avgPb(PB[t]).toFixed(2)} g/mol. Compare that with the paint sample.`;
+    else if (key === '3z.flameMany') w = /^Yes\. Only/.test(t) ? 'Check the table again: more than one element gives this color.' : 'Several elements share a color (look down the table), so one color can’t name one element.';
+    else if (key === '12a.cabbage') { const c = CABBAGE.find(x => `pH ${x[2]}` === t); w = c ? `${t} would look ${c[1].toLowerCase()}.` : WHY_DEF.acid[t] ? `${t} solutions turn the juice ${WHY_DEF.acid[t]}.` : ''; }
+    else if (key === '10a.station' && p.label === 'Observation') { const rx = RX.find(x => x.obs === o); if (rx) w = `That is what ${rxPlain(rx.r)} looks like (${S2[rx.s2].toLowerCase()}).`; }
+    else if (key === '10a.scheme1' && WHY_DEF.s1[t]) w = `${t} means ${WHY_DEF.s1[t]}.`;
+    else if (S2.includes(t) && WHY_DEF.s2[t]) w = `${t} means ${WHY_DEF.s2[t]}.`;
+    else for (const g of ['geo', 'ang', 'st', 'type', 'yield', 'heat', 'acid']) if (WHY_DEF[g][t]) { w = g === 'geo' ? `${t} needs ${WHY_DEF.geo[t]}.` : g === 'ang' ? `${t} goes with ${WHY_DEF.ang[t]}.` : `${t.replace(/ \(.*\)$/, '')} means ${WHY_DEF[g][t]}.`; break; }
+    out[i] = w || (q.hint ? `Not this one. Hint: ${q.hint}` : 'Not this one. Check the reference and try again.');
+  });
+  return out;
+}
 function makeQ(labId, kind) {
   const lab = labById(labId), kinds = Object.keys(lab.K), k = kind || pick(kinds);
-  const q = lab.K[k](); q.lab = labId; q.kind = k; q.labName = lab.name; return q;
+  const q = lab.K[k](); q.lab = labId; q.kind = k; q.labName = lab.name;
+  q.parts.forEach(p => { if (p.type === 'choice' && p.options) { const w = whyFor(q, p); if (Object.keys(w).length) p.why = Object.assign(p.why || {}, w); } });
+  if (q.skill === 'read' && k !== 'volumetric') q.parts.forEach(p => { if (p.type === 'num' && p.unit && p.unit !== 'g' && RTOL[p.unit]) { const r = p.rtol != null ? p.rtol : RTOL[p.unit](p); if (p.tol == null || p.tol < r) p.tol = r; } });
+  return q;
 }
 
 /* ===================== PhET Lab Bench ===================== */
@@ -2875,8 +2970,12 @@ function buildPractical0(ver, timer) {
     if (!stations.some(st => st.lab === id) && HANDS[id] && nh < 3 && Math.random() < 0.6 && HFAM[id].every(f => !used.has(f))) { stations.push(HANDS[id]()); HFAM[id].forEach(f => used.add(f)); nh++; P.mockLabs[id] = (P.mockLabs[id] || 0) + 1; return; }
     const all = [...new Set(l.mock || Object.keys(l.K))], fresh = shuffle(all.filter(k => !used.has(famOf(id, k))));
     const pickK = [], fams = new Set();
-    fresh.forEach(k => { if (pickK.length < 3 && !fams.has(famOf(id, k))) { pickK.push(k); fams.add(famOf(id, k)); } });
-    fresh.forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); });
+    // A, B and C should be about the same job: same kind of skill, about the same number of answers.
+    // If no other question type is close, the other versions get the same type with different numbers.
+    const shp = {}, shape = k => shp[k] || (shp[k] = (q => [q.skill, q.parts.length])(makeQ(id, k)));
+    const close = k => !fresh.length || (shape(k)[0] === shape(fresh[0])[0] ? 0 : 2) + Math.abs(shape(k)[1] - shape(fresh[0])[1]) <= 1;
+    fresh.forEach(k => { if (pickK.length < 3 && !fams.has(famOf(id, k)) && close(k)) { pickK.push(k); fams.add(famOf(id, k)); } });
+    fresh.forEach(k => { if (pickK.length < 3 && !pickK.includes(k) && close(k)) pickK.push(k); });
     if (!pickK.length) shuffle(all).forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); }); // only if nothing fresh is left; otherwise reuse a fresh type
     const v = {}; 'ABC'.split('').forEach((V, i) => { const k = pickK[i % pickK.length]; v[V] = makeQ(id, k); used.add(famOf(id, k)); });
     stations.push({ lab: id, title: l.name, versions: v }); P.mockLabs[id] = (P.mockLabs[id] || 0) + 1;
@@ -2890,7 +2989,7 @@ function buildPractical0(ver, timer) {
       if (reads <= 1) break;
       if (st.hands || !isRead(st, st.versions[V])) continue;
       const l = labById(st.lab);
-      for (const k of shuffle([...new Set(l.mock || Object.keys(l.K))])) { if (used.has(famOf(st.lab, k)) || READ_FAM.has(famOf(st.lab, k))) continue; const q = makeQ(st.lab, k); if (q.skill === 'read') continue; st.versions[V] = q; used.add(famOf(st.lab, k)); reads--; break; }
+      for (const k of shuffle([...new Set(l.mock || Object.keys(l.K))])) { if (used.has(famOf(st.lab, k)) || READ_FAM.has(famOf(st.lab, k))) continue; const q = makeQ(st.lab, k), others = 'ABC'.split('').filter(x => x !== V).map(x => st.versions[x].parts.length); if (q.skill === 'read' || others.some(n => Math.abs(n - q.parts.length) > 1)) continue; st.versions[V] = q; used.add(famOf(st.lab, k)); reads--; break; }
     }
   });
   const byVer = { A: new Set(), B: new Set(), C: new Set() };
@@ -3197,7 +3296,7 @@ function mixResult(A, B) {
   for (const [c, a] of [[x.c, y.a], [y.c, x.a]]) { const col = INSOL[`${c}|${a}`]; if (col) { const f = saltFormula(c, a); return { kind: 'ppt', ppt: f, obs: 0, type: 0, text: `A ${col === '#f4f4f4' ? 'white' : col === '#f7d417' ? 'bright yellow' : col === '#5a9cf0' ? 'pale blue' : col === '#5fb3a8' ? 'blue-green' : col === '#7a5230' ? 'brown' : 'pale yellow'} solid forms and settles: ${fhtml(f)}.`, color: col, view: { nc: c === 'Ag' && a === 'OH' ? 2 : ION[a][1] / (ION[c][1] === ION[a][1] ? ION[c][1] : 1), na: c === 'Ag' && a === 'OH' ? 1 : ION[c][1] / (ION[c][1] === ION[a][1] ? ION[c][1] : 1), cat: ION[c][0], an: c === 'Ag' && a === 'OH' ? 'O²⁻' : ION[a][0], cc: '#ffe2b8', ac: '#d6e4ff', sp1: ION[c === x.c ? y.c : x.c][0], sp2: ION[a === x.a ? y.a : x.a][0] } }; } }
   const has = (c, a) => (x.c === c && y.a === a) || (y.c === c && x.a === a);
   if (has('H', 'CO3')) return { kind: 'gas', gas: 'CO2', obs: 1, type: 2, text: 'Lots of fizzing: colorless CO₂ gas bubbles out.', tube: { bubbles: 26 } };
-  if (has('NH4', 'OH')) return { kind: 'gas', gas: 'NH3', obs: 1, type: 2, text: 'A sharp ammonia smell. Moist red litmus held over the tube turns blue.', tube: { smell: 1, litmus: '#5d8df0' } };
+  if (has('NH4', 'OH')) return { kind: 'gas', gas: 'NH3', obs: 1, type: 2, text: 'Moist red litmus held over the tube turns blue, and there is a sharp ammonia smell (wafted).', tube: { smell: 1, litmus: '#5d8df0' } };
   if (has('H', 'OH')) return { kind: 'neutral', obs: 2, type: 1, text: 'No visible change, but the test tube feels warm.', tube: { heat: 1, glow: 1 } };
   return { kind: 'none', obs: 4, type: 4, text: 'Nothing happens: the mixture stays clear, with no temperature change.', tube: {}, ions: [ION[x.c][0], ION[x.a][0], ION[y.c][0], ION[y.a][0]] };
 }
