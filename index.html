@@ -620,6 +620,7 @@ button:disabled{cursor:not-allowed}
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
 <script src="https://itsdrdan.github.io/games/brand/icons.js" defer></script>
 <script src="https://itsdrdan.github.io/games/brand/embed.js" defer></script>
+<script src="classes.js"></script>
 </head>
 <body><canvas id="celebrationCanvas" aria-hidden="true" hidden></canvas><div class="toasts" id="toasts" aria-live="polite"></div>
 <header class="topbar"><div class="tb">
@@ -2433,6 +2434,12 @@ const SECTIONS = [
   { key: '25784', alt: ['1', '25786'], name: 'Dr. Dan · CHEM 3A · 25784/25786', labs: ['0a', '1a', '3z', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '12a', '12b'] },
   { key: '25787', alt: ['2', '25788'], name: 'Dr. Dan and Professor Xiong’s Lab Section · 25787/25788', labs: ['0a', '1a', '3a', '4b', '5a', '6a', '7a', '8a', '9a', '10a', '11a', '12a', '12b'] }
 ];
+// Other professors' lab lists from their public Simple Syllabus syllabi (classes.js). Links: ?prof=uvarov or ?sec=25790.
+const OTHER = ((window.SR_CLASSES || {}).profs || []).filter(x => x && x.key && Array.isArray(x.labs));
+const LAB_EXTRA = Object.fromEntries((window.SR_LAB_NAMES || []).filter(x => !x[2]).map(x => [x[0], x[1]]));
+const otherBy = v => { v = String(v || '').toLowerCase().replace(/^(professor|prof\.?|dr\.?)\s+/, '').trim(); return v ? OTHER.find(x => x.key === v || x.name.toLowerCase().endsWith(' ' + v)) : null; };
+const cleanName = v => { v = String(v || '').replace(/[<>"]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40); if (!v) return ''; return /\s/.test(v) || /[A-Z]/.test(v) ? v : 'Professor ' + v.charAt(0).toUpperCase() + v.slice(1); };
+const missingLabs = ids => (ids || []).filter(id => !labById(id)).map(id => `Exp ${id} ${LAB_EXTRA[id] || ''}`.trim());
 const RANKS = [[0, 'Lab Rookie'], [60, 'Goggles On'], [150, 'Meniscus Reader'], [300, 'Data Cruncher'], [500, 'Station Pro'], [800, 'Practical Ace'], [1200, 'Lab Legend']];
 const ACH = [
   ['first', 'First Station', 'Get your first answer right', 'stars', P => P.correct >= 1],
@@ -2455,8 +2462,10 @@ function load() { try { P = Object.assign(fresh(), JSON.parse(localStorage.getIt
 function save() { try { P.sel = [...state.sel]; localStorage.setItem(STORE, JSON.stringify(P)); } catch (e) {} }
 function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { if (!el.dataset.painted && window.ddIcon) { el.insertAdjacentHTML('afterbegin', ico(el.dataset.icon)); el.dataset.painted = 1; } }); }
 const labPick = () => P.labPick || { kind: 'all' };
-const labSet = () => { const k = labPick(); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
-const labPickName = () => { const k = labPick(); return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
+const labIds = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).labs || LABS.map(l => l.id); if (k.kind === 'link') return k.labs && k.labs.length ? k.labs : LABS.map(l => l.id); return null; };
+const labSet = () => { const k = labPick(), li = labIds(); if (li) return li.filter(id => labById(id)); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
+const labPickName = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o ? `${o.name}’s class` : 'Your class'; } if (k.kind === 'link') return k.prof ? `${k.prof}’s class` : 'Your class’s labs'; return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
+const profOf = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).name || ''; if (k.kind === 'link') return k.prof || ''; if (k.kind === 'sec') return k.sec === '25787' ? 'Dr. Dan / Professor Xiong' : 'Dr. Dan'; if (k.kind === 'dan') return 'Dr. Dan'; return ''; };
 const labTitle = id => `Exp ${id} · ${labById(id).name}`;
 function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.ddTrack({ game: 'labpractical', course: '3A', mode, topic: `Exp ${q.lab} ${q.labName} · ${q.tag}`, correct: !!ok, tries: ok ? '' : 'slip:' + (slip || 'other'), slip: ok ? '' : (slip || 'other') }); } catch (e) {} }
 
@@ -3651,22 +3660,26 @@ function setMode(m) {
 function setCompact(on) { P.compact = !!on; document.body.classList.toggle('compact', !!on); save(); renderLabset(); }
 function renderLabset() {
   const n = labSet().length, k = labPick();
-  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'In Dr. Dan’s class? Pick your section. Not? Choose your labs' : 'Change labs'}</button>${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
+  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'Pick your professor or choose your labs' : 'Change labs'}</button>${missingLabs(labIds()).length ? `<span class="small-note">Not in the game yet: ${esc(missingLabs(labIds()).join(', '))}</span>` : ''}${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
   $('setToggle').onclick = openLabPicker; const hb = $('howBtn'); if (hb) hb.onclick = () => setCompact(false);
 }
 function applyLabPick(pick) {
-  P.labPick = pick; state.sel = new Set(labSet()); save(); renderLabset();
+  P.labPick = pick; state.sel = new Set(labSet()); save(); renderLabset(); window.ddProfessor = profOf();
   if (state.mode === 'practice') { renderLabTiles(); newQuestion(); } if (state.mode === 'bench') renderBench(); if (state.mode === 'vlab') renderVLab();
 }
 function openLabPicker() {
   const k = labPick(), custom = new Set(k.custom || []);
-  const opt = (val, title, sub) => `<label class="lp-opt"><input type="radio" name="lp" value="${val}" ${val === (k.kind === 'sec' ? 'sec:' + k.sec : k.kind) ? 'checked' : ''}><span><b>${title}</b><small>${sub}</small></span></label>`;
+  const cur = k.kind === 'sec' ? 'sec:' + k.sec : k.kind === 'prof' ? 'prof:' + k.prof : k.kind;
+  const opt = (val, title, sub) => `<label class="lp-opt"><input type="radio" name="lp" value="${val}" ${val === cur ? 'checked' : ''}><span><b>${title}</b><small>${sub}</small></span></label>`;
   $('lpBody').innerHTML = `<p class="small-note">Your choice is saved on this device, so you only pick once.</p>
     ${SECTIONS.map(x => opt('sec:' + x.key, esc(x.name), `${x.labs.length} labs`)).join('')}
+    ${OTHER.map(x => { const n = x.labs.filter(id => labById(id)).length, miss = missingLabs(x.labs); return opt('prof:' + x.key, esc(x.name) + ' · CHEM 3A', `${n} labs, from the ${esc(x.term)} syllabus${miss.length ? ` (${esc(miss.join(', '))} not in the game yet)` : ''}`); }).join('')}
+    ${k.kind === 'link' ? opt('link', esc(labPickName()), `${labSet().length} labs, set by your professor’s link`) : ''}
     ${opt('all', 'All CHEM 3A labs', 'Every lab in the game, old and new')}
-    ${opt('custom', 'I don’t have Dr. Dan: let me choose my labs', 'Check the labs your class did')}
+    ${opt('custom', 'My professor isn’t listed: let me choose my labs', 'Check the labs your class did')}
     <div class="lp-grid" id="lpGrid">${LABS.map(l => `<label><input type="checkbox" value="${l.id}" ${custom.has(l.id) ? 'checked' : ''}> <b>Exp ${l.id}</b> ${esc(l.name)}</label>`).join('')}</div>
-    <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb"></p>`;
+    <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb"></p>
+    <p class="small-note">Instructor? <a href="setup.html" target="_blank" rel="noopener">Set this game up for your class</a> and get a Canvas link that opens with your labs.</p>`;
   const grid = $('lpGrid'), sync = () => { grid.hidden = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value !== 'custom'; };
   $('lpBody').querySelectorAll('input[name=lp]').forEach(r => (r.onchange = sync)); sync();
   grid.addEventListener('change', () => { const c = document.querySelector('#lpBody input[value=custom]'); if (c) c.checked = true; });
@@ -3674,7 +3687,9 @@ function openLabPicker() {
     const v = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value;
     if (!v) return;
     if (v === 'custom') { const ids = [...grid.querySelectorAll('input:checked')].map(x => x.value); if (!ids.length) { const f = $('lpFb'); f.className = 'feedback bad'; f.style.display = 'block'; f.textContent = 'Check at least one lab.'; return; } applyLabPick({ kind: 'custom', custom: ids }); }
-    else if (v.startsWith('sec:')) applyLabPick({ kind: 'sec', sec: v.slice(4) }); else applyLabPick({ kind: v });
+    else if (v.startsWith('sec:')) applyLabPick({ kind: 'sec', sec: v.slice(4) });
+    else if (v.startsWith('prof:')) applyLabPick({ kind: 'prof', prof: v.slice(5) });
+    else if (v === 'link') applyLabPick(k); else applyLabPick({ kind: v });
     $('lpDialog').close();
   };
   try { $('lpDialog').showModal(); } catch (e) { $('lpDialog').setAttribute('open', ''); }
@@ -3759,8 +3774,16 @@ function init() {
   const ls = (sp.get('labs') || '').toLowerCase();
   const sec = (sp.get('sec') || sp.get('section') || '').trim();
   const secHit = SECTIONS.find(x => x.key === sec || (x.alt || []).includes(sec));
-  if (sec && secHit) P.labPick = { kind: 'sec', sec: secHit.key };
+  const secOther = sec && !secHit ? OTHER.find(x => (x.sections || []).includes(sec)) : null;
+  const profRaw = (sp.get('prof') || sp.get('professor') || '').trim(), profHit = otherBy(profRaw);
+  const linkLabs = [...new Set(ls.split(/[\s,;]+/).map(x => x.replace(/^exp/, '')).filter(x => /^\d{1,2}[a-z]$/.test(x)))];
+  if (linkLabs.length) P.labPick = { kind: 'link', labs: linkLabs, prof: profHit ? profHit.name : /^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw) ? 'Dr. Dan' : cleanName(profRaw) };
+  else if (sec && secHit) P.labPick = { kind: 'sec', sec: secHit.key };
+  else if (secOther) P.labPick = { kind: 'prof', prof: secOther.key };
+  else if (profHit) P.labPick = { kind: 'prof', prof: profHit.key };
+  else if (/^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw)) P.labPick = { kind: 'dan' };
   else if (['dan', 'class', 'current', 'fcc'].includes(ls) && !P.labPick) P.labPick = { kind: 'dan' };
+  window.ddProfessor = profOf() || (profRaw ? cleanName(profRaw) : '');
   save();
   state.sel = new Set((P.sel || []).filter(id => labSet().includes(id)));
   if (!state.sel.size) state.sel = new Set(labSet());
