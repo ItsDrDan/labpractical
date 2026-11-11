@@ -1424,7 +1424,7 @@ const K0a = {
   volumetric() {
     const [kind, cap, tol] = pick([['pipet', 10, '0.02'], ['pipet', 25, '0.03'], ['flask', 25, '0.03'], ['flask', 50, '0.05'], ['flask', 100, '0.08']]);
     return { tag: `Volumetric ${kind}`, prompt: `This <b>${cap} mL volumetric ${kind}</b> is filled exactly to the etched line. Record the volume it ${kind === 'pipet' ? 'delivers' : 'holds'}.`, art: volumetricSVG(kind, cap, tol),
-      parts: [num(cap, { dp: 2, unit: 'mL', tol: 0.001 })], hint: 'Volumetric glassware measures only one volume, to two decimal places.', solution: `Record <b>${cap.toFixed(2)} mL</b>. Volumetric glassware is accurate to two decimal places.`, video: 'sigfig', skill: 'read' };
+      parts: [num(cap, { dp: 2, unit: 'mL', tol: 0.001 })], hint: 'A volumetric flask or pipet is made for one volume. Record that volume the way your lab manual does: to two decimal places (like 10.00 mL).', solution: `Record <b>${cap.toFixed(2)} mL</b>. The ± ${tol} mL printed on the glass is its tolerance (how close to ${cap} mL it is guaranteed to be); your manual records volumetric glassware to two decimal places.`, video: 'sigfig', skill: 'read' };
   },
   balance() {
     let v = rnd(20, 95, 4); let s = v.toFixed(4); if (chance(0.45)) s = s.slice(0, -1) + '0';
