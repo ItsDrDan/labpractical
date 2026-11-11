@@ -34,7 +34,8 @@ window.SR_CLASSES = {
 /* Professors added by hand (no public syllabus to read). tools/update_classes.py leaves this list alone.
    labs: [] means they check their own labs on setup.html. */
 window.SR_EXTRA_PROFS = [
-  { key: 'lacey', name: 'Professor Lacey', term: '', sections: [], syllabus: '', labs: [] }
+  { key: 'lacey', name: 'Professor Lacey', term: '', sections: [], syllabus: '', labs: [] },
+  { key: 'gruet', name: 'Professor Gruet', term: '', sections: [], syllabus: '', labs: [] }
 ];
 (function () { var c = window.SR_CLASSES, have = {}; c.profs.forEach(function (p) { have[p.key] = 1; });
   (window.SR_EXTRA_PROFS || []).forEach(function (p) { if (!have[p.key]) c.profs.push(p); }); })();
