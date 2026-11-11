@@ -622,6 +622,7 @@ button:disabled{cursor:not-allowed}
 <script src="https://itsdrdan.github.io/games/brand/icons.js" defer></script>
 <script src="https://itsdrdan.github.io/games/brand/embed.js" defer></script>
 <script src="classes.js"></script>
+<script>if (!window.SR_CLASSES) document.write('<script src="https://itsdrdan.github.io/labpractical/classes.js"><\/script>');</script>
 </head>
 <body><canvas id="celebrationCanvas" aria-hidden="true" hidden></canvas><div class="toasts" id="toasts" aria-live="polite"></div>
 <header class="topbar"><div class="tb">
@@ -903,6 +904,9 @@ const UNIT_ALIASES = {
 const normUnit = s => String(s).toLowerCase().replace(/\s+/g, '').replace(/[⁻]/g, '-').replace(/[¹]/g, '1').replace(/[³]/g, '3').replace(/[º˚]/g, '°').replace(/·/g, '·');
 function unitOk(raw, unit) {
   if (!unit) return true;
+  const r0 = String(raw == null ? '' : raw).trim();
+  if (unit === 'M' && /^m$/.test(r0)) return false;          // lowercase m is molality, not molarity
+  if (unit === 'mol/kg' && /^M$/.test(r0)) return false;     // capital M is molarity, not molality
   const t = normUnit(raw); if (!t) return false;
   const list = (UNIT_ALIASES[unit] || [unit]).map(normUnit).concat([normUnit(unit)]);
   return list.includes(t) || list.includes(t.replace(/[·*]/g, ''));
@@ -910,6 +914,7 @@ function unitOk(raw, unit) {
 
 /* ---------- grading one numeric part ----------
    spec: {type:'num', v, sf | dp, unit, tol (absolute), rel (relative, default 0.006)}  */
+const rawTail = raw => String(raw == null ? '' : raw).trim().replace(/^[+\-−–]?\s*(\d[\d,]*\.?\d*|\.\d+)(\s*([eE]|[x×*·]\s*10\^?)\s*\(?[+\-−–]?\d+\)?)?/, '').trim();
 function splitNum(raw) {
   const c = cleanTyped(raw).replace(/\(([+-]?\d+)\)/g, '$1');
   const m = c.match(/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+|x10\^?[+-]?\d+)?/);
@@ -918,13 +923,16 @@ function splitNum(raw) {
 }
 function gradeNum(spec, raw, unitRaw, needUnit) {
   const sp = splitNum(raw), u = sp ? parseEntry(sp.num) : null;
-  if (needUnit && spec.unit && !String(unitRaw || '').trim() && sp) { if (sp.tail) unitRaw = sp.tail; }
+  if (needUnit && spec.unit && !String(unitRaw || '').trim() && sp) { if (sp.tail) unitRaw = rawTail(raw); }
+  // a unit typed right after the number must be the right one (practice shows the unit, but "10.00 kg" for mL is still wrong)
+  if (!needUnit && sp && sp.tail && spec.unit && /[a-z%°]/i.test(rawTail(raw)) && !unitOk(rawTail(raw), spec.unit))
+    return { score: 0, ok: false, valueOk: false, note: `Check the unit: this answer is in <b>${spec.unit}</b>.` };
   if (!u) return { score: 0, ok: false, valueOk: false, note: 'Type a number (you can use 3.2E-5 for scientific notation).' };
   const x = toNum(u.d);
   const v = spec.v, tol = needUnit && spec.rtol != null ? spec.rtol : spec.tol != null ? spec.tol : Math.max(Math.abs(v) * (spec.rel != null ? spec.rel : 0.006), 1e-12);
   let valueOk = Math.abs(x - v) <= tol + 1e-12;
   // their number may simply be rounded to a different number of sig figs
-  if (!valueOk && u.sf >= 1 && u.sf <= 8) { const r = Number(v.toPrecision(u.sf)); if (Math.abs(x - r) <= Math.abs(r) * 1e-9 + 1e-15) valueOk = 'rounded'; }
+  if (!valueOk && u.sf >= (spec.sf != null ? Math.max(1, spec.sf - 1) : 1) && u.sf <= 8) { const r = Number(v.toPrecision(u.sf)); if (Math.abs(x - r) <= Math.abs(r) * 1e-9 + 1e-15) valueOk = 'rounded'; }
   if (!valueOk && spec.dp != null) { const r = +v.toFixed(Math.max(0, u.dp)); if (Math.abs(x - r) < 1e-9 && Math.abs(x - v) <= Math.max(tol * 4, 0.5 * Math.pow(10, -u.dp))) valueOk = 'rounded'; }
   let precOk = true, precNote = '';
   // "110" for a 3-sig-fig answer is ambiguous (trailing zeros with no decimal point), so accept it
@@ -983,7 +991,7 @@ const TYPED_SYN = {
   'went up': ['up', 'increased', 'increase', 'rose', 'higher', 'warmer', 'got warmer', 'hotter', 'went up'], 'went down': ['down', 'decreased', 'decrease', 'dropped', 'fell', 'lower', 'colder', 'cooler', 'got colder', 'went down'],
   'exothermic': ['exo', 'exothermic'], 'endothermic': ['endo', 'endothermic'], 'emitted': ['emitted', 'released', 'given off', 'emits', 'releases', 'emission', 'give off', 'gives off'], 'absorbed': ['absorbed', 'absorbs', 'absorption', 'taken in', 'absorb'],
   'precipitation': ['precipitation', 'precipitate', 'ppt'], 'acid base neutralization': ['neutralization', 'neutralisation', 'acid base', 'acid base neutralization', 'neutralizing'], 'gas evolution': ['gas evolution', 'gas forming', 'gas formation', 'gas evolving', 'gas producing'], 'redox': ['redox', 'oxidation reduction'], 'combustion': ['combustion', 'burning'], 'no reaction': ['no reaction', 'none', 'nr', 'no rxn'],
-  'combination': ['combination', 'synthesis'], 'decomposition': ['decomposition'], 'single displacement': ['single displacement', 'single replacement'], 'double displacement': ['double displacement', 'double replacement', 'metathesis'],
+  'combination': ['combination', 'synthesis'], 'violet': ['violet', 'purple', 'indigo'], 'decomposition': ['decomposition'], 'single displacement': ['single displacement', 'single replacement'], 'double displacement': ['double displacement', 'double replacement', 'metathesis'],
   'acidic': ['acidic', 'acid'], 'about neutral': ['neutral', 'about neutral', 'nearly neutral'], 'basic': ['basic', 'base', 'alkaline'],
   's': ['s', 'solid'], 'l': ['l', 'liquid'], 'g': ['g', 'gas'], 'aq': ['aq', 'aqueous'], 'solid': ['s', 'solid'], 'liquid': ['l', 'liquid'], 'aqueous': ['aq', 'aqueous', 'dissolved'],
   'type i ionic': ['type i', 'type 1', 'type one', 'type i ionic'], 'type ii ionic': ['type ii', 'type 2', 'type two', 'type ii ionic'], 'molecular': ['molecular', 'covalent', 'molecular covalent'], 'acid': ['acid'],
@@ -992,6 +1000,22 @@ const TYPED_SYN = {
   'volumetric pipet': ['volumetric pipet', 'volumetric pipette'], 'transfer pipet': ['transfer pipet', 'transfer pipette', 'plastic pipet', 'disposable pipet', 'dropper'], 'graduated cylinder': ['graduated cylinder', 'grad cylinder'], 'erlenmeyer flask': ['erlenmeyer flask', 'erlenmeyer', 'conical flask'], 'buret': ['buret', 'burette']
 };
 const tv = v => String(v == null ? '' : v).replace(/^T:/, '');
+// "these are NOT isotopes": a keyword right after "is/are not" (or isn't/aren't) is a denial, so it doesn't count.
+// Verb negations stay fine ("so heat does not escape", "to not burn yourself" are right answers).
+const DENY = /\b(is|are|was|were|be|it s|they re|that s) not( (a|an|the|really|actually))?$|\b(isn|aren|wasn|weren) t( (a|an|the|really|actually))?$/;
+function kwHit(t, w) {
+  if (/^(not|no|never|isn|aren|don|doesn|can)\b/.test(normWords(w))) return t.includes(w);
+  let i = t.indexOf(w);
+  while (i >= 0) { if (!DENY.test(t.slice(0, i).trim())) return true; i = t.indexOf(w, i + 1); }
+  return false;
+}
+// the claim part of an answer ("higher" in "higher, because the volume is too low")
+function claimOf(raw) {
+  const r = String(raw).trim();
+  if (/^(because|since|as)\b/i.test(r)) { const k = r.indexOf(','); return ' ' + normWords(k >= 0 ? r.slice(k + 1) : r) + ' '; }
+  const so = r.split(/\b(?:so|therefore|thus|which means|making)\b/i); if (so.length > 1) return ' ' + normWords(so[so.length - 1]) + ' ';
+  return ' ' + normWords(r.split(/,|;|\bbecause\b|\bsince\b|\bdue to\b/i)[0]) + ' ';
+}
 function optHit(o, t, raw, fuzzy) {
   const label = String(o).replace(/<[^>]+>/g, ''), nums = label.match(/\d+(\.\d+)?/g), x = parseFloat((String(raw).match(/\d+(\.\d+)?/) || [])[0]);
   if (/°/.test(label) && nums) return isFinite(x) && Math.abs(x - parseFloat(nums[0])) <= 1.6;
@@ -1003,7 +1027,7 @@ function gradeTyped(p, raw) {
   const t = ' ' + normWords(raw) + ' ';
   if (!t.trim()) return { score: 0, ok: false, empty: true, note: '' };
   const whyTyped = () => { const h = (p.whyKw || []).find(([ws]) => ws.some(w => t.includes(w))); return h ? h[1] : ''; };
-  if (p.kw) { const ok = p.kw.every(g => g.some(w => t.includes(w))) && !(p.nokw || []).some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : whyTyped() || p.kwNote || '' }; }
+  if (p.kw) { const c = p.obs ? t : claimOf(raw); const ok = p.kw.every(g => g.some(w => kwHit(t, w))) && !(p.nokw || []).some(w => c.includes(w) && kwHit(c, w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : whyTyped() || p.kwNote || '' }; }
   let hits = p.options.map(o => optHit(o, t, raw, false)); if (!hits.some(Boolean)) hits = p.options.map(o => optHit(o, t, raw, true)); const n = hits.filter(Boolean).length, ok = hits[p.ok] && n === 1;
   return { score: ok ? 1 : 0, ok, note: ok ? '' : n > 1 ? 'Give just one answer.' : (n === 1 && p.why && p.why[hits.findIndex(Boolean)]) || whyTyped() };
 }
@@ -1017,9 +1041,10 @@ function gradeIons(p, raw) {
   raw = supDigits(raw);
   const t = ' ' + normWords(raw).replace(/(\d)\s*([+-]|plus|minus)/g, '$1') + ' ', has = ion => ION_WORDS[ion].some(w => new RegExp(`(^|\\s|\\d)${w}(?=\\s|\\d|$)`).test(t));
   if (!t.trim()) return { score: 0, ok: false, empty: true, note: '' };
-  if (p.none) { const ok = /\bno(ne)?\b|nothing|no spectator/.test(t); return { score: ok ? 1 : 0, ok, note: '' }; }
-  const miss = p.spec.filter(x => !has(x)), extra = p.react.filter(x => has(x)), ok = !miss.length && !extra.length;
-  return { score: ok ? 1 : miss.length < p.spec.length && !extra.length ? 0.5 : 0, ok, note: ok ? '' : extra.length ? 'One of the ions you listed is in the solid, gas or water that forms, so it is not a spectator.' : 'Name every ion that stays dissolved and unchanged.' };
+  const named = Object.keys(ION_WORDS).filter(has);
+  if (p.none) { const ok = /\bno(ne)?\b|nothing|no spectator/.test(t) && !named.length; return { score: ok ? 1 : 0, ok, note: ok ? '' : named.length ? 'If every ion reacts, there are no spectators: don’t list any ions.' : '' }; }
+  const miss = p.spec.filter(x => !has(x)), extra = named.filter(x => !p.spec.includes(x)), ok = !miss.length && !extra.length;
+  return { score: ok ? 1 : miss.length < p.spec.length && !extra.length ? 0.5 : 0, ok, note: ok ? '' : extra.some(x => p.react.includes(x)) ? 'One of the ions you listed is in the solid, gas or water that forms, so it is not a spectator.' : extra.length ? 'List only ions that are in these two solutions.' : 'Name every ion that stays dissolved and unchanged.' };
 }
 function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'ions') return gradeIons(p, val);
@@ -1031,7 +1056,7 @@ function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.whyText) { const tw = ' ' + normWords(val) + ' ', h = p.whyText.find(([ws]) => ws.some(w => tw.includes(' ' + w + ' '))); if (h) return { score: 0, ok: false, note: h[1] }; } if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
   if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
-  if (p.type === 'coef') { const got = String(val).split(',').map(s => parseInt(s, 10)); const ok = p.vals.every((c, i) => (got[i] || (got[i] === 0 ? 0 : 1)) === c); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Count each element on both sides. Use the smallest whole numbers.' }; }
+  if (p.type === 'coef') { const raw = String(val).split(',').map(x => x.trim()); if (raw.length !== p.vals.length || raw.some(x => x !== '' && !/^[1-9]\d*$/.test(x))) return { score: 0, ok: false, note: 'Use whole numbers only, one in each box (leave a box blank or write 1 for a coefficient of 1).' }; const got = raw.map(x => (x === '' ? 1 : +x)); const ok = p.vals.every((c, i) => got[i] === c); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Count each element on both sides. Use the smallest whole numbers.' }; }
   return { score: 0, ok: false };
 }
 const NUM = (v, o) => Object.assign({ type: 'num', v }, o);
@@ -1363,7 +1388,7 @@ const EQ_SYN = {
   erlenmeyer: ['erlenmeyer flask', 'erlenmeyer', 'conical flask', 'erlenmyer flask', 'erlenmeyer flask'], volflask: ['volumetric flask'], transferpipet: ['transfer pipet', 'transfer pipette', 'plastic pipet', 'disposable pipet', 'pasteur pipet', 'dropper', 'plastic pipette'],
   volpipet: ['volumetric pipet', 'volumetric pipette'], pipetbulb: ['pipet bulb', 'pipette bulb', 'pipet pump', 'pipette pump', 'bulb', 'pipet filler', 'rubber bulb'], buret: ['buret', 'burette'], buretclamp: ['buret clamp', 'burette clamp', 'double buret clamp'],
   bunsen: ['bunsen burner', 'burner', 'bunsen'], funnel: ['funnel', 'glass funnel', 'filter funnel'], washbottle: ['wash bottle', 'squirt bottle', 'di water bottle'], tongs: ['crucible tongs', 'tongs'], scoopula: ['scoopula', 'spatula', 'scoop'],
-  ringstand: ['ring stand', 'ring stand with rings', 'ring stand with ring', 'iron ring', 'ring clamp', 'support stand', 'bench stand', 'ring stand and iron ring'], utilityclamp: ['utility clamp', 'clamp', 'three finger clamp', '3 finger clamp', 'extension clamp'], clampholder: ['clamp holder', 'boss head', 'clamp holder boss', 'bosshead']
+  ringstand: ['ring stand', 'ring stand with rings', 'ring stand with ring', 'iron ring', 'ring clamp', 'support stand', 'bench stand', 'ring stand and iron ring'], utilityclamp: ['utility clamp', 'three finger clamp', '3 finger clamp', 'extension clamp'], clampholder: ['clamp holder', 'boss head', 'clamp holder boss', 'bosshead']
 };
 
 /* ===================== Question bank, part 1 =====================
@@ -1420,7 +1445,7 @@ const K0a = {
   equipUse() {
     const e = pick(EQ_NAMING.filter(x => ['measure', 'heat', 'move'].includes(x[3])));
     return { tag: 'What is it for?', prompt: `Which piece of equipment <b>${e[2]}</b>? Type its name.`, parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })],
-      hint: `Think about the labs where you had to ${e[3] === 'measure' ? 'measure something' : e[3] === 'heat' ? 'heat something' : 'move or transfer something'}.`, solution: `The <b>${e[1].toLowerCase()}</b> ${e[2]}.`, video: 'practical1', skill: 'equip' };
+      hint: `It starts with “${e[1][0]}”. Check the Equipment List page at the front of your lab manual.`, solution: `The <b>${/^(Büchner|Bunsen|Erlenmeyer)/.test(e[1]) ? e[1] : e[1].charAt(0).toLowerCase() + e[1].slice(1)}</b> ${e[2]}.`, video: 'practical1', skill: 'equip' };
   }
 };
 
@@ -1496,6 +1521,16 @@ const K3a = {
     return { tag: 'Photon energy', prompt: `What is the energy of one photon of <b>${nm} nm</b> light?`, eq: 'E = hc / λ &nbsp;&nbsp; h = 6.626 × 10<sup>−34</sup> J·s &nbsp;&nbsp; c = 2.998 × 10<sup>8</sup> m/s',
       parts: [num(E, { sf: 3, unit: 'J' })], hint: 'Convert nm to m first.', solution: `E = (6.626 × 10⁻³⁴)(2.998 × 10⁸) ÷ (${nm} × 10⁻⁹) = <b>${sfHTML(E, 3)} J</b>.`, video: 'light', skill: 'calc' };
   },
+  rydberg() {
+    const LINES = [[3, 'Red'], [4, 'Green (blue-green)'], [5, 'Violet']], k = rint(0, 2), ni = LINES[k][0], lam = 1 / ((1 / 91.13) * (1 / 4 - 1 / (ni * ni)));
+    const all = LINES.map(l => 1 / ((1 / 91.13) * (1 / 4 - 1 / (l[0] * l[0]))));
+    const colors = LINES.map(l => l[1]), why = LINES.map((l, i) => [l[1], `${l[1].replace(/ \(.*\)/, '')} is the n = ${l[0]} → 2 line (${all[i].toFixed(1)} nm). A bigger drop gives more energy and a shorter wavelength: 3→2 red, 4→2 green, 5→2 violet.`, []]).filter((x, i) => i !== k);
+    return { tag: 'Rydberg equation', prompt: `Use the Rydberg equation to calculate the wavelength of the hydrogen line made when an electron falls from <b>n = ${ni}</b> to <b>n = 2</b>. What color is this line?`, eq: '1/λ = (1 / 91.13 nm)(1/n<sub>f</sub><sup>2</sup> − 1/n<sub>i</sub><sup>2</sup>)',
+      parts: [num(lam, { sf: 4, unit: 'nm', label: 'Wavelength', slip: x => Math.abs(x - 1 / lam) < 0.01 / lam ? 'That is 1/λ. Take 1 ÷ your answer to get λ in nm.' : Math.abs(x + lam) < lam * 0.01 ? 'n<sub>f</sub> is the level it falls <b>to</b> (2) and n<sub>i</sub> is where it starts, so the answer is positive.' : Math.abs(x - 1 / ((1 / 91.13) * (1 / 2 - 1 / ni))) < 2 ? 'Square both n values (2² = 4, ' + ni + '² = ' + ni * ni + ').' : '' }),
+        attachWhy(choice(colors, k, { label: 'Color of the line' }), why)],
+      hint: 'n<sub>f</sub> = 2 and n<sub>i</sub> = the starting level. Work out the bracket, divide by 91.13, then flip (1 ÷ answer) to get λ.',
+      solution: `1/λ = (1/91.13)(1/2² − 1/${ni}²) = (1/91.13)(${(1 / 4 - 1 / (ni * ni)).toFixed(5)}) = ${(1 / lam).toFixed(7)} nm⁻¹, so λ = <b>${sfHTML(lam, 4)} nm</b>: the <b>${colors[k].toLowerCase()}</b> line (91.13 has 4 sig figs; n values are exact).`, video: 'light', skill: 'calc' };
+  },
   bohr() {
     const emit = chance(0.5);
     return { tag: 'Bohr model', prompt: emit ? 'In the Bohr model, an electron moves from n = 4 down to n = 2. Is light emitted or absorbed?' : 'In the Bohr model, an electron moves from n = 1 up to n = 3. Is energy emitted or absorbed?',
@@ -1512,12 +1547,12 @@ const K3z = {
   flame() {
     const uniq = FLAME.filter(f => FLAME.filter(g => g[2] === f[2]).length === 1), f = pick(uniq);
     return { tag: 'Flame test', prompt: `A paint sample is held in the flame. The flame turns <b>${f[2].toLowerCase()}</b>. Which metal is in the sample? (Type the name or symbol.)`, art: flameSVG(f[3], `A Bunsen burner flame colored ${f[2]}`), ref: flameTable(),
-      parts: [textPart([f[0].replace(/ \(.*\)/, ''), f[1], f[0]], { ans: `${f[0]} (${f[1]})`, check: null })], hint: 'Find the color in the table. Only one element gives this color.', solution: `<b>${f[0]} (${f[1]})</b> gives a ${f[2].toLowerCase()} flame.`, video: 'light', skill: 'read' };
+      parts: [textPart([f[0].replace(/ \(.*\)/, ''), f[1], f[0]], { ans: `${f[0]} (${f[1]})`, check: null })], hint: 'Find the color in the table. Only one element gives this color.', solution: `<b>${f[0]} (${f[1]})</b> gives ${/^[aeiou]/i.test(f[2]) ? 'an' : 'a'} ${f[2].toLowerCase()} flame.`, video: 'light', skill: 'read' };
   },
   flameMany() {
     const colors = ['Red', 'Green', 'Blue'], c = pick(colors), list = FLAME.filter(f => f[2] === c);
     return { tag: 'One color, many metals', prompt: `A flame test gives a <b>${c.toLowerCase()}</b> flame. Can you identify a single element from this color alone? Explain.`, art: flameSVG(list[0][3], `A ${c} flame`), ref: flameTable(),
-      parts: [choice([`No. ${list.map(x => x[1]).join(', ')} all give a ${c.toLowerCase()} flame`, `Yes. Only ${list[0][0]} gives a ${c.toLowerCase()} flame`, 'Yes. Every element has its own flame color'], 0, { kw: [[' no ', 'not', 'cannot', 'can t', 'couldn t'], ['more than one', 'several', 'multiple', 'many', 'other', 'also', 'same color', 'both', ...list.flatMap(x => [x[0].toLowerCase().replace(/ \(.*\)/, ''), ' ' + x[1].toLowerCase() + ' '])]], kwNote: 'Say yes or no, and look at how many elements in the table give this color.' })], hint: 'Count how many rows of the table show this color.', solution: `<b>No.</b> ${list.map(x => x[0]).join(', ')} all burn ${c.toLowerCase()}, so you need another test (like the emission spectrum).`, video: 'light', skill: 'concept' };
+      parts: [choice([`No. ${list.map(x => x[1]).join(', ')} all give ${/^[aeiou]/i.test(c) ? 'an' : 'a'} ${c.toLowerCase()} flame`, `Yes. Only ${list[0][0]} gives ${/^[aeiou]/i.test(c) ? 'an' : 'a'} ${c.toLowerCase()} flame`, 'Yes. Every element has its own flame color'], 0, { kw: [[' no ', 'not', 'cannot', 'can t', 'couldn t'], ['more than one', 'several', 'multiple', 'many', 'other', 'also', 'same color', 'both', ...list.flatMap(x => [x[0].toLowerCase().replace(/ \(.*\)/, ''), ' ' + x[1].toLowerCase() + ' '])]], kwNote: 'Say yes or no, and look at how many elements in the table give this color.' })], hint: 'Count how many rows of the table show this color.', solution: `<b>No.</b> ${list.map(x => x[0]).join(', ')} all burn ${c.toLowerCase()}, so you need another test (like the emission spectrum).`, video: 'light', skill: 'concept' };
   },
   avgMass() {
     const region = pick(Object.keys(PB)), ab = PB[region], m = avgPb(ab);
@@ -1539,20 +1574,49 @@ const K3z = {
 };
 
 /* ---------------- Exp 4a (older): Law of Constant Composition ---------------- */
+function cuRun() {
+  const A = rnd(18, 24, 4), cu = rnd(0.95, 1.6, 4), sAdd = rnd(2.0, 4.0, 4), sR = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4);
+  const B = +(A + cu).toFixed(4), C = +(B + sAdd).toFixed(4), D = +(B + sR).toFixed(4);
+  const d = { A, B, C, D, cu: +(B - A).toFixed(4), sUsed: +(C - B).toFixed(4), comp: +(D - A).toFixed(4), sR: +(D - B).toFixed(4), ex: +(C - D).toFixed(4) };
+  d.sfR = Math.min(sfCount(d.cu.toFixed(4)), sfCount(d.sR.toFixed(4))); d.ratio = d.cu / d.sR; return d;
+}
+// the manual's data table (letters A–D are what the report's "How" column uses)
+const cuTable = (d, rows = 'ABCD') => tableHTML([['A', 'Crucible (empty)', d.A], ['B', 'Crucible + copper', d.B], ['C', 'Crucible + copper + sulfur', d.C], ['D', 'Crucible + copper and sulfur compound', d.D]].filter(r => rows.includes(r[0])).map(r => [r[0], r[1], `${r[2].toFixed(4)} g`]), ['', 'Mass of…', 'Mass']);
 const K4a = {
   massS() {
-    const cr = rnd(18, 24, 4), cu = rnd(0.95, 1.6, 4), s = cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3), prod = cr + cu + s;
-    return { tag: 'Mass of sulfur reacted', prompt: 'Copper was heated with excess sulfur to make a copper sulfide. How much <b>sulfur reacted</b> with the copper?', ref: tableHTML([['Mass of crucible + cover', `${cr.toFixed(4)} g`], ['Mass of crucible + cover + Cu', `${(cr + cu).toFixed(4)} g`], ['Mass of crucible + cover + product', `${prod.toFixed(4)} g`]]),
-      parts: [num(+(prod - cr - cu).toFixed(4), { dp: 4, unit: 'g', tol: 0.00015 })], hint: 'Sulfur reacted = product − copper. Subtracting keeps 4 decimal places.', solution: `(${prod.toFixed(4)} − ${cr.toFixed(4)}) − ${cu.toFixed(4)} = <b>${(prod - cr - cu).toFixed(4)} g S</b>.`, video: 'empirical', skill: 'calc' };
+    const d = cuRun();
+    return { tag: 'Mass of sulfur reacted', prompt: 'Copper wire was heated with excess sulfur. Use the data table to find the mass of <b>sulfur reacted</b> with the copper.', ref: cuTable(d, 'ABD'),
+      parts: [num(d.sR, { dp: 4, unit: 'g', tol: 0.00015, slip: x => Math.abs(x - d.comp) < 0.0002 ? 'D − A is the whole compound. Subtract the copper too: D − B.' : '' })], hint: 'The compound is copper + the sulfur that reacted, so sulfur reacted = D − B. Subtracting keeps 4 decimal places.', solution: `Sulfur reacted = D − B = ${d.D.toFixed(4)} − ${d.B.toFixed(4)} = <b>${d.sR.toFixed(4)} g S</b>.`, video: 'empirical', skill: 'calc' };
+  },
+  ratio() {
+    const d = cuRun();
+    return { tag: 'Mass ratio Cu / S (report Q1)', prompt: 'Use the data table to find the mass of copper reacted, the mass of sulfur reacted, and the <b>mass ratio of copper / sulfur</b> reacted.', ref: cuTable(d, 'ABCD'), eq: 'Mass ratio = g Cu reacted ÷ g S reacted',
+      parts: [num(d.cu, { dp: 4, unit: 'g', tol: 0.00015, label: 'Copper reacted (B − A)' }), num(d.sR, { dp: 4, unit: 'g', tol: 0.00015, label: 'Sulfur reacted (D − B)', slip: x => Math.abs(x - d.sUsed) < 0.0002 ? 'C − B is the sulfur you <b>added</b>. Most of it burned off; the sulfur that reacted is D − B.' : '' }),
+        num(d.ratio, { sf: d.sfR, unit: '', label: 'Mass ratio Cu / S', slip: x => Math.abs(x - 1 / d.ratio) < 0.01 / d.ratio ? 'That is S / Cu. Divide copper by sulfur.' : Math.abs(x - d.cu / d.sUsed) < 0.01 * d.cu / d.sUsed ? 'Use the sulfur that <b>reacted</b> (D − B), not the sulfur you added (C − B).' : '' })],
+      hint: 'Copper reacted = B − A (all of it reacts). Sulfur reacted = D − B (the compound minus the copper). Then divide Cu ÷ S.',
+      solution: `Cu = ${d.B.toFixed(4)} − ${d.A.toFixed(4)} = <b>${d.cu.toFixed(4)} g</b>. S reacted = ${d.D.toFixed(4)} − ${d.B.toFixed(4)} = <b>${d.sR.toFixed(4)} g</b>. Ratio = ${d.cu.toFixed(4)} ÷ ${d.sR.toFixed(4)} = <b>${sfHTML(d.ratio, d.sfR)}</b> (${d.sfR} sig figs). Pure Cu₂S gives about 3.96.`, video: 'empirical', skill: 'calc' };
+  },
+  excess() {
+    const d = cuRun();
+    return { tag: 'Sulfur used and excess sulfur', prompt: 'From the data table, how much sulfur did you <b>add</b>, and how much was <b>excess</b> (burned off as SO₂)?', ref: cuTable(d, 'BCD'),
+      parts: [num(d.sUsed, { dp: 4, unit: 'g', tol: 0.00015, label: 'Sulfur added (C − B)' }), num(d.ex, { dp: 4, unit: 'g', tol: 0.00015, label: 'Excess sulfur', slip: x => Math.abs(x - d.sR) < 0.0002 ? 'That is the sulfur that reacted. Excess = sulfur added − sulfur reacted.' : '' })],
+      hint: 'Sulfur added = C − B. Sulfur reacted = D − B. Excess = added − reacted (which works out to C − D).', solution: `Added = ${d.C.toFixed(4)} − ${d.B.toFixed(4)} = <b>${d.sUsed.toFixed(4)} g</b>. Reacted = D − B = ${d.sR.toFixed(4)} g. Excess = ${d.sUsed.toFixed(4)} − ${d.sR.toFixed(4)} = <b>${d.ex.toFixed(4)} g</b> (burned off as SO₂).`, video: 'empirical', skill: 'calc' };
+  },
+  pctDiff() {
+    const mine = +rnd(3.80, 4.12, 3).toFixed(3), others = Array.from({ length: 6 }, () => +rnd(3.84, 4.08, 3).toFixed(3)), avg = others.reduce((a, b) => a + b, 0) / others.length, pd = (mine - avg) / avg * 100;
+    return { tag: 'Percent difference from the class (Q2–Q3)', prompt: `Your Cu / S mass ratio was <b>${mine.toFixed(3)}</b>. Find the class average (other groups only) and the <b>percent difference</b> of your ratio from it.`,
+      ref: tableHTML([others.map(x => x.toFixed(3))], ['Group A', 'Group B', 'Group C', 'Group D', 'Group E', 'Group F']), eq: 'Percent difference = (your ratio − class ratio) ÷ class ratio × 100',
+      parts: [num(avg, { sf: 4, unit: '', label: 'Average class ratio (excluding yours)', rel: 0.0005, slip: x => Math.abs(x - (avg * 6 + mine) / 7) < 0.0006 ? 'Leave your own ratio out of the class average.' : '' }), num(pd, { unit: '%', label: 'Percent difference', rel: 0.03, tol: 0.06, ans: pd.toFixed(1), slip: x => Math.abs(x + pd) < 0.06 ? 'Your ratio − class ratio (keep the sign).' : Math.abs(x - (mine - avg) / mine * 100) < 0.06 ? 'Divide by the class ratio, not yours.' : '' })],
+      hint: 'Add the six group ratios and divide by 6. Then (yours − class) ÷ class × 100.', solution: `Class average = (${others.map(x => x.toFixed(3)).join(' + ')}) ÷ 6 = <b>${sfHTML(avg, 4)}</b>. (${mine.toFixed(3)} − ${sfHTML(avg, 4)}) ÷ ${sfHTML(avg, 4)} × 100 = <b>${pd.toFixed(1)}%</b>.`, video: 'empirical', skill: 'calc' };
   },
   formula() {
     const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), nCu = cu / 63.55, nS = s / 32.06, r = nCu / nS;
-    return { tag: 'Empirical formula', prompt: `A student heated <b>${cu.toFixed(4)} g Cu</b> with sulfur and found that <b>${s.toFixed(4)} g S</b> reacted. What is the <b>empirical formula</b> of the copper sulfide?`, ref: tableHTML([['Molar mass of Cu', '63.55 g mol⁻¹'], ['Molar mass of S', '32.06 g mol⁻¹']]),
+    return { tag: 'Empirical formula (extra: not on the 4a report)', prompt: `A student heated <b>${cu.toFixed(4)} g Cu</b> with sulfur and found that <b>${s.toFixed(4)} g S</b> reacted. What is the <b>empirical formula</b> of the copper sulfide?`, ref: tableHTML([['Molar mass of Cu', '63.55 g mol⁻¹'], ['Molar mass of S', '32.06 g mol⁻¹']]),
       parts: [{ type: 'formula', accept: ['Cu2S'], ans: fhtml('Cu2S') }], hint: 'Change each mass to moles, then divide both by the smaller number of moles. Round to a whole number.', solution: `mol Cu = ${cu.toFixed(4)} ÷ 63.55 = ${nCu.toFixed(5)} mol; mol S = ${s.toFixed(4)} ÷ 32.06 = ${nS.toFixed(5)} mol. Divide by the smaller: Cu ${r.toFixed(2)} : S 1.00 ≈ 2 : 1 → <b>${fhtml('Cu2S')}</b> (copper(I) sulfide).`, video: 'empirical', skill: 'calc' };
   },
   pctCu() {
     const cu = rnd(0.95, 1.6, 4), s = +(cu / (2 * 63.55) * 32.06 * rnd(0.97, 1.03, 3)).toFixed(4), pc = cu / (cu + s) * 100;
-    return { tag: 'Percent copper', prompt: `A student found that <b>${cu.toFixed(4)} g Cu</b> reacted with <b>${s.toFixed(4)} g S</b>. Calculate the <b>mass percent of copper</b> in the copper sulfide.`,
+    return { tag: 'Percent copper (extra: not on the 4a report)', prompt: `A student found that <b>${cu.toFixed(4)} g Cu</b> reacted with <b>${s.toFixed(4)} g S</b>. Calculate the <b>mass percent of copper</b> in the copper sulfide.`,
       parts: [num(pc, { sf: Math.min(sfCount(cu.toFixed(4)), sfCount((cu + s).toFixed(4))), unit: '%' })], hint: 'Mass of product = Cu + S. Percent Cu = (g Cu ÷ g product) × 100.', solution: `${cu.toFixed(4)} + ${s.toFixed(4)} = ${(cu + s).toFixed(4)} g product. ${cu.toFixed(4)} ÷ ${(cu + s).toFixed(4)} × 100 = <b>${sfHTML(pc, Math.min(sfCount(cu.toFixed(4)), sfCount((cu + s).toFixed(4))))}%</b> Cu. (Pure Cu₂S is 79.86% Cu.)`, video: 'empirical', skill: 'calc' };
   },
   idea() {
@@ -1718,9 +1782,9 @@ const K7a = {
       parts: [num(+(tot - cal).toFixed(4), { dp: 4, unit: 'g', tol: 0.00011 })], hint: 'Subtract the empty calorimeter.', solution: `${tot.toFixed(4)} − ${cal.toFixed(4)} = <b>${(tot - cal).toFixed(4)} g</b>.`, video: 'calorimetry', skill: 'calc' };
   },
   ice() {
-    const cw = rnd(52, 62, 4), ice = rnd(9, 16, 4), n = ice / 18.02;
+    const cw = rnd(52, 62, 4), ice = rnd(9, 16, 4), n = ice / 18.015;
     return { tag: 'Moles of ice', prompt: 'Ice was added to the water in a calorimeter and allowed to melt. How many <b>moles of ice</b> were added?', ref: tableHTML([['Mass of calorimeter + water', `${cw.toFixed(4)} g`], ['Mass of calorimeter + water + melted ice', `${(cw + ice).toFixed(4)} g`]]),
-      parts: [num(n, { sf: 4, unit: 'mol' })], hint: 'Mass of ice = difference of the two masses. Then divide by 18.02 g/mol.', solution: `${ice.toFixed(4)} g ÷ 18.02 g/mol = <b>${sfHTML(n, 4)} mol</b>.`, video: 'calorimetry', skill: 'calc' };
+      parts: [num(n, { sf: 4, unit: 'mol' })], hint: 'Mass of ice = difference of the two masses. Then divide by 18.015 g/mol.', solution: `${ice.toFixed(4)} g ÷ 18.015 g/mol = <b>${sfHTML(n, 4)} mol</b>.`, video: 'calorimetry', skill: 'calc' };
   },
   qWater() {
     const cal = rnd(3.2, 6.8, 4), w = rnd(45, 55, 4), Ti = rnd(22, 27, 1), Tf = +(Ti - rnd(8, 16, 1)).toFixed(1), dT = +(Tf - Ti).toFixed(1), q = w * 4.184 * dT, sf = Math.min(4, sfCount(Math.abs(dT).toFixed(1)));
@@ -1732,10 +1796,28 @@ const K7a = {
     return { tag: 'Calorimeter', prompt: q[0], art: eqDraw(eqById('calorimeter')), parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about where the heat goes.', solution: q[2], video: 'calorimetry', skill: 'concept' };
   }
 };
+const dpAtSF = (x, sf) => Math.max(0, sf - 1 - expOf(x));
+Object.assign(K7a, {
+  qIce() {
+    const cal = rnd(3.2, 6.8, 4), mw = rnd(45, 55, 4), Ti = rnd(22, 27, 1), Tf = rnd(5, 12, 1);
+    const ice = +(mw * 4.184 * (Ti - Tf) / (333.6 + 4.184 * Tf) * rnd(0.95, 1.04, 3)).toFixed(4);
+    const w1 = +(cal + mw).toFixed(4), w2 = +(w1 + ice).toFixed(4), m = +(w1 - cal).toFixed(4), dT = +(Tf - Ti).toFixed(1), mi = +(w2 - w1).toFixed(4);
+    const sfw = Math.min(sfCount(m.toFixed(4)), sfCount(Math.abs(dT).toFixed(1))), qw = m * 4.184 * dT / 1000, n = mi / 18.015, sfn = Math.min(sfCount(mi.toFixed(4)), 5), qi = n * 6.01;
+    const qwR = Number(qw.toPrecision(sfw)), qiR = Number(qi.toPrecision(3)), dp = Math.min(dpAtSF(qwR, sfw), dpAtSF(qiR, 3)), sum = +(qwR + qiR).toFixed(dp);
+    return { tag: 'Part 2: q of the ice (ΔH<sub>fus</sub>)', prompt: 'Ice was melted in the calorimeter water. Complete the Part 2 results in <b>kJ</b>: q<sub>water</sub>, moles of ice, q<sub>ice</sub>, and q<sub>water</sub> + q<sub>ice</sub>.', eq: 'q<sub>water</sub> = m·c·ΔT &nbsp;&nbsp; q<sub>ice</sub> = n·ΔH<sub>fus</sub> &nbsp;&nbsp; ΔH<sub>fus</sub> = 6.01 kJ/mol &nbsp;&nbsp; c = 4.184 J/g·°C',
+      ref: tableHTML([['Mass of calorimeter (empty)', `${cal.toFixed(4)} g`], ['Mass of calorimeter + water', `${w1.toFixed(4)} g`], ['Initial temperature of water', `${Ti.toFixed(1)} °C`], ['Final (lowest) temperature', `${Tf.toFixed(1)} °C`], ['Mass of calorimeter + water + melted ice', `${w2.toFixed(4)} g`]]),
+      parts: [num(qw, { sf: sfw, unit: 'kJ', label: 'q<sub>water</sub>', slip: x => Math.abs(x - qw * 1000) < Math.abs(qw) * 10 ? 'Change J to kJ (÷ 1000).' : Math.abs(x + qw) < Math.abs(qw) * 0.01 ? 'The water got colder, so ΔT and q<sub>water</sub> are negative.' : '' }),
+        num(n, { sf: sfn, unit: 'mol', label: 'Moles of ice', slip: x => Math.abs(x - (w2 - cal) / 18.015) < n * 0.05 ? 'Mass of ice = (calorimeter + water + ice) − (calorimeter + water).' : '' }),
+        num(qi, { sf: 3, unit: 'kJ', label: 'q<sub>ice</sub>', slip: x => Math.abs(x + qi) < qi * 0.01 ? 'Melting absorbs heat, so q<sub>ice</sub> is positive.' : Math.abs(x - qi * 1000) < qi * 10 ? 'ΔH<sub>fus</sub> is already in kJ/mol, so q<sub>ice</sub> comes out in kJ.' : '' }),
+        num(sum, { dp, unit: 'kJ', label: 'q<sub>water</sub> + q<sub>ice</sub>', tol: Math.pow(10, -dp) * 1.01, ans: sum.toFixed(dp) })],
+      hint: 'm(water) = (calorimeter + water) − calorimeter; ΔT = final − initial. Mass of ice = the last two weighings\u2019 difference; ÷ 18.015 g/mol. Then q<sub>ice</sub> = n × 6.01 kJ/mol.',
+      solution: `q<sub>water</sub> = ${m.toFixed(4)} × 4.184 × (${dT.toFixed(1)}) = <b>${fmtSF(qw, sfw).html} kJ</b>. Ice = ${w2.toFixed(4)} − ${w1.toFixed(4)} = ${mi.toFixed(4)} g ÷ 18.015 = <b>${fmtSF(n, sfn).html} mol</b>. q<sub>ice</sub> = ${fmtSF(n, sfn).html} × 6.01 = <b>${fmtSF(qi, 3).html} kJ</b>. Sum = ${fmtSF(qwR, sfw).html} + ${fmtSF(qiR, 3).html} = <b>${sum.toFixed(dp)} kJ</b>. It should be close to 0: heat lost by the water ≈ heat gained by the ice. It isn\u2019t exactly 0 because the melted ice also warms up to the final temperature and a little heat comes in from the room.`, video: 'calorimetry', skill: 'calc' };
+  }
+});
 const K7aOld = {
   metalC() {
     const mm = rnd(45, 90, 2), mw = rnd(40, 60, 1), Tw = rnd(20.5, 23.5, 1), cT = pick([0.385, 0.388, 0.449, 0.897]), Tf = +((mm * cT * 100 + mw * 4.184 * Tw) / (mm * cT + mw * 4.184)).toFixed(1), Tm = 100.0, qw = mw * 4.184 * (Tf - Tw), c = qw / (mm * (Tm - Tf)), sf = Math.min(sfCount(mw.toFixed(1)), sfCount((Tf - Tw).toFixed(1)), 4);
-    return { tag: 'Specific heat of a metal', prompt: `A ${mm.toFixed(2)} g metal cylinder at <b>100.0 °C</b> is dropped into <b>${mw.toFixed(1)} g</b> of water at <b>${Tw.toFixed(1)} °C</b>. Both end at <b>${Tf.toFixed(1)} °C</b>. Find the specific heat of the metal.`, eq: 'q<sub>metal</sub> + q<sub>water</sub> = 0 &nbsp;&nbsp; q = m × c × ΔT &nbsp;&nbsp; c<sub>water</sub> = 4.184 J/g·°C',
+    return { tag: 'Specific heat of a metal (earlier manual)', prompt: `A ${mm.toFixed(2)} g metal cylinder at <b>100.0 °C</b> is dropped into <b>${mw.toFixed(1)} g</b> of water at <b>${Tw.toFixed(1)} °C</b>. Both end at <b>${Tf.toFixed(1)} °C</b>. Find the specific heat of the metal.`, eq: 'q<sub>metal</sub> + q<sub>water</sub> = 0 &nbsp;&nbsp; q = m × c × ΔT &nbsp;&nbsp; c<sub>water</sub> = 4.184 J/g·°C',
       parts: [num(c, { sf, unit: 'J/g°C' })], hint: 'Find q<sub>water</sub>, then q<sub>metal</sub> = −q<sub>water</sub>. Solve for c<sub>metal</sub> with the metal’s ΔT (which is negative).', solution: `q<sub>water</sub> = ${mw.toFixed(1)} × 4.184 × ${(Tf - Tw).toFixed(1)} = ${qw.toFixed(1)} J. c = ${qw.toFixed(1)} ÷ (${mm.toFixed(2)} × ${(Tm - Tf).toFixed(1)}) = <b>${sfHTML(c, sf)} J/g·°C</b>.`, video: 'specificheat', skill: 'calc' };
   }
 };
@@ -1788,7 +1870,7 @@ const K8a = {
   },
   idea() {
     const q = pick([['Why do you subtract the vapor pressure of water from the room pressure?', ['The gas in the tube is a mix of H₂ and water vapor (Dalton’s law)', 'Water vapor makes the room pressure too low', 'The HCl adds extra pressure'], 'Gas collected over water also contains <b>water vapor</b>, so P<sub>H₂</sub> = P<sub>room</sub> − P<sub>water</sub>.', [['water vapor', 'vapor', 'water', 'dalton', 'h2o', 'steam']], ['too low', 'room pressure low']],
-      ['The magnesium ribbon was not cleaned well (it had an oxide coating). How does that affect the volume of H₂ collected?', ['Too low: less pure Mg reacts, so less H₂ forms', 'Too high: the oxide makes extra H₂', 'No change'], 'Some of the mass is MgO, not Mg, so <b>less H₂</b> forms than expected.', [['less', 'lower', 'too low', 'decrease', 'smaller', 'fewer']], ['more', 'higher', 'increase', 'too high', 'no change', 'same']],
+      ['The magnesium ribbon was not cleaned well (it had an oxide coating). Compared with what that mass of pure Mg should make, how much H₂ do you collect?', ['Too low: less pure Mg reacts, so less H₂ forms', 'Too high: the oxide makes extra H₂', 'No change'], 'Some of the mass is MgO, not Mg, so <b>less H₂</b> forms than expected. (On the report, Q6 asks which <i>measured value</i> is affected: that is the <b>mass of Mg</b>, which is too high because it includes the oxide. Either way, R comes out lower.)', [['less', 'lower', 'too low', 'decrease', 'smaller', 'fewer']], ['more', 'higher', 'increase', 'too high', 'no change', 'same']],
       ['How do you know all the magnesium has reacted?', ['The ribbon is gone and bubbles stop forming', 'The water turns pink', 'The tube gets cold'], 'When the Mg is <b>gone and the bubbling stops</b>, the reaction is done.', [['gone', 'disappear', 'bubbl', 'no more', 'stop', 'dissolv', 'used up', 'no ribbon', 'no mg', 'no magnesium']]]]);
     return { tag: 'Gas lab ideas', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about what is really inside the gas collection tube.', solution: q[2], video: 'dalton', skill: 'concept' };
   }
@@ -1813,7 +1895,7 @@ const K9a = {
   },
   curve() {
     const m = 0.0435, b = 0.9984, x = rnd(0.25, 2.45, 4), y = +(m * x + b).toFixed(3), xc = (y - b) / m, pts = [[0, 0.9984], [0.25, 1.0101], [0.5, 1.0201], [1.0, 1.0405], [2.0, 1.0866], [2.5, 1.1077]];
-    return { tag: 'Standard curve', prompt: `A student measured the density of their unknown as <b>${y.toFixed(3)} g/mL</b>. Use the standard curve and the equation of the line to find its concentration (mol/L).`, art: curveSVG(m, b, pts, y),
+    return { tag: 'Standard curve (earlier manual)', prompt: `A student measured the density of their unknown as <b>${y.toFixed(3)} g/mL</b>. Use the standard curve and the equation of the line to find its concentration (mol/L).`, art: curveSVG(m, b, pts, y),
       parts: [num(xc, { unit: 'M', rel: 0.012, ans: xc.toFixed(3) })], hint: 'Density is y. Solve y = 0.0435x + 0.9984 for x: x = (y − 0.9984) ÷ 0.0435.', solution: `x = (${y.toFixed(3)} − 0.9984) ÷ 0.0435 = <b>${xc.toFixed(3)} M</b>.`, video: 'part2_9a', skill: 'calc' };
   },
   massPct() {
@@ -1854,20 +1936,35 @@ const RX = [ // reactants, products(with states), coefficients, scheme2, scheme1
   { r: ['C3H8(g)', 'O2(g)'], p: ['CO2(g)', 'H2O(g)'], c: [1, 5, 3, 4], s2: 4, s1: 4, obs: 'Propane burns in a Bunsen burner with a blue flame.', tube: null },
   { r: ['Mg(s)', 'O2(g)'], p: ['MgO(s)'], c: [2, 1, 2], s2: 4, s1: 0, obs: 'Magnesium ribbon burns with a blinding white light, leaving a white powder.', tube: null }
 ];
+// typed observations: what a student would actually write for each station (key features, not the full sentence)
+const OBS_SOLID = ['solid', 'precipitat', 'ppt', 'cloudy', 'milky', 'chalky', 'curdy', 'jelly', 'gel', 'turbid'], OBS_GAS = ['bubble', 'fizz', 'gas', 'effervesc', 'foam'];
+const obsKw = rx => { const k = rx.r.join('+');
+  if (rx.s2 === 0) return { obs: 1, kw: [OBS_SOLID], nokw: ['bubble', 'fizz', 'no change', 'nothing'], kwNote: 'Describe what you see form in the tube.' };
+  if (k === 'NH4Cl(aq)+NaOH(aq)') return { obs: 1, kw: [['smell', 'odor', 'odour', 'litmus', 'ammonia']], nokw: ['solid', 'precipitat', 'coat', 'odorless', 'no smell', 'no odor', 'fizz'], kwNote: 'What do you notice with your nose (wafting) and the moist red litmus?' };
+  if (rx.s2 === 2 || k === 'Zn(s)+HCl(aq)') return { obs: 1, kw: [OBS_GAS.concat(k === 'Zn(s)+HCl(aq)' ? ['pop'] : [])], nokw: ['solid', 'precipitat', 'no change', 'nothing'].concat(k === 'Zn(s)+HCl(aq)' ? [] : ['pop', 'zinc', 'flammable']), kwNote: 'Describe what comes off the mixture.' };
+  if (rx.s2 === 1) return { obs: 1, kw: [['warm', 'heat', 'hot', 'temperature', 'exotherm']], nokw: ['solid', 'precipitat', 'bubble', 'fizz', 'no temperature'], kwNote: 'You can’t see a change. What can you feel?' };
+  if (k === 'Zn(s)+CuSO4(aq)') return { obs: 1, kw: [['coat', 'copper', 'brown', 'fade', 'lighter', 'deposit']], nokw: ['bubble', 'fizz', 'precipitat', 'litmus', 'smell'], kwNote: 'Look at the zinc and at the blue color of the solution.' };
+  return {}; };
+// Scheme 2 is what the practical asks for. A Scheme 1 name gets a note instead of a silent "wrong".
+const S1_NOTE = [[['single displacement', 'single replacement'], 'That is the <b>Scheme 1</b> name. This asks for <b>Scheme 2</b>: a reaction with an uncombined element (like Zn metal) is <b>Redox</b>.'],
+  [['double displacement', 'double replacement', 'metathesis'], 'That is the <b>Scheme 1</b> name. This asks for <b>Scheme 2</b>: say what the swap makes (a solid → precipitation, a gas → gas evolution, water from an acid and base → neutralization, nothing → no reaction).'],
+  [['combination', 'synthesis', 'decomposition'], 'That is a <b>Scheme 1</b> name. This asks for <b>Scheme 2</b> (precipitation, acid/base neutralization, gas evolution, redox, combustion or no reaction).']];
+const S2_NOTE = [[['precipitation', 'precipitate', 'neutralization', 'gas evolution', 'redox'], 'That is a <b>Scheme 2</b> name. This asks for <b>Scheme 1</b>: combination, decomposition, single displacement, double displacement or combustion.']];
+const s2Part = (ok, o = {}) => Object.assign(choice(S2, ok, o), { whyKw: S1_NOTE });
 const sideHTML = (list, coefs) => list.map((x, i) => `${coefs ? (coefs[i] === 1 ? '' : coefs[i]) : ''}${fhtml(x)}`).join(' + ');
 const rxHTML = (rx, withC) => `${sideHTML(rx.r, withC ? rx.c.slice(0, rx.r.length) : null)} → ${sideHTML(rx.p, withC ? rx.c.slice(rx.r.length) : null)}`;
 const rxPlain = list => list.map(x => fhtml(x.replace(/\((s|l|g|aq)\)$/, ''))).join(' + ');
 const K10a = {
   scheme2() {
     const rx = pick(RX);
-    return { tag: 'Reaction type (scheme 2)', prompt: `You mix ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [choice(S2, rx.s2)],
+    return { tag: 'Reaction type (scheme 2)', prompt: `You mix ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this, using <b>Scheme 2</b>?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [s2Part(rx.s2)],
       hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. Something burning in O₂ → combustion (a special redox your lab manual lists on its own). Any other uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   station() {
     const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
     const others = shuffle(RX.filter(x => x.tube && x.obs !== rx.obs && x.s2 !== rx.s2)).slice(0, 3).map(x => x.obs), opts = shuffle([rx.obs, ...others]);
-    const beg = lvl() === 'beg', parts = [choice(opts, opts.indexOf(rx.obs), { label: 'Observation', w: 2 }), choice(S2, rx.s2, { label: 'Type of reaction', w: 2 }), beg ? balPart(rx, { label: 'Balance the equation', w: 6 }) : eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
-    return { tag: 'Types of reactions station', gs: !beg, prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction. Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
+    const beg = lvl() === 'beg', parts = [choice(opts, opts.indexOf(rx.obs), Object.assign({ label: 'Observation', w: 2 }, lvl() === 'beg' ? {} : obsKw(rx))), s2Part(rx.s2, { label: 'Type of reaction (Scheme 2)', w: 2 }), beg ? balPart(rx, { label: 'Balance the equation', w: 6 }) : eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
+    return { tag: 'Types of reactions station', gs: !beg, prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction (Scheme 2). Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
       hint: 'Swap partners (double displacement) or let the metal replace the ion (single displacement). Fix each formula from the ion charges, check the solubility rules for (s) vs (aq), then balance.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   predict() {
@@ -1878,7 +1975,7 @@ const K10a = {
   },
   scheme1() {
     const rx = pick(RX.filter(x => x.s2 !== 5 && !(x.r.length === 2 && x.r.includes('O2(g)') && x.p.length === 1)));
-    return { tag: 'Reaction type (scheme 1)', prompt: 'Classify this reaction by its pattern:', art: eqn(rxHTML(rx, true)), parts: [choice(S1, rx.s1)], hint: 'A + B → AB combination; AB → A + B decomposition; A + BC → AC + B single displacement; AB + CD → AD + CB double displacement; fuel + O₂ combustion.', solution: `<b>${S1[rx.s1]}</b>.`, video: 'reactions', skill: 'concept' };
+    return { tag: 'Reaction type (scheme 1)', prompt: 'Classify this reaction by its pattern (<b>Scheme 1</b>):', art: eqn(rxHTML(rx, true)), parts: [Object.assign(choice(S1, rx.s1), { whyKw: S2_NOTE })], hint: 'A + B → AB combination; AB → A + B decomposition; A + BC → AC + B single displacement; AB + CD → AD + CB double displacement; fuel + O₂ combustion.', solution: `<b>${S1[rx.s1]}</b>.`, video: 'reactions', skill: 'concept' };
   },
   ppt() {
     const rx = pick(RX.filter(x => x.ppt));
@@ -1985,18 +2082,18 @@ const K12b = {
       parts: [num(V, { dp: 2, unit: 'mL', tol: 0.03, slip: x => Math.abs(x - b) < 0.05 ? 'That’s the final reading. Subtract the initial reading.' : '' })], hint: 'Volume used = final − initial. Both go to 0.01 mL.', solution: `${b.toFixed(2)} − ${a.toFixed(2)} = <b>${V.toFixed(2)} mL</b>.`, video: 'titration', skill: 'read' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.06, { unit: 'g/mol', tol: 0.03, ans: '126.06' })], hint: 'Add H₂C₂O₄ (90.03) and 2 waters (2 × 18.02).', solution: '2(1.008) + 2(12.011) + 4(15.999) + 2(18.015) = <b>126.06 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.06, { unit: 'g/mol', tol: 0.03, ans: '126.06' })], hint: 'Add H₂C₂O₄ (90.034) and 2 waters (2 × 18.015).', solution: '2(1.008) + 2(12.011) + 4(15.999) + 2(18.015) = <b>126.06 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   standardize() {
     const Vs = offLine(18, 42, 2), M = rnd(0.09, 0.12, 4), m = +(M * Vs / 1000 / 2 * 126.06).toFixed(4), Mx = m / 126.06 * 2 / (Vs / 1000);
     return { tag: 'Standardizing NaOH', prompt: `<b>${m.toFixed(4)} g</b> of oxalic acid dihydrate needed <b>${Vs.toFixed(2)} mL</b> of NaOH to reach the endpoint. What is the molarity of the NaOH?`, art: RXN_OX, ref: '<p class="small-note">H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O = 126.06 g/mol</p>',
-      parts: [num(Mx, { sf: 4, unit: 'M', slip: x => Math.abs(x - Mx / 2) < Mx * 0.01 ? 'Use the 1 : 2 ratio: each oxalic acid reacts with 2 NaOH.' : '' })], hint: 'g acid → mol acid → mol NaOH (× 2) → ÷ L NaOH.', solution: `${m.toFixed(4)} ÷ 126.06 = ${(m / 126.06).toExponential(4)} mol × 2 = ${(m / 126.06 * 2).toExponential(4)} mol NaOH ÷ ${(Vs / 1000).toFixed(5)} L = <b>${sfHTML(Mx, 4)} M</b>.`, video: 'titration', skill: 'calc' };
+      parts: [num(Mx, { sf: 4, unit: 'M', slip: x => Math.abs(x - Mx / 2) < Mx * 0.01 ? 'Use the 1 : 2 ratio: each oxalic acid reacts with 2 NaOH.' : '' })], hint: 'g acid → mol acid → mol NaOH (× 2) → ÷ L NaOH.', solution: `${m.toFixed(4)} ÷ 126.06 = ${fmtSF(m / 126.06, 5).html} mol × 2 = ${fmtSF(m / 126.06 * 2, 5).html} mol NaOH ÷ ${(Vs / 1000).toFixed(5)} L = <b>${sfHTML(Mx, 4)} M</b>.`, video: 'titration', skill: 'calc' };
   },
   citric() {
     const Mb = rnd(0.09001, 0.11499, 5), Vi = offLine(0.5, 4, 2), Vf = +(Vi + rnd(5, 13, 2)).toFixed(2), Vb = Vf - Vi, C = Mb * Vb / 1000 / 3 / 0.01000;
     return { tag: 'Molarity of citric acid', prompt: `A 10.00 mL soda sample was titrated with <b>${Mb.toFixed(5)} M NaOH</b>. The buret went from <b>${Vi.toFixed(2)} mL</b> to <b>${Vf.toFixed(2)} mL</b>. What is the molarity of citric acid in the soda?`, art: RXN_CIT, eq: 'Molarity (M) = mol solute ÷ L solution',
       parts: [num(C, { sf: Math.min(4, sfCount(Vb.toFixed(2))), unit: 'M', slip: x => Math.abs(x - C * 3) < C * 0.03 ? 'Each citric acid reacts with <b>3</b> NaOH, so divide mol NaOH by 3.' : Math.abs(x - Mb * Vf / 1000 / 3 / 0.01) < C * 0.02 ? 'Use the volume used (final − initial), not the final reading.' : '' })],
-      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${(Mb * Vb / 1000).toExponential(4)} mol NaOH ÷ 3 = ${(Mb * Vb / 3000).toExponential(4)} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, Math.min(4, sfCount(Vb.toFixed(2))))} M</b>.`, video: 'titration', skill: 'calc' };
+      hint: 'mol NaOH = M × L used. mol citric acid = mol NaOH ÷ 3. Then ÷ 0.01000 L of soda.', solution: `NaOH used = ${Vb.toFixed(2)} mL. ${Mb.toFixed(5)} × ${(Vb / 1000).toFixed(5)} = ${fmtSF(Mb * Vb / 1000, 5).html} mol NaOH ÷ 3 = ${fmtSF(Mb * Vb / 3000, 5).html} mol citric acid ÷ 0.01000 L = <b>${sfHTML(C, Math.min(4, sfCount(Vb.toFixed(2))))} M</b>.`, video: 'titration', skill: 'calc' };
   },
   terms() {
     const q = pick([['In this titration, which chemical is the <b>titrant</b> (the one with a known molarity, added from the buret)?', 'NaOH (sodium hydroxide)', ['Citric acid', 'Oxalic acid', 'Phenolphthalein'], 'The <b>titrant</b> is NaOH: it goes in the buret and its molarity is known.'],
@@ -2024,7 +2121,7 @@ function attachWhy(p, wrongs) { // wrongs: [[option text, why, typed keywords]]
   return p;
 }
 const dirPart = (dir, label, words, s) => {
-  const keys = ['high', 'low', 'none'], ok = keys.indexOf(dir), p = choice(words || ['Too high', 'Too low', 'Unchanged'], ok, Object.assign({ label, kwNote: 'Say which way: too high, too low, or unchanged.' }, DIR3[dir]));
+  const keys = ['high', 'low', 'none'], ok = keys.indexOf(dir), p = choice(words || ['Too high', 'Too low', 'Unchanged'], ok, Object.assign({ label, showOpts: true, kwNote: 'Say which way: too high, too low, or unchanged.' }, DIR3[dir]));
   if (!s) return p;
   const msg = k => dir === 'none' ? `It doesn’t change. ${s}` : k === 'none' ? `It does change. ${s}` : `Other way. ${s}`;
   return attachWhy(p, ['none', 'high', 'low'].filter(k => k !== dir).map(k => [p.options[keys.indexOf(k)], msg(k), DIR3[k].kw[0]]));
@@ -2151,10 +2248,10 @@ const K2a = {
   avgAtomic() {
     const d = fresnoRun(), pc = d.pct.map(x => +x.toFixed(2)), pm = d.per.map(x => +x.toPrecision(4)), avg = pm.reduce((s, x, i) => s + x * pc[i] / 100, 0), plain = pm.reduce((a, b) => a + b, 0) / 3;
     return { tag: 'Average atomic mass', prompt: 'Use the completed Trial 1 table to calculate the <b>average atomic mass</b> of Fresnocitium.', eq: 'Average atomic mass = (mass<sub>1</sub>·abundance<sub>1</sub>) + (mass<sub>2</sub>·abundance<sub>2</sub>) + … &nbsp;&nbsp; (abundances as decimals)',
-      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${pc[i].toFixed(2)}%`, `${pm[i]} g`]), ['Isotope color', 'Percent abundance', 'Average mass per atom']),
+      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${pc[i].toFixed(2)}%`, `${pm[i].toPrecision(4)} g`]), ['Isotope color', 'Percent abundance', 'Average mass per atom']),
       parts: [num(avg, { unit: 'g', rel: 0.001, ans: avg.toPrecision(4), slip: x => Math.abs(x - avg * 100) < avg * 0.5 ? 'Change each percent to a decimal (÷ 100) before multiplying.' : Math.abs(x - plain) < plain * 0.002 && Math.abs(plain - avg) > avg * 0.003 ? 'That’s a plain average of the three masses. Weight each mass by its abundance.' : '' })],
       hint: 'Percent ÷ 100 gives the fractional abundance. Multiply each isotope’s mass by its fraction, then add the three.',
-      solution: FRESNO.map((c, i) => `${pm[i]}(${(pc[i] / 100).toFixed(4)})`).join(' + ') + ` = <b>${avg.toPrecision(4)} g</b>. That is the weighted average mass of one Fresnocitium atom.`, video: 'isotopes', skill: 'calc' };
+      solution: FRESNO.map((c, i) => `${pm[i].toPrecision(4)}(${(pc[i] / 100).toFixed(4)})`).join(' + ') + ` = <b>${avg.toPrecision(4)} g</b>. That is the weighted average mass of one Fresnocitium atom.`, video: 'isotopes', skill: 'calc' };
   },
   table() {
     const d = fresnoRun();
@@ -2167,11 +2264,11 @@ const K2a = {
     let pc, per = [rnd(0.240, 0.262, 4), rnd(0.300, 0.326, 4), rnd(0.168, 0.190, 4)], big, avg;
     do { big = rint(0, 2); const top = rint(62, 80), rest = rint(5, 100 - top - 5); pc = [0, 0, 0]; pc[big] = top; const o = [0, 1, 2].filter(k => k !== big); pc[o[0]] = rest; pc[o[1]] = 100 - top - rest; avg = per.reduce((s, x, i) => s + x * pc[i] / 100, 0); }
     while (per.map(x => Math.abs(x - avg)).indexOf(Math.min(...per.map(x => Math.abs(x - avg)))) !== big || pc.some(x => x < 5));
-    const opts = FRESNO.map((c, i) => `${c[0]} (${per[i]} g)`);
+    const opts = FRESNO.map((c, i) => `${c[0]} (${per[i].toFixed(4)} g)`);
     return { tag: 'Weighted average', prompt: `A batch of Fresnocitium is <b>${FRESNO.map((c, i) => `${pc[i]}% ${c[0].toLowerCase()}`).join(', ')}</b>. Without a calculator: the average atomic mass will be <b>closest to the mass of which isotope</b>?`,
-      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${per[i]} g`]), ['Isotope', 'Mass per atom']),
+      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${per[i].toFixed(4)} g`]), ['Isotope', 'Mass per atom']),
       parts: [attachWhy(choice(opts, big), opts.filter((o, i) => i !== big).map(o => [o, 'That isotope is less abundant, so it pulls the average less. The average is weighted toward the most abundant isotope.', []]))],
-      hint: 'More abundant isotopes count more toward the average atomic mass.', solution: `The <b>${FRESNO[big][0].toLowerCase()}</b> isotope is ${pc[big]}% of the atoms, so it counts the most. The weighted average is ${avg.toPrecision(4)} g, closest to ${per[big]} g.`, video: 'isotopes', skill: 'concept' };
+      hint: 'More abundant isotopes count more toward the average atomic mass.', solution: `The <b>${FRESNO[big][0].toLowerCase()}</b> isotope is ${pc[big]}% of the atoms, so it counts the most. The weighted average is ${avg.toPrecision(4)} g, closest to ${per[big].toFixed(4)} g.`, video: 'isotopes', skill: 'concept' };
   },
   represent() {
     return { tag: 'What the beads stand for', prompt: 'In this lab, the red, black and white beads are all “atoms” of Fresnocitium with different masses. In a real element, what are the different kinds of beads like?',
@@ -2185,7 +2282,8 @@ const K2a = {
       hint: 'Write out (abundance × mass per atom) for one color: (n<sub>red</sub>/N)(m<sub>red</sub>/n<sub>red</sub>) = m<sub>red</sub>/N. Add the three colors.', solution: `They <b>should match</b>. The weighted average Σ(n<sub>i</sub>/N)(m<sub>i</sub>/n<sub>i</sub>) simplifies to (total mass) ÷ N, the same thing Q2C calculates. Here ${sfHTML(d.perMix, 4)} g vs ${a.toPrecision(4)} g: the tiny difference comes from weighing the mix and each color separately, and rounding.`, video: 'isotopes', skill: 'concept' };
   },
   trials() {
-    const d1 = fresnoRun(), d2 = fresnoRun(); d2.per = d1.per.map(x => x * rnd(0.997, 1.003, 4));
+    const d1 = fresnoRun(), n2 = d1.n.map(k => Math.max(8, Math.round(k * rnd(0.85, 1.15, 3)))), per2 = d1.per.map(x => x * rnd(0.997, 1.003, 4)), m2 = n2.map((k, i) => +(k * per2[i]).toFixed(4));
+    const d2 = fresnoCalc({ beaker: d1.beaker, n: n2, w: m2.map(x => +(d1.beaker + x).toFixed(4)), wMix: +(d1.beaker + m2.reduce((a, b) => a + b, 0)).toFixed(4) });
     const fix = x => x.toFixed(2) + '%';
     return { tag: 'Trial 1 vs Trial 2 (Q5)', prompt: 'A student’s two trials gave different percent abundances, but almost the same mass per atom for each color. Why are the <b>abundances</b> different?',
       ref: tableHTML(FRESNO.map((c, i) => [c[0], fix(d1.pct[i]), fix(d2.pct[i]), `${d1.per[i].toPrecision(4)} g`, `${d2.per[i].toPrecision(4)} g`]), ['Isotope', '% Trial 1', '% Trial 2', 'Mass/atom Trial 1', 'Mass/atom Trial 2']),
@@ -2265,7 +2363,8 @@ Object.assign(K6a, {
       ['A nitrogen (blue) ball has one hole plugged. How many bonds does nitrogen make in the kit, and why?', ['Three: N has 5 valence electrons, so it needs 3 bonds (plus 1 lone pair) for an octet', 'Four: like carbon', 'Two: like oxygen'], 'N makes <b>3 bonds</b> and keeps one lone pair. That is why one hole is plugged.', [['3', 'three']], ['four', '4 ', 'two', '2 ']],
       ['How do you know your model is built correctly?', ['Every hole on every ball has a connector in it', 'All the balls are the same color', 'The model lies flat on the table'], 'The manual: the model is right when <b>every hole is filled</b>.', [['hole', 'every', 'all filled', 'filled']], ['color', 'flat']]
     ]);
-    return { tag: 'Using the model kit', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Short rigid = single bond. Long flexible = double or triple.', solution: q[2], video: 'lewis', skill: 'concept' };
+    const hint = /double bond/.test(q[0]) ? 'Short rigid = single bond. Long flexible = double or triple.' : /nitrogen/.test(q[0]) ? 'Count valence electrons: N has 5. Each bond shares one of them; the rest pair up.' : 'Look at every ball: are there any empty holes left?';
+    return { tag: 'Using the model kit', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint, solution: q[2], video: 'lewis', skill: 'concept' };
   }
 });
 
@@ -2297,7 +2396,7 @@ Object.assign(K8a, {
   errors() {
     return pickErr([
       { prompt: 'Report question: the gas collection tube was <b>not fully filled</b> with water, and <b>air stayed inside</b> when the tube was inverted.', meas: [['Volume of gas collected', ['volume', 'gas collected', ' ml', 'tube reading']], ['Mass of Mg', ['mass', 'magnesium', ' mg ']]], dir: 'high', res: 'high', result: 'experimental R value (R = PV/nT)', sol: 'The trapped air adds to the gas in the tube, so the <b>volume reads too high</b>. V is on top of R = PV/(nT), so <b>R comes out higher</b>.', video: 'dalton' },
-      { prompt: 'Report question: the magnesium ribbon was <b>not cleaned well</b>. Part of the mass you recorded is the dull oxide coating, not Mg.', meas: [['Mass of magnesium (so moles of H₂)', ['mass', 'magnesium', ' mg ', 'moles', 'grams']], ['Room pressure', ['pressure']]], dir: 'high', res: 'low', result: 'experimental R value (R = PV/nT)', sol: 'The balance counts the oxide as Mg, so the <b>mass of Mg (and the moles of H₂ you calculate) are too high</b>. n is on the bottom of R = PV/(nT), so <b>R comes out lower</b>. (Less H₂ also forms, which lowers V and R too.)', video: 'dalton' },
+      { prompt: 'Report question: the magnesium ribbon was <b>not cleaned well</b>. Part of the mass you recorded is the dull oxide coating, not Mg.', meas: [['Mass of magnesium (so moles of H₂)', ['mass', 'magnesium', ' mg ', 'moles', 'grams']], ['Room pressure', ['pressure']]], dir: 'high', res: 'low', result: 'experimental R value (R = PV/nT)', sol: 'The balance counts the oxide as Mg, so the <b>mass of Mg (and the moles of H₂ you calculate) are too high</b>. n is on the bottom of R = PV/(nT), so <b>R comes out lower</b>. (You also collect less H₂ than that mass of pure Mg would make, but the volume you read is the true volume of the H₂ that formed. The mismatch is that n assumes the whole mass was Mg.)', video: 'dalton' },
       { prompt: 'A student reads the gas volume <b>while the ribbon is still bubbling</b>.', meas: [['Volume of gas collected', ['volume', 'gas', ' ml', 'tube']], ['Temperature of the water', ['temp']]], dir: 'low', res: 'low', result: 'experimental R value', sol: 'Not all the H₂ has formed yet, so the <b>volume is too low</b> and R = PV/(nT) comes out <b>lower</b>. Wait until the Mg is gone and bubbles stop.', video: 'dalton' },
       { prompt: 'A student forgets to <b>subtract the vapor pressure of water</b> and uses the room pressure as P<sub>H₂</sub>.', dir: null, res: 'high', result: 'experimental R value', sol: 'Room pressure is P<sub>H₂</sub> + P<sub>water</sub>, so using it makes <b>P too high</b> and R = PV/(nT) comes out <b>higher</b>.', video: 'dalton', hint: 'Is P<sub>room</sub> bigger or smaller than P<sub>H₂</sub>? Where is P in R = PV/nT?' }
     ], 'R = PV ÷ (nT) &nbsp;&nbsp; P<sub>H₂</sub> = P<sub>room</sub> − P<sub>water</sub>');
@@ -2358,11 +2457,11 @@ Object.assign(K12b, {
     return { tag: 'Titration technique', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the procedure steps in the lab manual.', solution: q[2], video: 'titration', skill: 'concept' };
   },
   stdTable() {
-    const MM = 126.07, m = rnd(0.1000, 0.1200, 4), Mtrue = rnd(0.095, 0.110, 4), molB = m / MM * 2, Vi = rnd(0.30, 2.80, 2), net = molB / Mtrue * 1000, Vf = +(Vi + net).toFixed(2), Vn = +(Vf - Vi).toFixed(2), M = molB / (Vn / 1000), sf = Math.min(4, sfCount(Vn.toFixed(2)));
-    return { tag: 'Standardization table', prompt: 'Fill in the Part I (standardization) results for Trial 1. Oxalic acid dihydrate, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O, is 126.07 g/mol.', eq: 'H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O(aq) + 2NaOH(aq) → Na<sub>2</sub>C<sub>2</sub>O<sub>4</sub>(aq) + 4H<sub>2</sub>O(l)',
+    const MM = 126.06, m = rnd(0.1000, 0.1200, 4), Mtrue = rnd(0.095, 0.110, 4), molB = m / MM * 2, Vi = rnd(0.30, 2.80, 2), net = molB / Mtrue * 1000, Vf = +(Vi + net).toFixed(2), Vn = +(Vf - Vi).toFixed(2), M = molB / (Vn / 1000), sf = Math.min(4, sfCount(Vn.toFixed(2)));
+    return { tag: 'Standardization table', prompt: 'Fill in the Part I (standardization) results for Trial 1. Oxalic acid dihydrate, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O, is 126.06 g/mol.', eq: 'H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O(aq) + 2NaOH(aq) → Na<sub>2</sub>C<sub>2</sub>O<sub>4</sub>(aq) + 4H<sub>2</sub>O(l)',
       ref: tableHTML([['Mass of oxalic acid', `${m.toFixed(4)} g`], ['Initial buret reading (NaOH)', `${Vi.toFixed(2)} mL`], ['Final buret reading (NaOH)', `${Vf.toFixed(2)} mL`]], ['', 'Trial 1']),
       parts: [num(molB, { sf: 4, unit: 'mol', label: 'Moles of sodium hydroxide', slip: x => Math.abs(x - molB / 2) < molB * 0.006 ? 'Use the 2 : 1 mole ratio: 2 mol NaOH per mol oxalic acid.' : '' }), num(Vn / 1000, { sf, unit: 'L', label: 'Net volume NaOH used (L)', slip: x => Math.abs(x - Vn) < 0.01 ? 'Convert mL to L (÷ 1000).' : Math.abs(x - Vf / 1000) < 1e-5 ? 'Net volume = final − initial reading.' : '' }), num(M, { sf, unit: 'M', label: 'Molarity of sodium hydroxide' })],
-      hint: 'g oxalic acid → mol oxalic acid → × 2 → mol NaOH. Net volume = final − initial (in L). M = mol ÷ L.', solution: `${m.toFixed(4)} g ÷ 126.07 g/mol × 2 = <b>${sfHTML(molB, 4)} mol NaOH</b>. Net volume = ${Vf.toFixed(2)} − ${Vi.toFixed(2)} = ${Vn.toFixed(2)} mL = <b>${sfHTML(Vn / 1000, sf)} L</b>. M = ${molB.toExponential(4)} ÷ ${(Vn / 1000).toFixed(5)} = <b>${sfHTML(M, sf)} M</b>.`, video: 'titration', skill: 'calc' };
+      hint: 'g oxalic acid → mol oxalic acid → × 2 → mol NaOH. Net volume = final − initial (in L). M = mol ÷ L.', solution: `${m.toFixed(4)} g ÷ 126.06 g/mol × 2 = <b>${sfHTML(molB, 4)} mol NaOH</b>. Net volume = ${Vf.toFixed(2)} − ${Vi.toFixed(2)} = ${Vn.toFixed(2)} mL = <b>${sfHTML(Vn / 1000, sf)} L</b>. M = ${molB.toExponential(4)} ÷ ${(Vn / 1000).toFixed(5)} = <b>${sfHTML(M, sf)} M</b>.`, video: 'titration', skill: 'calc' };
   },
   errors() {
     return pickErr([
@@ -2397,17 +2496,17 @@ const LABS = [
   { id: '0a', name: 'Lab Exploration', blurb: 'Equipment names, glassware and balances', K: K0a, badge: 'burette', cur: 1, mock: ['cyl', 'buret', 'volumetric', 'balance', 'massWater', 'equipName', 'safety'] },
   { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar', 'errors'] },
   { id: '2a', name: 'Atomic Mass', blurb: 'Fresnocitium beads: abundance and weighted average', K: K2a, badge: 'scale', cur: 0, other: 1, mock: ['natureAvg', 'abundance', 'isoMass', 'avgAtomic', 'weighted', 'compare', 'bigger', 'errors'] },
-  { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 0 },
+  { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 1 },
   { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests and average atomic mass', K: K3z, badge: 'target', cur: 1 },
-  { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data', K: K4a, badge: 'scale', cur: 0 },
+  { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data, Cu/S mass ratio', K: K4a, badge: 'scale', cur: 1, mock: ['massS', 'ratio', 'excess', 'pctDiff', 'idea'] },
   { id: '4b', name: 'Rolling for Compound Initiative', blurb: 'Naming compounds and writing formulas', K: K4b, badge: 'book', cur: 1 },
   { id: '5a', name: 'Empirical Formula', blurb: 'Crucible data, percent composition', K: K5a, badge: 'percent', cur: 1 },
   { id: '6a', name: 'Molecular Modeling', blurb: 'Lewis structures and shapes', K: K6a, badge: 'geometry', cur: 1 },
-  { id: '7a', name: 'Calorimetry', blurb: 'Thermometers, q = mcΔT, exo vs endo', K: Object.assign({}, K7a, K7aOld), badge: 'heat', cur: 1, mock: ['thermo', 'exoEndo', 'qSolution', 'qReaction', 'qWater', 'ice', 'table', 'errors'] },
+  { id: '7a', name: 'Calorimetry', blurb: 'Thermometers, q = mcΔT, exo vs endo', K: Object.assign({}, K7a, K7aOld), badge: 'heat', cur: 1, mock: ['thermo', 'exoEndo', 'qSolution', 'qReaction', 'qIce', 'table', 'errors'] },
   { id: '8a', name: 'Gas Constant R', blurb: 'Gas collection, Dalton’s law, PV = nRT', K: K8a, badge: 'gaslaw', cur: 1 },
-  { id: '9a', name: 'Solutions and Dilutions', blurb: 'Standard curve, molarity, M₁V₁ = M₂V₂', K: K9a, badge: 'molarity', cur: 1 },
+  { id: '9a', name: 'Solutions and Dilutions', blurb: 'Molarity, M₁V₁ = M₂V₂, % and density', K: K9a, badge: 'molarity', cur: 1, mock: ['density', 'molarity', 'dilution', 'massPct', 'mvPct', 'glass', 'molality', 'errors'] },
   { id: '10a', name: 'Types of Reactions', blurb: 'Observations, reaction types, net ionic', K: K10a, badge: 'precipitate', cur: 1, mock: ['station', 'station', 'predict', 'scheme2', 'ppt', 'gasTest'] },
-  { id: '11a', name: 'Synthesis of Alum', blurb: 'Vacuum filtration, hydrates, % yield', K: K11a, badge: 'lattice', cur: 0 },
+  { id: '11a', name: 'Synthesis of Alum', blurb: 'Vacuum filtration, hydrates, % yield', K: K11a, badge: 'lattice', cur: 1 },
   { id: '12a', name: 'pH of Household Items', blurb: 'pH, pOH, cabbage indicator', K: K12a, badge: 'phgauge', cur: 1 },
   { id: '12b', name: 'Citric Acid in Soda', blurb: 'Burets, standardization, titration math', K: K12b, badge: 'titrate', cur: 1 }
 ];
@@ -2604,7 +2703,7 @@ function qHTML(q, opt = {}) {
   if (q.cab) t += cabBox();
   if (q.pt !== false && (q.pt || /g\/mol|molar mass/i.test(`${q.prompt} ${q.hint || ''} ${q.solution || ''}`))) t += ptBox();
   if (needsSol(q)) t += solBox();
-  if (opt.mock) q.parts.forEach(p => { if (p.type === 'choice') t += `${p.label ? `<p class="small-note"><b>${p.label}</b></p>` : ''}<ol class="chooselist" type="a">${p.options.map(o => `<li>${o}</li>`).join('')}</ol>`; });
+  if (opt.mock) q.parts.forEach(p => { if (p.type === 'choice' && (lvl() === 'beg' || p.showOpts)) t += `${p.label ? `<p class="small-note"><b>${p.label}</b></p>` : ''}<ol class="chooselist" type="a">${p.options.map(o => `<li>${o}</li>`).join('')}</ol>`; });
   return t;
 }
 function partsHTML(parts, key, mock, saved = []) {
@@ -2650,7 +2749,7 @@ const partAns = p => (p.type === 'choice' ? (p.ans || p.options[p.ok]) : p.ans !
 /* ---------- practice mode ---------- */
 function renderLabTiles() {
   const set = labSet();
-  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur ? '' : `<span class="oldtag">${l.other ? 'not on Dr. Dan’s list' : 'earlier manual'}</span>`}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
+  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur || !['all', 'custom', 'dan'].includes(labPick().kind) ? '' : `<span class="oldtag">${l.other ? 'not on Dr. Dan’s list' : 'earlier manual'}</span>`}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
 }
 function toggleLab(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderLabTiles(); save(); if (!state.q || state.done || !state.sel.has(state.q.lab)) newQuestion(); }
 function newQuestion() {
@@ -2739,23 +2838,26 @@ const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '1
   '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light',
   '2a.avgAtomic': 'avgmass', '2a.weighted': 'avgmass', '2a.natureAvg': '2a.peratom', '2a.isoMass': '2a.peratom', '2a.abundance': '2a.abund', '2a.table': '2a.abund', '2a.compare': '2a.idea', '2a.trials': '2a.idea', '2a.bigger': '2a.idea', '2a.errors': 'errors',
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
-  '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
+  '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.qIce': 'heat', '4a.ratio': '4a.ratio', '4a.pctDiff': 'pcterr', '4a.excess': 'balance', '3a.rydberg': 'light', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
   '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
   '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula', '4a.formula': 'empirical', '5a.formula': 'empirical', '4a.pctCu': 'masspct', '5a.percent': 'masspct', '5a.pctFormula': 'masspct',
   // same skill in different labs: error analysis, mass by difference, technique, flame, gas ID, precipitate/phases, solution %
   '1a.errors': 'errors', '5a.errors': 'errors', '7a.errors': 'errors', '8a.errors': 'errors', '9a.errors': 'errors', '12b.errors': 'errors',
   '4a.massS': 'balance', '5a.massO': 'balance', '0a.safety': 'technique', '5a.why': 'technique', '12b.technique': 'technique', '3z.flameWhy': 'flame',
-  '10a.gas': 'gasid', '10a.gasTest': 'gasid', '10a.ppt': 'ppt', '10a.states': 'ppt', '9a.massPct': 'solpct', '9a.mvPct': 'solpct' };
+  '10a.gas': 'gasid', '10a.gasTest': 'gasid', '10a.ppt': 'ppt', '10a.states': 'ppt', '9a.massPct': 'masspct', '9a.mvPct': 'solpct' };
 const famOf = (lab, kind) => FAM[lab + '.' + kind] || lab + '.' + kind;
 const HFAM = { '0a': ['cyl', 'balance', 'density'], '1a': ['cyl', 'balance', 'density'], '9a': ['balance', 'density'], '10a': ['rxn', 'rxtype'], '12a': ['cabbage', 'ph'], '12b': ['buret', 'titr'], '6a': ['vsepr', '6a.valence'] };
 const MOCK_N = 10, MOCK_GEN = 2;
 // readings for the general Measurements station; it picks ones the lab stations didn't already use
 const READS = [['0a', 'cyl'], ['7a', 'thermo'], ['1a', 'ruler'], ['0a', 'buret'], ['0a', 'balance'], ['0a', 'volumetric'], ['8a', 'readTube']];
-function genSkills(used = new Set()) {
-  let pool = shuffle(READS.filter(r => !used.has(famOf(r[0], r[1]))));
-  if (pool.length < 3) pool = pool.concat(shuffle(READS.filter(r => !pool.includes(r))));
-  const v = {};
-  'ABC'.split('').forEach((V, i) => { const q = makeQ(pool[i][0], pool[i][1]); q.lab = 'gen'; q.labName = 'General Lab Knowledge'; v[V] = q; used.add(famOf(pool[i][0], pool[i][1])); });
+// byVer: the question families already on each version's sheet, so no student gets the same kind of reading twice
+function genSkills(used = new Set(), byVer = { A: new Set(), B: new Set(), C: new Set() }) {
+  const v = {}, taken = new Set();
+  'ABC'.split('').forEach(V => {
+    const ok = r => !byVer[V].has(famOf(r[0], r[1])) && !taken.has(famOf(r[0], r[1]));
+    const pool = shuffle(READS.filter(r => ok(r) && !used.has(famOf(r[0], r[1])))).concat(shuffle(READS.filter(r => ok(r) && used.has(famOf(r[0], r[1])))), shuffle(READS.filter(r => !byVer[V].has(famOf(r[0], r[1])))), shuffle(READS));
+    const r = pool[0]; const q = makeQ(r[0], r[1]); q.lab = 'gen'; q.labName = 'General Lab Knowledge'; v[V] = q; taken.add(famOf(r[0], r[1])); used.add(famOf(r[0], r[1]));
+  });
   return { lab: 'gen', title: 'General Lab Knowledge: Measurements', versions: v };
 }
 function buildPractical(ver, timer) {
@@ -2780,7 +2882,20 @@ function buildPractical0(ver, timer) {
     stations.push({ lab: id, title: l.name, versions: v }); P.mockLabs[id] = (P.mockLabs[id] || 0) + 1;
   });
   stations = shuffle(stations);
-  stations.splice(rint(0, stations.length), 0, genSkills(used));
+  // at most 2 instrument readings on any one sheet (lab stations ≤ 1, plus the general Measurements station)
+  const READ_FAM = new Set(['cyl', 'buret', 'thermo', 'ruler', 'gastube', '0a.volumetric']), isRead = (st, q) => !!q && (q.skill === 'read' || (!st.hands && READ_FAM.has(famOf(q.lab, q.kind))));
+  'ABC'.split('').forEach(V => {
+    let reads = stations.filter(st => isRead(st, st.versions[V])).length;
+    for (const st of shuffle(stations)) {
+      if (reads <= 1) break;
+      if (st.hands || !isRead(st, st.versions[V])) continue;
+      const l = labById(st.lab);
+      for (const k of shuffle([...new Set(l.mock || Object.keys(l.K))])) { if (used.has(famOf(st.lab, k)) || READ_FAM.has(famOf(st.lab, k))) continue; const q = makeQ(st.lab, k); if (q.skill === 'read') continue; st.versions[V] = q; used.add(famOf(st.lab, k)); reads--; break; }
+    }
+  });
+  const byVer = { A: new Set(), B: new Set(), C: new Set() };
+  stations.forEach(st => 'ABC'.split('').forEach(V => { if (st.hands) (HFAM[st.lab] || []).forEach(x => byVer[V].add(x)); else { const q = st.versions[V]; if (q) byVer[V].add(famOf(q.lab, q.kind)); } }));
+  stations.splice(rint(0, stations.length), 0, genSkills(used, byVer));
   stations.splice(rint(0, stations.length), 0, genStation());
   stations.forEach(st => 'ABC'.split('').forEach(V => { const q = st.versions[V]; if (q && q.skill === 'read') q.parts.forEach(pt => { if (pt.type === 'num') { pt.read = true; if (pt.rtol == null) pt.rtol = RTOL[pt.unit] != null ? RTOL[pt.unit](pt) : null; } }); }));
   save();
@@ -3652,7 +3767,7 @@ function vlCheck(reveal) {
   if (ok || reveal) {
     const use = parts.map((p, k) => (ok ? (p.type === 'num' ? vlNum(vals[k].val) : vals[k].val) : p.type === 'num' ? p.v : p.ok));
     if (st.rec) st.rec(VL.s, use);
-    VL.done[VL.step] = parts.map((p, k) => (p.type === 'num' ? `${ok ? esc(vals[k].val) : p.ans} ${p.unit || ''}` : p.type === 'choice' ? p.options[ok ? +vals[k].val : p.ok] : ok ? esc(vals[k].val) : p.ans)).join(', ');
+    VL.done[VL.step] = parts.map((p, k) => (p.type === 'num' ? `${ok ? esc(vals[k].val) : p.ans} ${p.unit || ''}` : p.type === 'choice' ? (ok ? (String(vals[k].val).startsWith('T:') ? esc(tv(vals[k].val)) : p.options[+vals[k].val]) : p.options[p.ok]) : ok ? esc(vals[k].val) : p.ans)).join(', ');
     const first = ok && VL.tries === 0; if (ok) { P.xp += first ? 10 : 5; P.correct++; P.streak = first ? P.streak + 1 : P.streak; } else P.streak = 0;
     P.tried++;
     fb.className = 'feedback ' + (ok ? 'good' : 'info'); fb.style.display = 'block';
@@ -3878,7 +3993,7 @@ function openLabPicker() {
     ${opt('custom', 'My professor isn’t listed: let me choose my labs', 'Check the labs your class did')}
     <div class="lp-grid" id="lpGrid">${LABS.map(l => `<label><input type="checkbox" value="${l.id}" ${custom.has(l.id) ? 'checked' : ''}> <b>Exp ${l.id}</b> ${esc(l.name)}</label>`).join('')}</div>
     <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb"></p>
-    <p class="small-note">Instructor? <a href="setup.html" target="_blank" rel="noopener">Set this game up for your class</a> and get a Canvas link that opens with your labs.</p>`;
+    <p class="small-note">Instructor? <a href="https://itsdrdan.github.io/labpractical/setup.html" target="_blank" rel="noopener">Set this game up for your class</a> and get a Canvas link that opens with your labs.</p>`;
   const grid = $('lpGrid'), sync = () => { grid.hidden = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value !== 'custom'; };
   $('lpBody').querySelectorAll('input[name=lp]').forEach(r => (r.onchange = sync)); sync();
   grid.addEventListener('change', () => { const c = document.querySelector('#lpBody input[value=custom]'); if (c) c.checked = true; });
@@ -3981,7 +4096,9 @@ function init() {
   else if (secOther) P.labPick = { kind: 'prof', prof: secOther.key };
   else if (profHit) P.labPick = { kind: 'prof', prof: profHit.key };
   else if (/^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw)) P.labPick = { kind: 'dan' };
-  else if (['dan', 'class', 'current', 'fcc'].includes(ls) && !P.labPick) P.labPick = { kind: 'dan' };
+  // a NEW ?labs=dan link wins over an older saved choice; reopening the same link keeps what the student picked since
+  else if (['dan', 'class', 'current', 'fcc'].includes(ls) && (!P.labPick || P.linkSig !== [ls, sec, profRaw].join('|'))) P.labPick = { kind: 'dan' };
+  if (ls || sec || profRaw) P.linkSig = [ls, sec, profRaw].join('|');
   window.ddProfessor = profOf() || (profRaw ? cleanName(profRaw) : '');
   save();
   state.sel = new Set((P.sel || []).filter(id => labSet().includes(id)));

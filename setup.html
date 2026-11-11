@@ -89,7 +89,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:24px}
     <div class="row"><button type="button" class="btn" id="copyEmbed">Copy embed code</button></div>
     <p class="ok" id="copied" role="status" aria-live="polite">Copied!</p>
     <p class="warn" id="warn" hidden></p>
-    <p class="note">The game sizes itself inside Canvas, so there's no extra scroll bar. Students' progress stays on their own device. The game never asks for names, except in the optional feedback form.</p>
+    <p class="note">The game sizes itself inside Canvas, so there's no extra scroll bar. Students' progress stays on their own device. The game never asks for names, except in the optional feedback form. It does send anonymous practice stats (topic and right or wrong only: no names, IDs or typed answers) so we can see which topics are hardest; browsers set to Do Not Track or Global Privacy Control send nothing.</p>
   </section>
 
   <footer>Station Rotation by ItsDrDan · Lab lists for listed professors come from public syllabi in FCC's Simple Syllabus library (updated <span id="upd"></span>). If yours is wrong, just change the checkboxes.</footer>
@@ -145,7 +145,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:24px}
       if (name) q.set('prof', name); else warn = 'Type your name in step 1 so students can pick you in the game’s feedback form.';
       if (labs.length) q.set('labs', labs.join(','));
     } else warn = 'Pick your name in step 1.';
-    if (!labs.length && !warn) warn = 'Check at least one lab in step 2, or the game will show every lab.';
+    if (!labs.length && !warn) warn = p && p.labs.length ? 'No labs are checked, so this link will use the labs from your syllabus (' + p.labs.filter(inGame).map(function (id) { return 'Exp ' + id; }).join(', ') + ').' : 'Check at least one lab in step 2, or the game will show every CHEM 3A lab.';
     if ($('mode').value) q.set('mode', $('mode').value);
     var url = GAME + '?' + q.toString().replace(/%2C/g, ',');
     $('link').value = url; $('tryIt').href = url;
