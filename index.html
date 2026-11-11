@@ -2846,7 +2846,7 @@ function readParts(root, parts) {
 function gradeAll(parts, vals, mock) {
   return parts.map((p, i) => {
     let spec = p;
-    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (spec && (p.read || p.rtol != null)) spec = Object.assign({}, spec, { read: p.read, rtol: p.rtol != null ? p.rtol : spec.rtol }); if (!spec) return { score: 0, ok: false, note: p.type === 'num' && !p.free && p.label == null ? 'You didn’t finish the measurement at this station.' : 'Fill in the first box first.' }; }
+    if (p.dep) { spec = p.dep(vals.map(v => v.val)); if (spec && (p.read || p.rtol != null)) spec = Object.assign({}, spec, { read: p.read, rtol: p.rtol != null ? p.rtol : spec.rtol }); if (!spec) return { score: 0, ok: false, note: p.unfinished ? p.unfinished() : p.type === 'num' && !p.free && p.label == null ? 'You didn’t finish the measurement at this station.' : 'Fill in the first box first.' }; }
     if (p.free) { const ok = !!parseEntry(vals[i].val); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Type the number you see.' }; }
     if (!String(vals[i].val).trim()) return { score: 0, ok: false, empty: true, note: '' };
     return gradePart(spec, vals[i].val, vals[i].unit, mock);
@@ -3729,7 +3729,7 @@ VBENCH.push(BENCH_BEADS);
 // a part graded against what the student actually did at the station
 function livePart(get, o) {
   const p = Object.assign({ type: 'num' }, o, { dep: () => get() });
-  Object.defineProperty(p, 'ans', { get: () => { const sp = get(); return sp ? sp.ans : 'do the measurement first'; } });
+  Object.defineProperty(p, 'ans', { get: () => { const sp = get(); if (sp) return sp.ans; const id = o && o.ideal && o.ideal(); return id ? id.ans + ' (at the real endpoint)' : 'do the measurement first'; } });
   return p;
 }
 const handQ = (lab, prompt, parts, sol, skill) => { const q = { lab, labName: labById(lab).name, kind: 'hands', tag: 'Hands-on station', prompt, parts, video: (LAB_VIDEOS[lab] || [])[0], skill }; Object.defineProperty(q, 'solution', { get: sol }); return q; };
@@ -3776,11 +3776,14 @@ const HANDS = {
   },
   '12b'() {
     const b = BENCH_TITRATE, s = b.setup(); Object.assign(s, { soda: true, flask: true, ind: true }); s.v = +(s.ve - rnd(0.45, 1.0, 2)).toFixed(2);
-    const fin = () => (s.done ? num(s.v, { dp: 2, unit: 'mL', tol: 0.02 }) : null);
-    return { lab: '12b', title: 'Citric Acid in Soda (hands-on)', hands: { bench: b, s, snap: () => `Initial ${s.vi.toFixed(2)} mL · ${s.done ? 'stopped at ' + s.v.toFixed(2) + ' mL' : 'never reached the endpoint'}` }, versions: {
-      A: handQ('12b', 'The titration was started for you. Finish it drop by drop: stop at the first light pink that stays. Record the <b>final</b> buret reading.', [livePart(fin, { unit: 'mL' })], () => `<b>${s.v.toFixed(2)} mL</b>.`, 'read'),
-      B: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b>. Finish the titration (first light pink that stays). What volume of NaOH was used?`, [livePart(() => (s.done ? num(s.v - s.vi, { dp: 2, unit: 'mL', tol: 0.03 }) : null), { unit: 'mL' })], () => `${s.v.toFixed(2)} − ${s.vi.toFixed(2)} = <b>${(s.v - s.vi).toFixed(2)} mL</b>.`, 'calc'),
-      C: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b> and the NaOH is <b>${s.Mb.toFixed(4)} M</b>. Finish the titration. How many moles of NaOH were used?`, [livePart(() => (s.done ? num(s.Mb * (s.v - s.vi) / 1000, { sf: Math.min(4, sfCount((s.v - s.vi).toFixed(2))), unit: 'mol', rel: 0.006 }) : null), { unit: 'mol' })], () => `${s.Mb.toFixed(4)} M × ${((s.v - s.vi) / 1000).toFixed(5)} L = <b>${sfHTML(s.Mb * (s.v - s.vi) / 1000, Math.min(4, sfCount((s.v - s.vi).toFixed(2))))} mol</b>.`, 'calc') } };
+    // pink showing counts as finished even if the Stop button wasn't pressed
+    const ok = () => s.done || s.v >= s.ve, V = () => s.v - s.vi, Ve = () => s.ve - s.vi, sfV = x => Math.min(4, sfCount(x.toFixed(2)));
+    const short = () => `The flask was still colorless at ${s.v.toFixed(2)} mL, so the titration wasn’t finished. Keep adding NaOH (single drops near the end) until the first light pink that stays, then press <b>Light pink stays: stop</b>.`;
+    const mol = x => num(s.Mb * x / 1000, { sf: sfV(x), unit: 'mol', rel: 0.006 });
+    return { lab: '12b', title: 'Citric Acid in Soda (hands-on)', hands: { bench: b, s, snap: () => `Initial ${s.vi.toFixed(2)} mL · ${ok() ? 'stopped at ' + s.v.toFixed(2) + ' mL' : 'still colorless at ' + s.v.toFixed(2) + ' mL (endpoint not reached)'}` }, versions: {
+      A: handQ('12b', 'The titration was started for you. Finish it drop by drop: stop at the first light pink that stays. Record the <b>final</b> buret reading.', [livePart(() => (ok() ? num(s.v, { dp: 2, unit: 'mL', tol: 0.02 }) : null), { unit: 'mL', unfinished: short, ideal: () => num(s.ve, { dp: 2, unit: 'mL', tol: 0.02 }) })], () => ok() ? `<b>${s.v.toFixed(2)} mL</b>.` : `${short()} Near <b>${s.ve.toFixed(2)} mL</b>.`, 'read'),
+      B: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b>. Finish the titration (first light pink that stays). What volume of NaOH was used?`, [livePart(() => (ok() ? num(V(), { dp: 2, unit: 'mL', tol: 0.03 }) : null), { unit: 'mL', unfinished: short, ideal: () => num(Ve(), { dp: 2, unit: 'mL', tol: 0.03 }) })], () => ok() ? `${s.v.toFixed(2)} − ${s.vi.toFixed(2)} = <b>${V().toFixed(2)} mL</b>.` : `${short()} At the endpoint: ${s.ve.toFixed(2)} − ${s.vi.toFixed(2)} = <b>${Ve().toFixed(2)} mL</b>.`, 'calc'),
+      C: handQ('12b', `The initial reading was <b>${s.vi.toFixed(2)} mL</b> and the NaOH is <b>${s.Mb.toFixed(4)} M</b>. Finish the titration. How many moles of NaOH were used?`, [livePart(() => (ok() ? mol(V()) : null), { unit: 'mol', unfinished: short, ideal: () => mol(Ve()) })], () => { const x = ok() ? V() : Ve(); return `${ok() ? '' : short() + ' At the endpoint: '}${s.Mb.toFixed(4)} M × ${(x / 1000).toFixed(5)} L = <b>${sfHTML(s.Mb * x / 1000, sfV(x))} mol</b>.`; }, 'calc') } };
   },
   '6a'() {
     const b = BENCH_MODEL, s = b.setup(), m = s.m;
