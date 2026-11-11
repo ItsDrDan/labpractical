@@ -25,7 +25,8 @@ Beginner level shows answer choices. Intermediate and above are typed, with no m
 
 - **Reaction types:** Types of Reactions asks for **Scheme 2** (precipitation, acid/base neutralization, gas evolution, redox, combustion, no reaction). A Scheme 1 answer gets a note telling the student which scheme is being asked.
 - **Older labs:** a few questions come from earlier manuals and are labeled "(earlier manual)": the 9a standard curve and the specific heat of a metal. They stay out of the mock practical. Exp 3z (Found or Forgery) is only on Dr. Dan's list.
-- **Readings:** the mock accepts readings within the practical's usual window (about ±0.1 mL on a buret, ±0.3 mL on a 50/100 mL cylinder, ±0.3 °C on a thermometer). Students must still record the right number of decimal places.
+- **Partial credit (mock):** readings are graded accuracy 40% / decimal places 40% / unit 20%; calculations answer 80% / sig figs 10% / unit 10%. A reading within the practical's window (about ±0.1 mL on a buret, ±0.3 mL on a 50/100 mL cylinder, ±0.3 °C on a thermometer) gets full accuracy; within twice that window, half. A calculation within 2% of the answer, or one with a known setup slip, gets half the answer points. Wrong sig figs or units lose only their share.
+- **Practice:** the right number with the wrong sig figs counts as correct but shows a yellow "fix your sig figs" box, so students learn the rule without losing their streak.
 - **Privacy:** progress stays on the student's device. The game sends only anonymous practice stats (topic and right or wrong; no names, IDs or typed answers). Browsers set to Do Not Track send nothing.
 
 ## Feedback

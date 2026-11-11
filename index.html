@@ -389,7 +389,7 @@ html.dd-embedded{scroll-padding-top:8px}
 .part input.unit-in{flex:0 0 120px}.part .unit{color:var(--muted);font-weight:800;font-size:1.05rem}
 .part select{width:100%;min-height:52px;border:1.5px solid var(--line2);border-radius:12px;padding:8px 12px;font-size:1.05rem;background:#fff;max-width:100%}
 .part.good input,.part.good select{border-color:#3a9a71;background:var(--mint)}.part.bad input,.part.bad select{border-color:#d4677a;background:var(--rose)}
-.part .pnote{font-size:.95rem}.part.good .pnote{color:var(--mint-ink)}.part.bad .pnote{color:var(--rose-ink)}
+.part.warn input{border-color:#d9a400;background:#fff6d6}.part.warn .pnote{color:#7a5a00;background:#fff3c4;border-radius:8px;padding:4px 8px;font-weight:700}.part .pnote{font-size:.95rem}.part.good .pnote{color:var(--mint-ink)}.part.bad .pnote{color:var(--rose-ink)}
 .opts{display:flex;flex-wrap:wrap;gap:8px}.opt{border:1.5px solid var(--line2);background:#fff;border-radius:12px;padding:10px 14px;min-height:50px;font-weight:750;color:#2b3760;text-align:left;font-size:1.02rem}
 .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}.opt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px #4b57d126}
 .opt.right{border-color:#3a9a71;background:var(--mint);color:var(--mint-ink)}.opt.wrong{border-color:#d4677a;background:var(--rose);color:var(--rose-ink)}
@@ -932,8 +932,14 @@ function autoSlip(spec, x) {
   for (const k of [3, 6, 9, 2, 1]) for (const sgn of [1, -1]) if (near(x, v * Math.pow(10, sgn * k))) return `Your answer is ${k === 1 ? '10' : k === 2 ? '100' : k === 3 ? '1000' : '10' + String(k).replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d])} times too ${sgn > 0 ? 'big' : 'small'}: check a unit conversion (mL ↔ L, g ↔ kg, J ↔ kJ, nm ↔ m) or the decimal point.`;
   for (const f of [2, 3]) { if (near(x, v * f)) return `Your answer is ${f} times too big: check the mole ratio from the balanced equation.`; if (near(x, v / f)) return `Your answer is ${f} times too small: check the mole ratio from the balanced equation.`; }
   if (near(x * v, 1, 0.012)) return 'It looks like you divided upside down.';
-  if (near(x, v, 0.05)) return 'Close. Use the unrounded numbers until the last step, and check each value you copied.';
+  if (near(x, v, 0.05)) return spec.read || spec.reading ? 'Outside the accepted range for this reading. Check which numbered line you counted from, and read the bottom of the meniscus.' : spec.tol === 0 ? 'This one has to be exact. Count again.' : 'Close. Use the unrounded numbers until the last step, and check each value you copied.';
   return '';
+}
+// close but outside the accepted window: readings within 2× the window, calculations within 2% (not for exact counts)
+function isClose(spec, tol, x) {
+  if (spec.tol === 0 || !isFinite(x)) return false;
+  const d = Math.abs(x - spec.v);
+  return spec.read ? d <= 2 * tol + 1e-12 : d <= Math.max(2.5 * tol, Math.abs(spec.v) * 0.02) + 1e-12;
 }
 function gradeNum(spec, raw, unitRaw, needUnit) {
   const sp = splitNum(raw), u = sp ? parseEntry(sp.num) : null;
@@ -957,10 +963,13 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
   let score = 0, bd = null;
   if (needUnit) {
     // graded like the real practical: readings = accuracy 4 / precision 4 / unit 2; calculations = answer 8 / sig figs 1 / unit 1.
-    // Precision and units earn their points even when the value is off. A known setup slip earns half the answer points.
+    // Precision and units earn their points even when the value is off. A known setup slip earns half the answer points,
+    // and so does a value that is close: a reading within twice the accepted window, a calculation within 2%.
     const slipHit = !valueOk && spec.slip && spec.slip(x);
     const W = spec.read ? [0.4, 0.4, 0.2] : spec.unit ? [0.8, 0.1, 0.1] : [0.8, 0.2, 0];
-    const a = valueOk ? W[0] : slipHit ? W[0] / 2 : 0, pr = precOk ? W[1] : 0, un = spec.unit && uOk ? W[2] : 0;
+    const closeHit = !valueOk && !slipHit && isClose(spec, tol, x);
+    const a = valueOk ? W[0] : slipHit || closeHit ? W[0] / 2 : 0, pr = precOk ? W[1] : 0, un = spec.unit && uOk ? W[2] : 0;
+    if (closeHit) spec = Object.assign({}, spec, { closeNote: spec.read ? 'Close, but outside the accepted range for this reading: half credit for accuracy. Read the meniscus (or line) again.' : 'Close, but not within rounding of the answer: half credit. Keep every digit until the last step and check each value you used.' });
     score = a + pr + un;
     bd = [[spec.read ? 'Accuracy' : 'Answer', a, W[0]], [spec.dp != null ? 'Precision' : 'Sig figs', pr, W[1]]]; if (W[2]) bd.push(['Units', un, W[2]]);
   } else {
@@ -968,12 +977,15 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
     if (valueOk && precOk) score += 0.2;
     score = Math.min(1, score);
   }
-  const ok = !!valueOk && precOk && uOk;
+  // Practice: the right number with the wrong sig figs (or decimal places) counts as correct, with a yellow "fix your sig figs" notice.
+  // The mock grades it like the practical (sig figs/precision points lost, value points kept).
+  const warn = !needUnit && !!valueOk && !precOk && uOk ? `Close, but fix your ${spec.dp != null ? 'decimal places' : 'sig figs'}: ${precNote.replace(/^(Sig figs|Precision): /, '')}` : '';
+  const ok = !!valueOk && uOk && (precOk || !!warn);
   let note = '';
-  if (!valueOk) note = (spec.slip ? spec.slip(x) || '' : '') || autoSlip(spec, x);
+  if (!valueOk) note = spec.closeNote || (spec.slip ? spec.slip(x) || '' : '') || autoSlip(spec, x);
   else if (!precOk) note = precNote;
   else if (!uOk) note = `Units: write <b>${spec.unit}</b>.`;
-  return { score: +score.toFixed(2), ok, valueOk: !!valueOk, precOk, uOk, note, bd };
+  return { score: +score.toFixed(2), ok, warn, valueOk: !!valueOk, precOk, uOk, note, bd };
 }
 // Full chemical equation typed by the student, e.g. "2HCl(aq) + Na2CO3(aq) -> 2NaCl(aq) + H2O(l) + CO2(g)"
 function parseEq(str) {
@@ -2607,6 +2619,7 @@ function makeQ(labId, kind) {
   const lab = labById(labId), kinds = Object.keys(lab.K), k = kind || pick(kinds);
   const q = lab.K[k](); q.lab = labId; q.kind = k; q.labName = lab.name;
   q.parts.forEach(p => { if (p.type === 'choice' && p.options) { const w = whyFor(q, p); if (Object.keys(w).length) p.why = Object.assign(p.why || {}, w); } });
+  if (q.skill === 'read') q.parts.forEach(p => { if (p.type === 'num') p.reading = true; });
   if (q.skill === 'read' && k !== 'volumetric') q.parts.forEach(p => { if (p.type === 'num' && p.unit && p.unit !== 'g' && RTOL[p.unit]) { const r = p.rtol != null ? p.rtol : RTOL[p.unit](p); if (p.tol == null || p.tol < r) p.tol = r; } });
   return q;
 }
@@ -2874,9 +2887,9 @@ function newQuestion() {
 }
 function markParts(root, res, parts, reveal) {
   root.querySelectorAll('.part').forEach((el, i) => {
-    const r = res[i]; el.classList.remove('good', 'bad'); if (!r || r.empty) return;
-    el.classList.add(r.ok ? 'good' : 'bad');
-    let note = r.ok ? '' : r.note || (r.valueOk === false ? 'Check this value.' : '');
+    const r = res[i]; el.classList.remove('good', 'bad', 'warn'); if (!r || r.empty) return;
+    el.classList.add(r.ok ? (r.warn ? 'warn' : 'good') : 'bad');
+    let note = r.ok ? r.warn || '' : r.note || (r.valueOk === false ? 'Check this value.' : '');
     if (reveal && !r.ok) note = `Answer: <b>${partAns(parts[i])}</b>` + (note ? ` · ${note}` : '');
     el.querySelector('.pnote').innerHTML = note;
     if (parts[i].type === 'choice') el.querySelectorAll('.opt').forEach(b => { b.classList.remove('right', 'wrong'); if (b.classList.contains('sel')) b.classList.add(r.ok ? 'right' : 'wrong'); });
@@ -2894,7 +2907,7 @@ function check() {
     let xp = 10 + (state.tries === 0 ? 5 : 0) + (!state.helped ? 5 : 0); P.streak++; P.best = Math.max(P.best, P.streak);
     if (!state.logged) { P.tried++; bumpLab(q.lab, true); ddLog('Practice', q, state.tries === 0); state.logged = true; }
     P.correct++; P.xp += xp; P.skill[q.skill] = (P.skill[q.skill] || 0) + 1;
-    fb.className = 'feedback good'; fb.innerHTML = `${tock('correct', 'fb-tock')}<b>Nice work!</b> <span class="xp-pop">+${xp} XP</span><div class="sol">${q.solution}</div>`;
+    fb.className = 'feedback good'; fb.innerHTML = `${tock('correct', 'fb-tock')}<b>Nice work!</b> <span class="xp-pop">+${xp} XP</span>${res.some(r => r.warn) ? '<div class="pnote" style="background:#fff3c4;color:#7a5a00;border-radius:8px;padding:6px 10px;margin-top:6px;font-weight:700">Your number is right. Fix the sig figs (yellow box): the practical takes points off for them.</div>' : ''}<div class="sol">${q.solution}</div>`;
     finish();
   } else {
     state.tries++;
