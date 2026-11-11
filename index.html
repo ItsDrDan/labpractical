@@ -774,7 +774,7 @@ const isInfWord = raw => INF_WORDS.includes(cleanTyped(raw));
 function sfOfDigits(whole, dot, frac) {
   let d = (whole + frac).replace(/^0+/, '');
   if (!dot) d = d.replace(/0+$/, '');
-  return d.length || 1;
+  return d.length || (dot ? Math.max(1, frac.length) : 1);
 }
 function parseEntry(raw) {
   let s = cleanTyped(raw).replace(/[()]/g, '').replace(/^x?10\^/, '1e').replace(/x10\^?/, 'e');
