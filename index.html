@@ -896,7 +896,7 @@ const UNIT_ALIASES = {
   'J': ['j', 'joules', 'joule'], 'kJ': ['kj', 'kilojoules', 'kilojoule'], 'J/g°C': ['j/g°c', 'j/gc', 'j/g*c', 'j/g·°c', 'j/gºc', 'j/(g°c)', 'j/(gc)', 'jg-1c-1', 'jg-1°c-1'], 'kJ/mol': ['kj/mol', 'kjmol-1', 'kj/mole'],
   'mol': ['mol', 'moles', 'mole'], 'M': ['m', 'mol/l', 'molar', 'moll-1', 'mol/liter'], 'L': ['l', 'liters', 'liter'], 'mmHg': ['mmhg', 'torr', 'mm hg'], 'atm': ['atm', 'atmospheres', 'atmosphere'], 'K': ['k', 'kelvin'],
   '%': ['%', 'percent', 'pct'], 'Hz': ['hz', 's-1', '1/s', 's^-1', '/s'], 'nm': ['nm', 'nanometers', 'nanometer'], 'amu': ['amu', 'u', 'g/mol', 'da'], 'g/mol': ['g/mol', 'gmol-1', 'gmol^-1', 'g/mole'],
-  'L·atm/(mol·K)': ['l·atm/mol·k', 'latm/molk', 'l*atm/mol*k', 'latm/(molk)', 'l·atm/(mol·k)', 'latmmol-1k-1', 'l atm/mol k', 'l-atm/mol-k', 'latm/mol/k'], 'in Hg': ['inhg', 'inchesofmercury', 'in']
+  'L·atm/(mol·K)': ['l·atm/mol·k', 'latm/molk', 'l*atm/mol*k', 'latm/(molk)', 'l·atm/(mol·k)', 'latmmol-1k-1', 'l atm/mol k', 'l-atm/mol-k', 'latm/mol/k'], 'in Hg': ['inhg', 'inchesofmercury', 'in'], 'mol/kg': ['mol/kg', 'm', 'molal', 'molkg-1', 'mol/kilogram', 'moles/kg']
 };
 const normUnit = s => String(s).toLowerCase().replace(/\s+/g, '').replace(/[⁻]/g, '-').replace(/[¹]/g, '1').replace(/[³]/g, '3').replace(/[º˚]/g, '°').replace(/·/g, '·');
 function unitOk(raw, unit) {
@@ -1615,12 +1615,12 @@ const K4b = {
 /* ---------------- Exp 5a: Empirical Formula ---------------- */
 const EMP = [['Mg', 'O', 1, 1], ['Fe', 'O', 2, 3], ['Al', 'Cl', 1, 3], ['Cu', 'S', 2, 1], ['Ca', 'Cl', 1, 2], ['Zn', 'Cl', 1, 2], ['Al', 'O', 2, 3], ['Ni', 'Cl', 1, 2], ['Fe', 'Cl', 1, 3], ['Na', 'O', 2, 1]];
 const empF = (a, b, x, y) => `${a}${x > 1 ? x : ''}${b}${y > 1 ? y : ''}`;
-function mgoData() { const cr = rnd(20.5, 23.5, 4), mg = rnd(0.12, 0.19, 4), ox = mg / 24.31 * 15.999 * rnd(0.97, 1.02, 3), w1 = +(cr + mg + ox + rnd(0.0004, 0.0015, 4)).toFixed(4), w2 = +(cr + mg + ox).toFixed(4); return { cr, mg, ox: +(w2 - cr - mg).toFixed(4), w1, w2, comp: +(w2 - cr).toFixed(4) }; }
+function mgoData() { const cr = rnd(20.5, 23.5, 4), mg = rnd(0.12, 0.19, 4), ox = mg / 24.31 * 15.999 * rnd(0.97, 1.02, 3), w1 = +(cr + mg + ox - rnd(0.0002, 0.0009, 4)).toFixed(4), w2 = +(cr + mg + ox).toFixed(4); /* 2nd weighing is the higher one (manual step 15) */ return { cr, mg, ox: +(w2 - cr - mg).toFixed(4), w1, w2, comp: +(w2 - cr).toFixed(4) }; }
 const K5a = {
   massO() {
     const d = mgoData();
     return { tag: 'Mass of oxygen', prompt: 'A student just finished the empirical formula lab. What was the <b>mass of oxygen</b> that reacted?', ref: tableHTML([['Mass of empty crucible + cover', `${d.cr.toFixed(4)} g`], ['Mass of crucible + cover + Mg', `${(d.cr + d.mg).toFixed(4)} g`], ['Mass of crucible + cover + Mg<sub>x</sub>O<sub>y</sub>', `${d.w1.toFixed(4)} g (1st weighing)<br>${d.w2.toFixed(4)} g (2nd weighing)`]]),
-      parts: [num(d.ox, { dp: 4, unit: 'g', tol: 0.00011, slip: x => Math.abs(x - (d.w1 - d.cr - d.mg)) < 0.0002 ? 'Use the last weighing: you heat until the mass stops changing (constant mass).' : '' })], hint: 'Mass O = (crucible + cover + compound) − (crucible + cover + Mg). Use the final weighing.', solution: `${d.w2.toFixed(4)} − ${(d.cr + d.mg).toFixed(4)} = <b>${d.ox.toFixed(4)} g O</b>. Use the 2nd weighing, after the mass stopped changing.`, video: 'empirical', skill: 'calc' };
+      parts: [num(d.ox, { dp: 4, unit: 'g', tol: 0.00011, slip: x => Math.abs(x - (d.w1 - d.cr - d.mg)) < 0.0002 ? 'Use the higher of the two weighings. The lab manual: once the 1st and 2nd weighings agree within ±0.001 g, calculate with the higher one.' : '' })], hint: 'Mass O = (crucible + cover + compound) − (crucible + cover + Mg). The weighings agree within ±0.001 g, so use the higher one.', solution: `${d.w2.toFixed(4)} − ${(d.cr + d.mg).toFixed(4)} = <b>${d.ox.toFixed(4)} g O</b>. The two weighings agree within ±0.001 g, so use the <b>higher</b> one (lab manual, step 15).`, video: 'empirical', skill: 'calc' };
   },
   percent() {
     const d = mgoData(), el = pick(['oxygen', 'magnesium']), part = el === 'oxygen' ? d.ox : d.mg, pc = part / d.comp * 100, sf = Math.min(sfCount(part.toFixed(4)), sfCount(d.comp.toFixed(4)));
@@ -2004,21 +2004,225 @@ const K12b = {
   }
 };
 
+/* ===================== Manual-matched additions (Fall 2026 CHEM 3A Lab Manual + past practical) =====================
+   Error analysis ("too high / too low / unchanged"), report-sheet data tables, model-kit questions,
+   safety & technique, gas tests, titration technique, molality. */
+// too high / too low / unchanged, typed or picked. Short words are space-padded so "regardless" never reads as "less".
+const DIR3 = {
+  high: { kw: [[' high', 'bigger', 'larger', 'greater', 'increas', ' more ', ' over', ' up ']], nokw: [' low', 'smaller', ' less ', 'decreas', ' under', 'no change', 'unchanged', ' same', 'no effect', 'not change', 'not affect'] },
+  low: { kw: [[' low', 'smaller', ' less ', 'decreas', ' under', 'fewer', ' down ']], nokw: [' high', 'bigger', 'larger', 'greater', 'increas', ' more ', 'no change', 'unchanged', ' same', 'no effect', 'not change', 'not affect'] },
+  none: { kw: [['no change', 'unchanged', ' same', 'no effect', 'not change', 'not affect', 'doesn t change', 'does not change', 'won t change', 'unaffected', 'stays', 'nothing']], nokw: [' high', ' low', 'bigger', 'smaller', 'increas', 'decreas'] }
+};
+const dirPart = (dir, label, words) => choice(words || ['Too high', 'Too low', 'Unchanged'], ['high', 'low', 'none'].indexOf(dir), Object.assign({ label, kwNote: 'Say which way: too high, too low, or unchanged.' }, DIR3[dir]));
+const resPart = (dir, label) => dirPart(dir, label, ['Higher', 'Lower', 'No change']);
+// meas: [[option, kw words]...]; the first is the right one
+function errQ(o) {
+  const parts = [];
+  if (o.meas) { const opts = o.meas.map(m => m[0]); parts.push(choice(opts, 0, { label: 'Which measured value is directly affected?', kw: [o.meas[0][1]], nokw: o.meas.slice(1).flatMap(m => m[1]).filter(w => !o.meas[0][1].includes(w)), kwNote: 'Name the measurement from your data table.' })); }
+  if (o.dir) parts.push(dirPart(o.dir, `That measured value would be…`));
+  parts.push(resPart(o.res, `The ${o.result} would come out…`));
+  return { tag: 'Error analysis', prompt: o.prompt, ref: o.ref, eq: o.eq, parts, hint: o.hint || 'Write the equation for the result. Is the affected value on top (numerator) or on the bottom (denominator)?', solution: o.sol, video: o.video, skill: 'concept', pt: true };
+}
+const pickErr = (list, eq) => errQ(Object.assign({ eq }, pick(list)));
+
+/* ---- Exp 1a ---- */
+Object.assign(K1a, {
+  errors() {
+    return pickErr([
+      { prompt: 'A student finds the volume of a metal object by <b>displacement</b>. An <b>air bubble</b> stays stuck to the object under the water.', meas: [['Volume of the object (water level with the object)', ['volume', 'water level', 'final volume', 'displace', 'ml']], ['Mass of the object', ['mass', 'weigh']]], dir: 'high', res: 'low', result: 'density (d = m/V)', sol: 'The bubble pushes the water up too, so the final water level and the <b>volume read too high</b>. Volume is on the bottom of d = m/V, so the <b>density comes out lower</b>.', video: 'displacement' },
+      { prompt: 'A student measures the volume of a metal bar by displacement first, then puts the <b>still-wet bar</b> on the balance to get its mass.', meas: [['Mass of the bar', ['mass', 'weigh', 'balance', 'grams']], ['Volume of the bar', ['volume', ' ml']]], dir: 'high', res: 'high', result: 'density (d = m/V)', sol: 'Water on the bar adds mass, so the <b>mass is too high</b>. Mass is on top of d = m/V, so the <b>density comes out higher</b>. Dry the object before weighing.', video: 'density' },
+      { prompt: 'Measuring the dimensions of a rectangular bar, a student lines the edge up with the <b>end of the ruler</b> instead of the 0 cm mark, and the ruler’s end is worn down about 1 mm short of zero.', meas: [['The length measurement', ['length', 'dimension', 'ruler', ' cm', 'side', 'width', 'height']], ['The mass', ['mass']]], dir: 'high', res: 'high', result: 'volume from the dimensions (V = l × w × h)', sol: 'The worn end sits past zero, so each reading is about 0.1 cm <b>too high</b>, and V = l × w × h comes out <b>higher</b>. Always start at the 0 mark, not the end of the ruler.', video: 'measure' }
+    ], 'd = m ÷ V');
+  }
+});
+
+/* ---- Exp 3z ---- */
+Object.assign(K3z, {
+  flameWhy() {
+    return { tag: 'Why flames have colors', prompt: 'In a flame test, why does each metal give off its own color of light? Explain with electrons and energy levels.', parts: [choice(['Heat excites electrons to higher energy levels; when they fall back down they emit light of specific energies (colors)', 'The metal burns and the smoke is colored', 'The flame’s color depends only on how hot the burner is'], 0, { kw: [['electron'], ['fall', 'drop', 'return', 'relax', 'go back', 'goes back', 'come back', 'comes back', 'emit', 'releas', 'give off', 'gives off', 'lower level', 'lower energy']], kwNote: 'Mention the electrons, and what happens when they fall back down.' })],
+      hint: 'Think Bohr model: what happens to an electron when it is heated, and then when it falls back?', solution: 'Heat <b>excites electrons</b> to higher energy levels. When they <b>fall back</b> to lower levels they <b>emit photons</b> of specific energies. Each element has its own energy levels, so its own colors.', video: 'light', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 5a: weighings agree within ±0.001 g → the manual says use the HIGHER weighing ---- */
+Object.assign(K5a, {
+  errors() {
+    return pickErr([
+      { prompt: 'In the empirical formula lab, some of the magnesium in the middle of the pile <b>never reacted</b> (incomplete combustion).', meas: [['Mass of the Mg<sub>x</sub>O<sub>y</sub> compound (crucible + cover + compound)', ['compound', 'product', 'oxide', 'mgo', 'mgxoy', 'crucible cover compound']], ['Mass of Mg used', ['mass of mg', 'mg used', 'magnesium used'], ['mass of mg', 'mg used']]], dir: 'low', res: 'high', result: 'mass percent of Mg (based on the data)', sol: 'Unreacted Mg gains no oxygen, so the <b>compound weighs too little</b> and the mass of oxygen is too low. % Mg = g Mg ÷ g compound, with a smaller bottom → <b>% Mg too high</b> (the formula shows too much Mg). Break up the ash and keep heating to constant mass.', video: 'empirical' },
+      { prompt: 'After weighing the empty crucible, a student picks it up with <b>bare fingers</b> (no gloves) before the final weighings.', meas: [['Mass of crucible + cover + compound', ['compound', 'product', 'oxide', 'final', 'crucible']], ['Mass of oxygen in the air', ['air']]], dir: 'high', res: 'high', result: 'mass of oxygen (and % O)', sol: 'Finger oils add mass, so the <b>later weighings are too high</b>. Mass of O = (crucible + compound) − (crucible + Mg) comes out <b>higher</b>, so % O is too high. The manual says wear gloves after the first mass.', video: 'empirical' },
+      { prompt: 'Heating in open air, a little of the magnesium reacts with <b>nitrogen</b> (N<sub>2</sub>) instead of oxygen. Mg<sub>3</sub>N<sub>2</sub> adds less mass per Mg than MgO does.', meas: [['Mass of the Mg<sub>x</sub>O<sub>y</sub> compound', ['compound', 'product', 'oxide', 'crucible']], ['Mass of Mg used', ['mass of mg', 'mg used'], ['mg used']]], dir: 'low', res: 'low', result: 'calculated mass of oxygen', sol: 'Mg that becomes nitride gains less mass than it would as oxide, so the <b>compound weighs less</b> and the calculated <b>mass of oxygen is lower</b> (the Mg : O ratio looks Mg-heavy). The manual calls this unavoidable in open air.', video: 'empirical' }
+    ], '% Mg = (g Mg ÷ g compound) × 100 &nbsp;&nbsp; g O = g compound − g Mg');
+  }
+});
+
+/* ---- Exp 6a: the model kit and electron-group geometry (no polarity: not in the 3A manual) ---- */
+const KIT = { H: 'white', C: 'black', O: 'red', Cl: 'green', N: 'blue', Br: 'orange', I: 'purple' };
+const KIT_MOLS = [ // formula, central, outer, geometry, electron groups, double/triple bond note
+  ['CH4', 'C', ['H', 'H', 'H', 'H'], 'tetrahedral', 4, ''], ['NH3', 'N', ['H', 'H', 'H'], 'trigonalpyramidal', 4, ''], ['H2O', 'O', ['H', 'H'], 'bent', 4, ''],
+  ['CO2', 'C', ['O', 'O'], 'linear', 2, 'two double bonds'], ['HCN', 'C', ['H', 'N'], 'linear', 2, 'a triple bond to N'], ['CH2O', 'C', ['O', 'H', 'H'], 'trigonalplanar', 3, 'a double bond to O'],
+  ['CH2Cl2', 'C', ['H', 'Cl', 'H', 'Cl'], 'tetrahedral', 4, ''], ['CH3Br', 'C', ['H', 'H', 'H', 'Br'], 'tetrahedral', 4, ''], ['NH2Cl', 'N', ['H', 'H', 'Cl'], 'trigonalpyramidal', 4, ''], ['OCl2', 'O', ['Cl', 'Cl'], 'bent', 4, ''], ['HOCl', 'O', ['H', 'Cl'], 'bent', 4, ''], ['CH3I', 'C', ['H', 'H', 'H', 'I'], 'tetrahedral', 4, '']
+];
+const EGG = ['Linear', 'Trigonal planar', 'Tetrahedral'], egIdx = n => [2, 3, 4].indexOf(n);
+Object.assign(K6a, {
+  kit() {
+    const m = pick(KIT_MOLS), cnt = {}; m[2].forEach(e => (cnt[e] = (cnt[e] || 0) + 1));
+    const desc = `one <b>${KIT[m[1]]}</b> ball in the middle, bonded to ${Object.keys(cnt).map(e => `${cnt[e]} <b>${KIT[e]}</b> ball${cnt[e] > 1 ? 's' : ''}`).join(' and ')}${m[5] ? ` (with ${m[5]}: long flexible connectors)` : ''}`;
+    return { tag: 'Model kit → formula', prompt: `Your instructor hands you a model: ${desc}. Every hole is filled. Write the <b>chemical formula</b>.`, ref: tableHTML(Object.keys(KIT).map(e => [KIT[e][0].toUpperCase() + KIT[e].slice(1), e])),
+      parts: [{ type: 'formula', accept: [m[0], ...(m[0] === 'CH2Cl2' ? ['CCl2H2', 'CH2Cl2'] : m[0] === 'CH2O' ? ['H2CO', 'COH2'] : m[0] === 'HOCl' ? ['HClO', 'ClOH'] : m[0] === 'NH2Cl' ? ['NClH2', 'ClNH2'] : m[0] === 'OCl2' ? ['Cl2O'] : m[0] === 'CH3Br' ? ['CH3Br', 'CBrH3'] : m[0] === 'CH3I' ? ['CH3I', 'CIH3'] : [])], ans: fhtml(m[0]) }],
+      hint: 'Use the kit’s color key: white H, black C, red O, green Cl, blue N, orange Br, purple I.', solution: `Color key → <b>${fhtml(m[0])}</b>.`, video: 'lewis', skill: 'read' };
+  },
+  egGeom() {
+    const m = pick(KIT_MOLS), lp = m[4] - m[2].length;
+    return { tag: 'Electron groups', prompt: `For <span class="fbig">${fhtml(m[0])}</span> (central atom ${m[1]}): how many <b>electron groups</b> are around the central atom, and what is the <b>electron group geometry</b>?`, art: modelSVG(m[3], m[1], m[2], `A ball-and-stick model of ${m[0]}`),
+      parts: [num(m[4], { unit: '', tol: 0, ans: String(m[4]), label: 'Electron groups' }), choice(EGG, egIdx(m[4]), { label: 'Electron group geometry' })],
+      hint: 'Each bonded atom is one group (a double or triple bond still counts once), and each lone pair is one group.', solution: `${m[2].length} bonded atom${m[2].length > 1 ? 's' : ''} + ${lp} lone pair${lp === 1 ? '' : 's'} = <b>${m[4]}</b> electron groups → <b>${EGG[egIdx(m[4])].toLowerCase()}</b> electron group geometry (molecular geometry: ${GEO_NAMES[m[3]].toLowerCase()}).`, video: 'lewis', skill: 'concept' };
+  },
+  connectors() {
+    const q = pick([
+      ['In the model kit, what do you use to make a <b>double bond</b>?', ['Two long, flexible connectors', 'One short, rigid connector', 'Two short, rigid connectors'], 'A double bond uses <b>two long flexible connectors</b>; a triple bond uses three. Short rigid connectors are single bonds.', [['two', '2 ', 'double'], ['long', 'flexible', 'bendy']], ['short', 'rigid', 'one ']],
+      ['A nitrogen (blue) ball has one hole plugged. How many bonds does nitrogen make in the kit, and why?', ['Three: N has 5 valence electrons, so it needs 3 bonds (plus 1 lone pair) for an octet', 'Four: like carbon', 'Two: like oxygen'], 'N makes <b>3 bonds</b> and keeps one lone pair. That is why one hole is plugged.', [['3', 'three']], ['four', '4 ', 'two', '2 ']],
+      ['How do you know your model is built correctly?', ['Every hole on every ball has a connector in it', 'All the balls are the same color', 'The model lies flat on the table'], 'The manual: the model is right when <b>every hole is filled</b>.', [['hole', 'every', 'all filled', 'filled']], ['color', 'flat']]
+    ]);
+    return { tag: 'Using the model kit', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Short rigid = single bond. Long flexible = double or triple.', solution: q[2], video: 'lewis', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 7a: the report-sheet results table, error analysis ---- */
+Object.assign(K7a, {
+  table() {
+    const exo = Math.random() < 0.5, sub = exo ? 'Na₂CO₃' : 'H₃C₆H₅O₇', cal = rnd(3.6, 4.6, 4), water = rnd(45.5, 54.5, 2), solid = rnd(4.8, 5.2, 4), tot = +(cal + water + solid).toFixed(4);
+    const Ti = rnd(20.5, 23.5, 1), dT = (exo ? 1 : -1) * rnd(2.5, 6.5, 1), Tf = +(Ti + dT).toFixed(1), d = +(Tf - Ti).toFixed(1), m = +(tot - cal).toFixed(4);
+    const q = m * 4.184 * d, sfq = Math.min(sfCount(m.toFixed(4)), sfCount(Math.abs(d).toFixed(1)), 4);
+    return { tag: 'Calorimetry results table', prompt: `Fill in the results table from the calorimetry report for <b>${sub}</b> dissolving in water.`, eq: 'q<sub>solution</sub> = m·c·ΔT &nbsp;&nbsp; q<sub>reaction</sub> + q<sub>solution</sub> = 0 &nbsp;&nbsp; c = 4.184 J/g·°C',
+      ref: tableHTML([['Mass of calorimeter (empty)', `${cal.toFixed(4)} g`], ['Initial temperature', `${Ti.toFixed(1)} °C`], ['Final temperature', `${Tf.toFixed(1)} °C`], ['Mass of calorimeter and solution', `${tot.toFixed(4)} g`]]),
+      parts: [num(m, { dp: 4, unit: 'g', tol: 0.00011, label: 'Mass of solution (m)' }), num(d, { dp: 1, unit: '°C', tol: 0.051, label: 'Change in temperature (ΔT)', slip: x => Math.abs(x + d) < 0.06 ? 'ΔT = final − initial. Watch the sign.' : '' }),
+        num(q, { sf: sfq, unit: 'J', label: 'Heat of solution, q<sub>solution</sub>', slip: x => Math.abs(x + q) < Math.abs(q) * 0.01 ? 'q<sub>solution</sub> has the same sign as ΔT.' : '' }), num(-q, { sf: sfq, unit: 'J', label: 'Heat of reaction, q<sub>reaction</sub>', slip: x => Math.abs(x - q) < Math.abs(q) * 0.01 ? 'q<sub>reaction</sub> = −q<sub>solution</sub>: flip the sign.' : '' }),
+        choice(['Exothermic', 'Endothermic'], exo ? 0 : 1, { label: 'The reaction is…' })],
+      hint: 'Mass of solution = (calorimeter + solution) − empty calorimeter. ΔT = T<sub>f</sub> − T<sub>i</sub>. Then q = m·c·ΔT, and the reaction has the opposite sign.',
+      solution: `m = ${tot.toFixed(4)} − ${cal.toFixed(4)} = ${m.toFixed(4)} g. ΔT = ${Tf.toFixed(1)} − ${Ti.toFixed(1)} = ${d.toFixed(1)} °C. q<sub>solution</sub> = ${m.toFixed(4)} × 4.184 × ${d.toFixed(1)} = <b>${sfHTML(q, sfq)} J</b>, so q<sub>reaction</sub> = <b>${sfHTML(-q, sfq)} J</b>. The water got ${exo ? 'warmer' : 'colder'}, so the reaction is <b>${exo ? 'exothermic' : 'endothermic'}</b>.`, video: 'calorimetry', skill: 'calc' };
+  },
+  errors() {
+    return pickErr([
+      { prompt: 'For the exothermic Na<sub>2</sub>CO<sub>3</sub> trial, a student forgets the cardboard <b>lid</b>, and heat escapes into the room.', meas: [['Final temperature (so ΔT)', ['temp', 'final', 'delta t', 'change in temp', 'dt', 'degree']], ['Mass of the solution', ['mass']]], dir: 'low', res: 'low', result: 'size of q (heat released)', sol: 'Heat lost to the room never warms the water, so the <b>final temperature and ΔT read too low</b>. q = m·c·ΔT comes out <b>smaller</b> than the true heat released.', video: 'calorimetry' },
+      { prompt: 'A student weighs the calorimeter + solution <b>with the cardboard lid on</b>, but weighed the empty calorimeter without it.', meas: [['Mass of calorimeter + solution', ['mass', 'weigh', 'balance', 'grams']], ['Temperature change', ['temp']]], dir: 'high', res: 'high', result: 'heat of solution, q', sol: 'The lid’s mass sneaks into the mass of solution, so <b>m is too high</b> and q = m·c·ΔT comes out <b>higher</b>. The manual says never include the lid.', video: 'calorimetry' },
+      { prompt: 'In Part 2, a student records the final temperature <b>before all the ice has melted</b>.', meas: [['Final temperature of the water', ['temp', 'final', 'delta t', 'degree']], ['Mass of ice', ['ice', 'mass']]], dir: 'high', res: 'low', result: 'size of q<sub>water</sub> (heat lost by the water)', sol: 'The water hasn’t cooled all the way yet, so the <b>final temperature is too high</b>, ΔT is too small, and |q<sub>water</sub>| comes out <b>lower</b>. Stir until the ice is gone, then record the lowest temperature.', video: 'calorimetry' }
+    ], 'q = m·c·ΔT');
+  }
+});
+
+/* ---- Exp 8a: error analysis (report questions 6 and 7), apparatus ---- */
+Object.assign(K8a, {
+  errors() {
+    return pickErr([
+      { prompt: 'Report question: the gas collection tube was <b>not fully filled</b> with water, and <b>air stayed inside</b> when the tube was inverted.', meas: [['Volume of gas collected', ['volume', 'gas collected', ' ml', 'tube reading']], ['Mass of Mg', ['mass', 'magnesium', ' mg ']]], dir: 'high', res: 'high', result: 'experimental R value (R = PV/nT)', sol: 'The trapped air adds to the gas in the tube, so the <b>volume reads too high</b>. V is on top of R = PV/(nT), so <b>R comes out higher</b>.', video: 'dalton' },
+      { prompt: 'Report question: the magnesium ribbon was <b>not cleaned well</b>. Part of the mass you recorded is the dull oxide coating, not Mg.', meas: [['Mass of magnesium (so moles of H₂)', ['mass', 'magnesium', ' mg ', 'moles', 'grams']], ['Room pressure', ['pressure']]], dir: 'high', res: 'low', result: 'experimental R value (R = PV/nT)', sol: 'The balance counts the oxide as Mg, so the <b>mass of Mg (and the moles of H₂ you calculate) are too high</b>. n is on the bottom of R = PV/(nT), so <b>R comes out lower</b>. (Less H₂ also forms, which lowers V and R too.)', video: 'dalton' },
+      { prompt: 'A student reads the gas volume <b>while the ribbon is still bubbling</b>.', meas: [['Volume of gas collected', ['volume', 'gas', ' ml', 'tube']], ['Temperature of the water', ['temp']]], dir: 'low', res: 'low', result: 'experimental R value', sol: 'Not all the H₂ has formed yet, so the <b>volume is too low</b> and R = PV/(nT) comes out <b>lower</b>. Wait until the Mg is gone and bubbles stop.', video: 'dalton' },
+      { prompt: 'A student forgets to <b>subtract the vapor pressure of water</b> and uses the room pressure as P<sub>H₂</sub>.', dir: null, res: 'high', result: 'experimental R value', sol: 'Room pressure is P<sub>H₂</sub> + P<sub>water</sub>, so using it makes <b>P too high</b> and R = PV/(nT) comes out <b>higher</b>.', video: 'dalton', hint: 'Is P<sub>room</sub> bigger or smaller than P<sub>H₂</sub>? Where is P in R = PV/nT?' }
+    ], 'R = PV ÷ (nT) &nbsp;&nbsp; P<sub>H₂</sub> = P<sub>room</sub> − P<sub>water</sub>');
+  },
+  apparatus() {
+    const q = pick([
+      ['Why do you hold a finger over the hole in the rubber stopper while you flip the tube into the beaker?', ['So the acid and water stay in the tube (and off your hands) until it is under water', 'To warm the tube', 'To let air into the tube'], 'Your finger keeps the liquid (6 M HCl!) <b>in the tube</b> until the stopper is under water. Then let go.', [['in the tube', 'inside', 'falling out', 'fall out', 'spill', 'leak', 'pour out', 'come out', 'coming out', 'escape', 'stay', 'keep', 'acid']], ['warm', 'heat', 'let air', 'air in']],
+      ['How do you know the magnesium has finished reacting?', ['The ribbon is gone, bubbles stop, and the gas volume stops changing', 'The water turns pink', 'The tube gets cold'], 'The manual: the Mg is <b>no longer visible</b>, <b>bubbles stop</b>, and the <b>volume stops changing</b>.', [['gone', 'disappear', 'bubbl', 'no more', 'stop', 'no longer', 'not visible', 'used up', 'no ribbon', 'stops changing', 'volume stops']]],
+      ['Why is the temperature of the <b>water in the beaker</b> recorded as the temperature of the gas?', ['The gas sits in contact with that water, so it is at the same temperature', 'Gas has no temperature', 'The water is always 25 °C'], 'The H₂ is collected over the water and is assumed to be at the <b>same temperature as the water</b>.', [['same', 'equal', 'contact', 'touch', 'in the water', 'over water', 'surround', 'equilibrium']]],
+      ['Why does the magnesium ribbon get cleaned with steel wool first?', ['To remove the oxide coating so only pure Mg is weighed and reacts', 'To make it heavier', 'To dry it'], 'Steel wool removes the <b>oxide coating</b>, so the mass you record is all Mg.', [['oxide', 'coating', 'tarnish', 'dull', 'impur', 'pure', 'dirt', 'clean', 'mgo', 'layer']]]
+    ]);
+    return { tag: 'Gas collection setup', prompt: q[0], art: eqDraw(eqById('eudiometer')), parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Picture the tube upside down in the beaker of water.', solution: q[2], video: 'dalton', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 9a: molality from the report-sheet masses, error analysis ---- */
+Object.assign(K9a, {
+  molality() {
+    const V = pick([25, 50]), a = rnd(V === 50 ? 38 : 26, V === 50 ? 46 : 32, 4), salt = rnd(V === 50 ? 4.5 : 2.2, V === 50 ? 6.0 : 3.0, 4), b = +(a + salt).toFixed(4), dens = 1 + salt / V * 0.68, c = +(a + dens * V).toFixed(4);
+    const solv = +(c - b).toFixed(4), mol = salt / molarMass('NaCl'), mo = mol / (solv / 1000), sf = Math.min(sfCount(salt.toFixed(4)), sfCount(solv.toFixed(4)));
+    return { tag: 'Molality (report sheet)', prompt: `Use the data from the Solutions lab to find the <b>mass of solvent</b> and the <b>molality</b> of “Solution A” (NaCl, ${molarMass('NaCl').toFixed(2)} g/mol).`, eq: 'Molality (m) = mol solute ÷ kg solvent',
+      ref: tableHTML([[`Mass of ${V}-mL volumetric flask + stopper (empty)`, `${a.toFixed(4)} g`], [`Mass of ${V}-mL volumetric flask + stopper + NaCl`, `${b.toFixed(4)} g`], [`Mass of ${V}-mL volumetric flask + stopper + “Solution A”`, `${c.toFixed(4)} g`]]),
+      parts: [num(solv, { dp: 4, unit: 'g', tol: 0.00011, label: 'Mass of solvent (water)', slip: x => Math.abs(x - (c - a)) < 0.0002 ? 'That is the mass of the whole solution. Solvent = solution − solute.' : '' }), num(mo, { sf, unit: 'mol/kg', label: 'Molality of Solution A', slip: x => Math.abs(x - mol / (V / 1000)) < mol / (V / 1000) * 0.01 ? 'That is molarity (per L of solution). Molality is per <b>kg of solvent</b>.' : Math.abs(x - mol / solv) < mol / solv * 0.01 ? 'Convert the grams of solvent to kilograms first.' : '' })],
+      hint: 'Solute = (flask + NaCl) − flask. Solvent = (flask + solution) − (flask + NaCl). Change g of solvent to kg.', solution: `Solute = ${b.toFixed(4)} − ${a.toFixed(4)} = ${salt.toFixed(4)} g → ${mol.toFixed(6)} mol. Solvent = ${c.toFixed(4)} − ${b.toFixed(4)} = <b>${solv.toFixed(4)} g</b> = ${(solv / 1000).toFixed(7)} kg. Molality = ${mol.toFixed(6)} ÷ ${(solv / 1000).toFixed(7)} = <b>${sfHTML(mo, sf)} m</b>.`, video: 'concentrations', skill: 'calc' };
+  },
+  errors() {
+    return pickErr([
+      { prompt: 'Making Solution A, a student adds water <b>past the line</b> on the 50-mL volumetric flask, but still uses 50.00 mL in the calculation.', meas: [['Volume of the solution', ['volume', ' ml', 'line', 'water']], ['Mass of NaCl', ['nacl', 'salt', 'solute']]], dir: 'high', res: 'high', result: 'calculated molarity, compared to the real molarity', sol: 'The real volume is <b>more than 50.00 mL</b>, so the real solution is more dilute. The molarity calculated with 50.00 mL is <b>higher</b> than the true value. If you overshoot the line, start over.', video: 'molarity' },
+      { prompt: 'Making Solution B, a student draws Solution A into the 10-mL volumetric pipet but stops <b>below the line</b>, then delivers it anyway.', meas: [['Volume of Solution A transferred', ['volume', 'pipet', ' ml', 'transfer', 'solution a']], ['Mass of the empty flask', ['empty']]], dir: 'low', res: 'low', result: 'real molarity of Solution B, compared to the value calculated with 10.00 mL', sol: 'Less than 10.00 mL of Solution A went in, so fewer moles of NaCl are in flask B. Its <b>real molarity is lower</b> than the calculated value. Fill to the line, bottom of the meniscus.', video: 'dilution' }
+    ], 'M = mol solute ÷ L solution');
+  }
+});
+
+/* ---- Exp 10a: identifying the gas (match, litmus) ---- */
+Object.assign(K10a, {
+  gasTest() {
+    const g = pick([
+      ['Zinc pellets in 6.0 M HCl make bubbles. You hold a test tube upside down over it, then bring a lit match to the gas. It makes a loud <b>pop</b>.', ['h2', 'hydrogen', 'hydrogen gas', 'h2 g'], 'H<sub>2</sub>', 'Hydrogen burns with a <b>pop</b>: 2H₂ + O₂ → 2H₂O. That pop is the test for H₂.'],
+      ['NH<sub>4</sub>Cl and NaOH are mixed. You hold moist <b>red litmus</b> over the tube (not touching the liquid). It turns <b>blue</b>, and there is a sharp, <b>pungent smell</b>.', ['nh3', 'ammonia', 'ammonia gas'], 'NH<sub>3</sub>', 'Red litmus turning blue + a pungent smell confirms <b>ammonia, NH₃</b> (a base). NH₄OH breaks down into NH₃ + H₂O.'],
+      ['Na<sub>2</sub>CO<sub>3</sub> solution and HCl are mixed. It fizzes, but the gas does <b>not pop</b> with a match and has no smell.', ['co2', 'carbon dioxide', 'carbon dioxide gas'], 'CO<sub>2</sub>', 'Carbonate + acid makes H₂CO₃, which breaks down to <b>CO₂</b> + H₂O. CO₂ doesn’t burn, so no pop.'],
+      ['Solid KClO<sub>3</sub> is heated in a test tube. A glowing splint held in the mouth of the tube <b>relights</b>.', ['o2', 'oxygen', 'oxygen gas'], 'O<sub>2</sub>', 'KClO₃ decomposes: 2KClO₃ → 2KCl + 3O₂. <b>Oxygen</b> makes a glowing splint relight.']
+    ]);
+    return { tag: 'Identify the gas', prompt: `${g[0]} What gas formed? (Name or formula.)`, parts: [textPart(g[1], { ans: g[2] })], hint: 'Pop = flammable H₂. Red litmus → blue = a base (NH₃). No pop, no smell = CO₂. Splint relights = O₂.', solution: g[3], video: 'gasevolution', skill: 'concept' };
+  }
+});
+
+/* ---- Exp 12b: technique, standardization table, error analysis ---- */
+Object.assign(K12b, {
+  technique() {
+    const q = pick([
+      ['What does the <b>endpoint</b> look like with phenolphthalein in this titration?', ['A faint pink color that stays (persists) throughout the flask', 'Bright, dark pink', 'The solution turns clear after being pink'], 'Phenolphthalein is colorless in acid and pink in base. The endpoint is a <b>faint pink that lasts</b>. Bright pink means you overshot: redo it.', [['pink'], ['faint', 'light', 'pale', 'persist', 'stays', 'lasting', 'last', 'permanent', 'remain', 'slight']], ['bright', 'dark']],
+      ['Why do you rinse the buret <b>three times with the NaOH solution</b> before filling it?', ['So only NaOH is in the buret: leftover water would dilute it', 'To warm the buret', 'To make the endpoint pink'], 'Rinsing with the titrant leaves <b>only NaOH</b> in the buret, so it isn’t diluted by leftover water.', [['dilut', 'only naoh', 'only the naoh', 'water', 'contamin', 'concentration', 'same concentration', 'clean']], ['warm', 'heat']],
+      ['Why do you open the stopcock and run some NaOH into the waste beaker before the first reading?', ['To push the air bubble out of the buret tip', 'To measure the NaOH', 'To cool the NaOH'], 'Filling the tip removes the <b>air bubble</b>. A bubble that leaves during the titration would make the volume read wrong.', [['bubble', 'air']]],
+      ['A student uses about 15 mL of DI water to dissolve the oxalic acid instead of 10 mL. Does this change the moles of NaOH needed?', ['No: water is not a reactant, so the moles of acid (and NaOH needed) are the same', 'Yes: more water means more NaOH', 'Yes: more water means less NaOH'], 'Water is <b>not a reactant</b>. The moles of oxalic acid didn’t change, so the NaOH needed is the <b>same</b>.', [[' no ', 'no change', 'same', 'not change', 'doesn t', 'does not', 'not a reactant', 'nothing']], ['more naoh', 'less naoh', ' yes ']],
+      ['Why put a white piece of paper under the Erlenmeyer flask?', ['To see the faint pink endpoint more easily', 'To catch spills', 'To keep the flask warm'], 'White paper makes the <b>faint pink</b> easier to see.', [['see', 'color', 'pink', 'endpoint', 'visible', 'notice', 'contrast']], ['spill', 'warm']]
+    ]);
+    return { tag: 'Titration technique', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the procedure steps in the lab manual.', solution: q[2], video: 'titration', skill: 'concept' };
+  },
+  stdTable() {
+    const MM = 126.07, m = rnd(0.1000, 0.1200, 4), Mtrue = rnd(0.095, 0.110, 4), molB = m / MM * 2, Vi = rnd(0.30, 2.80, 2), net = molB / Mtrue * 1000, Vf = +(Vi + net).toFixed(2), Vn = +(Vf - Vi).toFixed(2), M = molB / (Vn / 1000), sf = Math.min(4, sfCount(Vn.toFixed(2)));
+    return { tag: 'Standardization table', prompt: 'Fill in the Part I (standardization) results for Trial 1. Oxalic acid dihydrate, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O, is 126.07 g/mol.', eq: 'H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O(aq) + 2NaOH(aq) → Na<sub>2</sub>C<sub>2</sub>O<sub>4</sub>(aq) + 4H<sub>2</sub>O(l)',
+      ref: tableHTML([['Mass of oxalic acid', `${m.toFixed(4)} g`], ['Initial buret reading (NaOH)', `${Vi.toFixed(2)} mL`], ['Final buret reading (NaOH)', `${Vf.toFixed(2)} mL`]], ['', 'Trial 1']),
+      parts: [num(molB, { sf: 4, unit: 'mol', label: 'Moles of sodium hydroxide', slip: x => Math.abs(x - molB / 2) < molB * 0.006 ? 'Use the 2 : 1 mole ratio: 2 mol NaOH per mol oxalic acid.' : '' }), num(Vn / 1000, { sf, unit: 'L', label: 'Net volume NaOH used (L)', slip: x => Math.abs(x - Vn) < 0.01 ? 'Convert mL to L (÷ 1000).' : Math.abs(x - Vf / 1000) < 1e-5 ? 'Net volume = final − initial reading.' : '' }), num(M, { sf, unit: 'M', label: 'Molarity of sodium hydroxide' })],
+      hint: 'g oxalic acid → mol oxalic acid → × 2 → mol NaOH. Net volume = final − initial (in L). M = mol ÷ L.', solution: `${m.toFixed(4)} g ÷ 126.07 g/mol × 2 = <b>${sfHTML(molB, 4)} mol NaOH</b>. Net volume = ${Vf.toFixed(2)} − ${Vi.toFixed(2)} = ${Vn.toFixed(2)} mL = <b>${sfHTML(Vn / 1000, sf)} L</b>. M = ${molB.toExponential(4)} ÷ ${(Vn / 1000).toFixed(5)} = <b>${sfHTML(M, sf)} M</b>.`, video: 'titration', skill: 'calc' };
+  },
+  errors() {
+    return pickErr([
+      { prompt: 'In Part II (determination), a student <b>overshoots the endpoint</b> and the soda turns bright pink.', meas: [['Final buret reading (volume of NaOH used)', ['volume', 'naoh', 'buret', 'final', ' ml']], ['Volume of soda', ['soda']]], dir: 'high', res: 'high', result: 'molarity of citric acid', sol: 'Extra NaOH went in, so the <b>volume of NaOH is too high</b>. More mol NaOH → more mol citric acid → <b>citric acid molarity too high</b>. Redo overdone trials.', video: 'titration' },
+      { prompt: 'In Part I (standardization), a student <b>overshoots the endpoint</b> (bright pink).', meas: [['Final buret reading (volume of NaOH used)', ['volume', 'naoh', 'buret', 'final', ' ml']], ['Mass of oxalic acid', ['mass', 'oxalic']]], dir: 'high', res: 'low', result: 'molarity of NaOH', sol: 'The moles of NaOH are set by the oxalic acid, but the <b>volume is too high</b>. M = mol ÷ L with a bigger bottom → <b>NaOH molarity too low</b>.', video: 'titration' },
+      { prompt: 'In Part II, an <b>air bubble</b> in the buret tip comes out during the titration.', meas: [['Volume of NaOH used (final − initial)', ['volume', 'naoh', 'buret', 'reading', ' ml']], ['Volume of soda', ['soda']]], dir: 'high', res: 'high', result: 'molarity of citric acid', sol: 'The bubble’s space is counted as NaOH delivered, so the <b>volume reads too high</b>, and the <b>citric acid molarity comes out too high</b>. Clear the tip before the first reading.', video: 'titration' }
+    ], 'M = mol ÷ L');
+  }
+});
+
+/* ---- Exp 0a: safety & technique (from the Lab Safety Contract and procedures) ---- */
+Object.assign(K0a, {
+  safety() {
+    const q = pick([
+      ['You need to dilute a concentrated acid. What goes into what?', ['Add the acid slowly to the water', 'Add the water to the acid', 'Pour them together quickly'], 'Always add <b>acid to water</b>, slowly with swirling. Water into acid can boil and spatter.', [['acid'], ['to water', 'into water', 'into the water', 'to the water', 'in water', 'in the water']], ['water to acid', 'water into acid', 'water to the acid', 'water into the acid']],
+      ['A chemical splashes in your eye. What do you do first?', ['Flush it at the eyewash station for at least 15 minutes and tell your instructor', 'Rub it with a paper towel', 'Wait to see if it hurts'], 'Go straight to the <b>eyewash</b> and flush for <b>15 minutes</b>, then tell your instructor.', [['eyewash', 'eye wash', 'flush', 'rinse', 'water']], ['rub', 'wait']],
+      ['A beaker breaks on the counter. How do you clean it up?', ['Brush and dustpan, into the broken glass container (never your hands or the trash)', 'Pick it up with your hands and throw it in the trash', 'Leave it for the next class'], 'Use a <b>brush and dustpan</b> and put it in the <b>broken glass</b> container. Never bare hands, never the regular trash.', [['broken glass', 'glass box', 'glass container', 'glass waste', 'sharps', 'dustpan', 'brush', 'broom']]],
+      ['Where does chemical waste go?', ['In the waste container provided, never down the sink unless told to', 'Down the sink with lots of water', 'In the trash can'], 'Chemicals go in the <b>waste container</b>. Never down the drain unless your instructor says so.', [['waste'], ['container', 'beaker', 'bottle', 'jar', 'bin', 'provided', 'labeled']], ['down the sink with', 'in the trash']],
+      ['You are heating KClO<sub>3</sub> in a test tube over a Bunsen burner. Where should the open end of the tube point?', ['Away from you and everyone else', 'At your lab partner so they can watch', 'Straight up, right under your face'], 'Never point a heated test tube <b>at anyone</b>: the contents can shoot out.', [['away', 'not at', 'nobody', 'no one', 'empty', 'wall', 'hood']], ['partner', 'face']],
+      ['You are told to check a smell (like NH<sub>3</sub> in the Types of Reactions lab). How do you smell it?', ['Hold it at arm’s length and waft (fan) the vapors toward you', 'Put your nose right over the tube and breathe in', 'Taste a tiny drop'], 'Never sniff directly. <b>Waft</b> the vapors toward your nose with your hand.', [['waft', 'fan', 'wave', 'arm s length', 'arms length', 'arm length', 'hand']], ['taste', 'directly']],
+      ['How do you fill a volumetric pipet?', ['With a pipet bulb or pump, never by mouth', 'By mouth, like a straw', 'Pour the liquid into the top'], 'Use a <b>pipet bulb or pump</b>. Never pipet by mouth, and don’t pull liquid up into the bulb.', [['bulb', 'pump', 'filler']], ['like a straw', 'pour']],
+      ['A crucible just came off the Bunsen burner. Where do you put it to cool?', ['On the wire mesh (gauze), moved with crucible tongs', 'Directly on the countertop', 'On a paper towel'], 'Hot things go on the <b>wire mesh</b>, moved with <b>tongs</b>. A hot crucible burns the counter or paper.', [['mesh', 'gauze', 'wire', 'clay triangle', 'triangle']], ['counter', 'paper']],
+      ['A small amount of acid spills on the bench. What do you use to neutralize it before wiping it up?', ['Sodium bicarbonate (baking soda)', 'Citric acid', 'More acid'], 'Acid spills are neutralized with <b>sodium bicarbonate</b> (baking soda). Base spills use citric acid.', [['bicarbonate', 'baking soda', 'nahco3', 'sodium hydrogen carbonate']], ['citric']]
+    ]);
+    return { tag: 'Safety & technique', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the Lab Safety Contract at the front of your manual.', solution: q[2], video: 'practical1', skill: 'concept' };
+  }
+});
+
 /* ---------------- lab list ---------------- */
 // cur: on Dr. Dan's current (Fall 2026) lab list. Other labs are from earlier versions of the CHEM 3A manual.
 const LABS = [
-  { id: '0a', name: 'Lab Exploration', blurb: 'Equipment names, glassware and balances', K: K0a, badge: 'burette', cur: 1, mock: ['cyl', 'buret', 'volumetric', 'balance', 'massWater', 'equipName'] },
-  { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar'] },
+  { id: '0a', name: 'Lab Exploration', blurb: 'Equipment names, glassware and balances', K: K0a, badge: 'burette', cur: 1, mock: ['cyl', 'buret', 'volumetric', 'balance', 'massWater', 'equipName', 'safety'] },
+  { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar', 'errors'] },
   { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 0 },
   { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests and average atomic mass', K: K3z, badge: 'target', cur: 1 },
   { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data', K: K4a, badge: 'scale', cur: 0 },
   { id: '4b', name: 'Rolling for Compound Initiative', blurb: 'Naming compounds and writing formulas', K: K4b, badge: 'book', cur: 1 },
   { id: '5a', name: 'Empirical Formula', blurb: 'Crucible data, percent composition', K: K5a, badge: 'percent', cur: 1 },
   { id: '6a', name: 'Molecular Modeling', blurb: 'Lewis structures and shapes', K: K6a, badge: 'geometry', cur: 1 },
-  { id: '7a', name: 'Calorimetry', blurb: 'Thermometers, q = mcΔT, exo vs endo', K: Object.assign({}, K7a, K7aOld), badge: 'heat', cur: 1, mock: ['thermo', 'exoEndo', 'qSolution', 'qReaction', 'qWater', 'ice'] },
+  { id: '7a', name: 'Calorimetry', blurb: 'Thermometers, q = mcΔT, exo vs endo', K: Object.assign({}, K7a, K7aOld), badge: 'heat', cur: 1, mock: ['thermo', 'exoEndo', 'qSolution', 'qReaction', 'qWater', 'ice', 'table', 'errors'] },
   { id: '8a', name: 'Gas Constant R', blurb: 'Gas collection, Dalton’s law, PV = nRT', K: K8a, badge: 'gaslaw', cur: 1 },
   { id: '9a', name: 'Solutions and Dilutions', blurb: 'Standard curve, molarity, M₁V₁ = M₂V₂', K: K9a, badge: 'molarity', cur: 1 },
-  { id: '10a', name: 'Types of Reactions', blurb: 'Observations, reaction types, net ionic', K: K10a, badge: 'precipitate', cur: 1, mock: ['station', 'station', 'predict', 'scheme2', 'ppt'] },
+  { id: '10a', name: 'Types of Reactions', blurb: 'Observations, reaction types, net ionic', K: K10a, badge: 'precipitate', cur: 1, mock: ['station', 'station', 'predict', 'scheme2', 'ppt', 'gasTest'] },
   { id: '11a', name: 'Synthesis of Alum', blurb: 'Vacuum filtration, hydrates, % yield', K: K11a, badge: 'lattice', cur: 0 },
   { id: '12a', name: 'pH of Household Items', blurb: 'pH, pOH, cabbage indicator', K: K12a, badge: 'phgauge', cur: 1 },
   { id: '12b', name: 'Citric Acid in Soda', blurb: 'Burets, standardization, titration math', K: K12b, badge: 'titrate', cur: 1 }
@@ -2328,7 +2532,7 @@ const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '1
   '0a.equipName': 'equip', '0a.equipUse': 'equip', '5a.equipment': 'equip', '9a.glass': 'equip', '11a.parts': 'equip', '1a.ruler': 'ruler', '1a.rulerMM': 'ruler', '1a.rectVolume': 'vol', '1a.cylVolume': 'vol',
   '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light',
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
-  '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr',
+  '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
   '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
   '10a.station': 'rxn', '10a.predict': 'rxn', '10a.balance': 'rxn', '10a.scheme1': 'rxtype', '10a.scheme2': 'rxtype', '4b.nameIonic': 'naming', '4b.acid': 'naming', '4b.formulaIonic': 'formula', '4b.molecular': 'formula', '4a.formula': 'empirical', '5a.formula': 'empirical', '4a.pctCu': 'masspct', '5a.percent': 'masspct', '5a.pctFormula': 'masspct' };
 const famOf = (lab, kind) => FAM[lab + '.' + kind] || lab + '.' + kind;
