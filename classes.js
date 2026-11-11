@@ -5,7 +5,7 @@
    Refresh each semester:  python3 tools/update_classes.py   (run on your own computer;
    Simple Syllabus blocks cloud servers), or ask Claude to re-read Simple Syllabus in your browser.
    Dr. Dan's own sections are hand-checked in SECTIONS inside index.html, so they are not here.
-   Lab ids the game doesn't have yet (like 2a) are kept so the game can say they're missing. */
+   Lab ids the game doesn't have yet (inGame 0 below) are kept so the game can say they're missing. */
 window.SR_CLASSES = {
   updated: '2026-11-11',
   source: 'https://fresnocitycollege.simplesyllabus.com/en-US/syllabus-library',
@@ -42,7 +42,7 @@ window.SR_EXTRA_PROFS = [
 /* Every lab in the CHEM 3A Lab Manual (old and current). inGame: 0 = no practice questions yet.
    Keep in step with LABS in index.html. */
 window.SR_LAB_NAMES = [
-  ['0a', 'Lab Exploration', 1], ['1a', 'Making Measurements', 1], ['2a', 'Atomic Mass', 0],
+  ['0a', 'Lab Exploration', 1], ['1a', 'Making Measurements', 1], ['2a', 'Atomic Mass', 1],
   ['3a', 'Electrons in Atoms', 1], ['3z', 'Found or Forgery', 1], ['4a', 'Law of Constant Composition', 1],
   ['4b', 'Rolling for Compound Initiative', 1], ['5a', 'Empirical Formula', 1], ['6a', 'Molecular Modeling', 1],
   ['7a', 'Calorimetry', 1], ['8a', 'Gas Constant R', 1], ['9a', 'Solutions and Dilutions', 1],

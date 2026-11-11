@@ -227,6 +227,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .vl-count{font-weight:700;margin-right:auto}.vl-zoom svg{max-width:340px;margin:0 auto}
 #vlLewis .lw-hit{cursor:pointer;outline:none}#vlLewis .lw-hit:hover circle,#vlLewis .lw-hit:focus circle{stroke:var(--accent)}#vlLewis .lw-hit:focus-visible line[stroke=transparent]{stroke:#4b57d126}#vlLewis.locked{pointer-events:none}
 .vl-onpan.static{pointer-events:none}
+.vl-beaker{display:block;width:150px!important;margin:0 auto 6px;padding:4px!important}.vl-beaker svg{width:140px!important;height:auto!important}div.vl-beaker{pointer-events:none}
 .vl-score{display:grid;gap:2px;padding:10px 12px;border-radius:12px;margin:4px 0 10px;font-size:.92rem}.vl-score b:first-child{font-size:1.15rem}.vl-score.gold{background:#fff4c2;border:1px solid #e6c34a}.vl-score.silver{background:#eef1f6;border:1px solid #b9c2d3}.vl-score.bronze{background:#fbe6d6;border:1px solid #d9a47a}
 .vl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .vl-wrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;align-items:start}
@@ -2103,6 +2104,120 @@ Object.assign(K1a, {
   }
 });
 
+/* ---------------- Exp 2a: Atomic Mass (Fresnocitium beads) ----------------
+   Manual: weigh an empty 100 mL beaker, scoop "Nature's Mix" of Fresnocitium, sort red / black / white,
+   weigh the beaker + each isotope and count them. Report sheet Q2 (mass, total atoms, mass per atom of the mix),
+   Q3 (% abundance, mass per atom of each isotope, average atomic mass), Q4 to Q6 (do they match, Trial 1 vs 2, bigger sample). */
+const FRESNO = [['Red', '#e0414f'], ['Black', '#2b2f3a'], ['White', '#f4f4ef']];
+// one trial: same beaker for every weighing; the mix is weighed once, so it can differ from the sum of the colors by a little
+function fresnoRun() {
+  const per = [rnd(0.240, 0.262, 4), rnd(0.300, 0.326, 4), rnd(0.168, 0.190, 4)], n = [rint(70, 130), rint(40, 95), rint(30, 80)];
+  const beaker = rnd(48.5, 56.5, 4), m = n.map((k, i) => +(k * per[i] * rnd(0.996, 1.004, 4)).toFixed(4));
+  const w = m.map(x => +(beaker + x).toFixed(4)), wMix = +(beaker + m.reduce((a, b) => a + b, 0) + rnd(-0.0004, 0.0004, 4)).toFixed(4);
+  return fresnoCalc({ beaker, n, w, wMix });
+}
+function fresnoCalc(d) {
+  d.m = d.w.map(x => +(x - d.beaker).toFixed(4)); d.mMix = +(d.wMix - d.beaker).toFixed(4); d.N = d.n.reduce((a, b) => a + b, 0);
+  d.pct = d.n.map(k => k / d.N * 100); d.per = d.m.map((x, i) => x / d.n[i]); d.perMix = d.mMix / d.N;
+  d.avg = d.per.reduce((s, x, i) => s + x * d.pct[i] / 100, 0); d.sf = d.m.map(x => sfCount(x.toFixed(4))); d.sfMix = sfCount(d.mMix.toFixed(4));
+  return d;
+}
+const fresnoData = (d, rows) => tableHTML(rows.map(r => [r[0], r[1]]));
+const fresnoRaw = d => fresnoData(d, [['Mass of beaker (empty)', `${d.beaker.toFixed(4)} g`], ['Mass of beaker + “Nature’s Mix”', `${d.wMix.toFixed(4)} g`], ...FRESNO.map((c, i) => [`Mass of beaker + ${c[0]} atoms`, `${d.w[i].toFixed(4)} g`]), ...FRESNO.map((c, i) => [`Number of ${c[0]} atoms`, d.n[i]])]);
+const K2a = {
+  natureAvg() {
+    const d = fresnoRun();
+    return { tag: 'Mass per atom of Nature’s Mix', prompt: 'Use the Trial 1 data to fill in report-sheet <b>Question 2</b>: the mass of the “Nature’s Mix” of Fresnocitium, the total number of atoms, and the <b>average mass per atom</b> in the mix.',
+      ref: fresnoData(d, [['Mass of beaker (empty)', `${d.beaker.toFixed(4)} g`], ['Mass of beaker + “Nature’s Mix”', `${d.wMix.toFixed(4)} g`], ...FRESNO.map((c, i) => [`Number of ${c[0]} atoms`, d.n[i]])]),
+      parts: [num(d.mMix, { dp: 4, unit: 'g', tol: 0.00011, label: 'A. Mass of Nature’s Mix' }), num(d.N, { tol: 0, unit: '', ans: String(d.N), label: 'B. Total number of atoms' }),
+        num(d.perMix, { sf: d.sfMix, unit: 'g', rel: 0.0005, label: 'C. Average mass per atom', slip: x => Math.abs(x - d.wMix / d.N) < d.perMix * 0.01 ? 'Subtract the empty beaker first: you divided the beaker’s mass too.' : '' })],
+      hint: 'Mass of mix = (beaker + mix) − empty beaker. Add the three counts. Then divide the mass by the number of atoms. Counts are exact, so the mass sets the sig figs.',
+      solution: `A. ${d.wMix.toFixed(4)} − ${d.beaker.toFixed(4)} = <b>${d.mMix.toFixed(4)} g</b>. B. ${d.n.join(' + ')} = <b>${d.N} atoms</b>. C. ${d.mMix.toFixed(4)} g ÷ ${d.N} = <b>${sfHTML(d.perMix, d.sfMix)} g</b> per atom (${d.sfMix} sig figs from the mass; a count is exact).`, video: 'isotopes', skill: 'calc' };
+  },
+  abundance() {
+    const d = fresnoRun(), i = rint(0, 2), c = FRESNO[i];
+    return { tag: 'Percent abundance', prompt: `A student sorted a scoop of Fresnocitium and counted each color. What is the <b>percent abundance of the ${c[0].toLowerCase()} isotope</b>?`, eq: 'Abundance (%) = (number of atoms ÷ total number of atoms) × 100',
+      ref: tableHTML(FRESNO.map((x, k) => [`Number of ${x[0]} atoms`, d.n[k]])),
+      parts: [num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, ans: d.pct[i].toFixed(2), slip: x => Math.abs(x - d.pct[i] / 100) < 0.002 ? 'That’s the fraction. Multiply by 100 for a percent.' : Math.abs(x - d.n[i] / (d.N - d.n[i]) * 100) < 0.05 ? 'Divide by the <b>total</b> of all three colors, including this one.' : '' })],
+      hint: 'Add up all three colors for the total, then divide this color’s count by it and × 100.', solution: `Total = ${d.n.join(' + ')} = ${d.N}. ${d.n[i]} ÷ ${d.N} × 100 = <b>${d.pct[i].toFixed(2)}%</b> ${c[0].toLowerCase()}.`, video: 'isotopes', skill: 'calc' };
+  },
+  isoMass() {
+    const d = fresnoRun(), i = rint(0, 2), c = FRESNO[i];
+    return { tag: 'Mass per atom of one isotope', prompt: `What is the <b>average mass per atom of the ${c[0].toLowerCase()} isotope</b>? (The same beaker was used for every weighing.)`,
+      ref: tableHTML([['Mass of beaker (empty)', `${d.beaker.toFixed(4)} g`], [`Mass of beaker + ${c[0]} atoms`, `${d.w[i].toFixed(4)} g`], [`Number of ${c[0]} atoms`, d.n[i]]]),
+      parts: [num(d.per[i], { sf: d.sf[i], unit: 'g', rel: 0.0005, slip: x => Math.abs(x - d.w[i] / d.n[i]) < d.per[i] * 0.02 ? 'Subtract the empty beaker first, so you divide only the mass of the atoms.' : '' })],
+      hint: 'Mass of the atoms = (beaker + atoms) − empty beaker. Then ÷ the number of atoms.', solution: `${d.w[i].toFixed(4)} − ${d.beaker.toFixed(4)} = ${d.m[i].toFixed(4)} g. ${d.m[i].toFixed(4)} g ÷ ${d.n[i]} = <b>${sfHTML(d.per[i], d.sf[i])} g</b> per ${c[0].toLowerCase()} atom (the count is exact, so the mass sets ${d.sf[i]} sig figs).`, video: 'isotopes', skill: 'calc' };
+  },
+  avgAtomic() {
+    const d = fresnoRun(), pc = d.pct.map(x => +x.toFixed(2)), pm = d.per.map(x => +x.toPrecision(4)), avg = pm.reduce((s, x, i) => s + x * pc[i] / 100, 0), plain = pm.reduce((a, b) => a + b, 0) / 3;
+    return { tag: 'Average atomic mass', prompt: 'Use the completed Trial 1 table to calculate the <b>average atomic mass</b> of Fresnocitium.', eq: 'Average atomic mass = (mass<sub>1</sub>·abundance<sub>1</sub>) + (mass<sub>2</sub>·abundance<sub>2</sub>) + … &nbsp;&nbsp; (abundances as decimals)',
+      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${pc[i].toFixed(2)}%`, `${pm[i]} g`]), ['Isotope color', 'Percent abundance', 'Average mass per atom']),
+      parts: [num(avg, { unit: 'g', rel: 0.001, ans: avg.toPrecision(4), slip: x => Math.abs(x - avg * 100) < avg * 0.5 ? 'Change each percent to a decimal (÷ 100) before multiplying.' : Math.abs(x - plain) < plain * 0.002 && Math.abs(plain - avg) > avg * 0.003 ? 'That’s a plain average of the three masses. Weight each mass by its abundance.' : '' })],
+      hint: 'Percent ÷ 100 gives the fractional abundance. Multiply each isotope’s mass by its fraction, then add the three.',
+      solution: FRESNO.map((c, i) => `${pm[i]}(${(pc[i] / 100).toFixed(4)})`).join(' + ') + ` = <b>${avg.toPrecision(4)} g</b>. That is the weighted average mass of one Fresnocitium atom.`, video: 'isotopes', skill: 'calc' };
+  },
+  table() {
+    const d = fresnoRun();
+    return { tag: 'Trial 1 results table', prompt: 'Fill in the report-sheet table for Trial 1 (<b>Question 3A</b>): the percent abundance and the average mass per atom of each isotope.', ref: fresnoRaw(d),
+      parts: [...FRESNO.map((c, i) => num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, ans: d.pct[i].toFixed(2), label: `${c[0]}: percent abundance` })), ...FRESNO.map((c, i) => num(d.per[i], { sf: d.sf[i], unit: 'g', rel: 0.0005, label: `${c[0]}: average mass per atom`, slip: x => Math.abs(x - d.w[i] / d.n[i]) < d.per[i] * 0.02 ? 'Subtract the empty beaker first.' : '' }))],
+      hint: 'Abundance = count ÷ total count × 100. Mass per atom = (beaker + atoms − empty beaker) ÷ count.',
+      solution: `Total atoms = ${d.N}.<br>` + FRESNO.map((c, i) => `${c[0]}: ${d.n[i]} ÷ ${d.N} × 100 = <b>${d.pct[i].toFixed(2)}%</b>; (${d.w[i].toFixed(4)} − ${d.beaker.toFixed(4)}) ÷ ${d.n[i]} = <b>${sfHTML(d.per[i], d.sf[i])} g</b>`).join('<br>'), video: 'isotopes', skill: 'calc' };
+  },
+  weighted() {
+    let pc, per = [rnd(0.240, 0.262, 4), rnd(0.300, 0.326, 4), rnd(0.168, 0.190, 4)], big, avg;
+    do { big = rint(0, 2); const top = rint(62, 80), rest = rint(5, 100 - top - 5); pc = [0, 0, 0]; pc[big] = top; const o = [0, 1, 2].filter(k => k !== big); pc[o[0]] = rest; pc[o[1]] = 100 - top - rest; avg = per.reduce((s, x, i) => s + x * pc[i] / 100, 0); }
+    while (per.map(x => Math.abs(x - avg)).indexOf(Math.min(...per.map(x => Math.abs(x - avg)))) !== big || pc.some(x => x < 5));
+    const opts = FRESNO.map((c, i) => `${c[0]} (${per[i]} g)`);
+    return { tag: 'Weighted average', prompt: `A batch of Fresnocitium is <b>${FRESNO.map((c, i) => `${pc[i]}% ${c[0].toLowerCase()}`).join(', ')}</b>. Without a calculator: the average atomic mass will be <b>closest to the mass of which isotope</b>?`,
+      ref: tableHTML(FRESNO.map((c, i) => [c[0], `${per[i]} g`]), ['Isotope', 'Mass per atom']),
+      parts: [attachWhy(choice(opts, big), opts.filter((o, i) => i !== big).map(o => [o, 'That isotope is less abundant, so it pulls the average less. The average is weighted toward the most abundant isotope.', []]))],
+      hint: 'More abundant isotopes count more toward the average atomic mass.', solution: `The <b>${FRESNO[big][0].toLowerCase()}</b> isotope is ${pc[big]}% of the atoms, so it counts the most. The weighted average is ${avg.toPrecision(4)} g, closest to ${per[big]} g.`, video: 'isotopes', skill: 'concept' };
+  },
+  represent() {
+    return { tag: 'What the beads stand for', prompt: 'In this lab, the red, black and white beads are all “atoms” of Fresnocitium with different masses. In a real element, what are the different kinds of beads like?',
+      parts: [conceptPart('Isotopes: atoms of the same element with different numbers of neutrons, so different masses', ['Different elements', 'Ions with different charges'], { kw: [['isotope']], nokw: ['different element', ' ion ', ' ions', 'charge'], kwNote: 'Name what the different colors model.' })],
+      hint: 'Same element (same number of protons), different mass.', solution: 'Each color is an <b>isotope</b>: same element (same number of protons) but a different number of neutrons, so a different mass. The periodic table mass is the weighted average of the isotopes.', video: 'isotopes', skill: 'concept' };
+  },
+  compare() {
+    const d = fresnoRun(), a = d.avg;
+    return { tag: 'Do they match? (Q4)', prompt: `In Trial 1, the average mass per atom in Nature’s Mix (Q2C) was <b>${sfHTML(d.perMix, 4)} g</b> and the average atomic mass from the equation (Q3A) was <b>${a.toPrecision(4)} g</b>. Should these two values match?`,
+      parts: [conceptPart('Yes: both are the total mass of the atoms divided by the total number of atoms; small differences come from weighing and rounding', ['No: the equation always gives a bigger number than mass ÷ atoms', 'No: they measure different things, so they shouldn’t match'], { kw: [['yes', 'should match', 'same', 'equal', 'match', 'agree', 'close'], ['total mass', 'mass divided', 'mass ÷', 'per atom', 'weighted', 'same thing', 'average', 'rounding', 'weigh']], nokw: [' no ', 'shouldn t', 'should not', 'bigger'], kwNote: 'Say whether they should match, and why (what does each one divide?).' })],
+      hint: 'Write out (abundance × mass per atom) for one color: (n<sub>red</sub>/N)(m<sub>red</sub>/n<sub>red</sub>) = m<sub>red</sub>/N. Add the three colors.', solution: `They <b>should match</b>. The weighted average Σ(n<sub>i</sub>/N)(m<sub>i</sub>/n<sub>i</sub>) simplifies to (total mass) ÷ N, the same thing Q2C calculates. Here ${sfHTML(d.perMix, 4)} g vs ${a.toPrecision(4)} g: the tiny difference comes from weighing the mix and each color separately, and rounding.`, video: 'isotopes', skill: 'concept' };
+  },
+  trials() {
+    const d1 = fresnoRun(), d2 = fresnoRun(); d2.per = d1.per.map(x => x * rnd(0.997, 1.003, 4));
+    const fix = x => x.toFixed(2) + '%';
+    return { tag: 'Trial 1 vs Trial 2 (Q5)', prompt: 'A student’s two trials gave different percent abundances, but almost the same mass per atom for each color. Why are the <b>abundances</b> different?',
+      ref: tableHTML(FRESNO.map((c, i) => [c[0], fix(d1.pct[i]), fix(d2.pct[i]), `${d1.per[i].toPrecision(4)} g`, `${d2.per[i].toPrecision(4)} g`]), ['Isotope', '% Trial 1', '% Trial 2', 'Mass/atom Trial 1', 'Mass/atom Trial 2']),
+      parts: [conceptPart('Each scoop is a random sample of the bin, so it holds a slightly different mix of colors', ['The beads changed mass between trials', 'The balance was tared differently, so the counts changed'], { kw: [['random', 'sample', 'scoop', 'different number', 'different amount', 'different mix', 'chance', 'not the same', 'each time', 'vary', 'varies']], nokw: ['changed mass', 'tare'], kwNote: 'What is different about each scoop of beads?' })],
+      hint: 'The mass of one red bead doesn’t change. What changes from one scoop to the next?', solution: 'Each scoop is a <b>random sample</b>, so the number of each color changes a little from trial to trial. The mass of each isotope stays the same, so the masses per atom agree but the abundances (and the average) shift a little.', video: 'isotopes', skill: 'concept' };
+  },
+  bigger() {
+    return { tag: 'A bigger sample (Q6)', prompt: 'If you used a <b>much larger sample</b> of Fresnocitium, would it make a big difference to your calculated average atomic mass? Why or why not?',
+      parts: [conceptPart('Not much: the average stays about the same, but a bigger sample is more representative of the whole bin, so trials agree better', ['Yes: more atoms means a bigger average atomic mass', 'Yes: doubling the sample doubles the average atomic mass'], { kw: [[' no ', 'not much', 'not really', 'wouldn t', 'would not', 'about the same', 'same', 'little', 'slight'], ['representative', 'random', 'more accurate', 'closer', 'average', 'ratio', 'proportion', 'percent', 'abundance', 'per atom', 'better']], nokw: ['double', 'bigger average', 'larger average', 'increase'], kwNote: 'Say whether it changes much, and why (what happens to the percent of each color?).' })],
+      hint: 'The average atomic mass is a per-atom value, like density. What happens to the percent of each color in a bigger scoop?', solution: '<b>Not much.</b> The average atomic mass is a per-atom (weighted) average, so it doesn’t grow with the sample size. A larger sample is just <b>more representative</b> of the whole bin, so random scoop-to-scoop differences shrink.', video: 'isotopes', skill: 'concept' };
+  }
+};
+Object.assign(WRONG_WHY, {
+  'Different elements': ['They are all Fresnocitium. Different elements would have different numbers of protons; these differ only in mass.', ['element']],
+  'Ions with different charges': ['Ions differ in electrons (charge), which barely changes the mass. The colors differ in mass: different neutrons.', ['ion', 'charge']],
+  'No: the equation always gives a bigger number than mass ÷ atoms': ['The weighted average works out to exactly (total mass) ÷ (total atoms), so neither is bigger. Only weighing and rounding make them differ.', ['bigger', 'larger']],
+  'No: they measure different things, so they shouldn’t match': ['Both are the average mass of one atom in the sample. The algebra makes them the same number.', ['different things', 'shouldn t', 'should not']],
+  'The beads changed mass between trials': ['A bead’s mass doesn’t change. That is why the mass per atom of each color agrees between trials.', ['changed mass', 'mass changed', 'heavier', 'lighter']],
+  'The balance was tared differently, so the counts changed': ['The balance has nothing to do with counting. The counts change because each scoop is a different random sample.', ['tare', 'balance']],
+  'Yes: more atoms means a bigger average atomic mass': ['The average is per atom: more atoms add more total mass, but the mass per atom stays about the same.', ['bigger', 'larger', 'increase']],
+  'Yes: doubling the sample doubles the average atomic mass': ['Doubling the sample doubles the total mass and the number of atoms, so mass ÷ atoms stays the same.', ['double']]
+});
+Object.assign(K2a, {
+  errors() {
+    return pickErr([
+      { prompt: 'After weighing the red atoms, a student drops the beaker and <b>5 red beads roll under the bench</b>. The student counts the rest and records that number.', meas: [['Number of red atoms', ['number', 'count', 'how many', 'red atoms']], ['Mass of beaker + red atoms', ['mass', 'weigh', 'balance', 'grams']]], dir: 'low', res: 'high', result: 'average mass per red atom', sol: 'The beads were weighed but not counted, so the <b>number of red atoms is too low</b>. Mass per atom = mass ÷ count, with a smaller bottom → <b>too high</b>. Count over a tray, and double-check the count.', video: 'isotopes' },
+      { prompt: 'For the black atoms only, a student grabs a <b>different, heavier beaker</b> but still subtracts the mass of the original empty beaker.', meas: [['Mass of the black atoms (beaker + black − empty beaker)', ['black', 'mass', 'weigh', 'beaker']], ['Number of black atoms', ['number', 'count']]], dir: 'high', res: 'high', result: 'average atomic mass of Fresnocitium', sol: 'The heavier beaker’s extra mass gets counted as black atoms, so the <b>mass of the black atoms is too high</b>, their mass per atom is too high, and the weighted <b>average atomic mass comes out higher</b>. The manual says use the same beaker for every weighing.', video: 'isotopes' },
+      { prompt: 'A student forgets to tare the balance. With nothing on the pan, it already reads <b>0.0150 g</b>, so every weighing includes that extra 0.0150 g.', meas: [['Every mass reading (empty beaker and beaker + atoms)', ['every', 'all', 'each', 'reading', 'mass', 'weigh', 'beaker']], ['Number of atoms', ['number', 'count']]], dir: 'high', res: 'none', result: 'mass of the red atoms (by difference)', sol: 'Every reading is 0.0150 g <b>too high</b>, but the mass of the atoms = (beaker + atoms) − (empty beaker), so the extra 0.0150 g <b>cancels out</b>: no change. (Still tare first, like the manual says.)', video: 'isotopes' }
+    ], 'Mass per atom = mass of atoms ÷ number of atoms &nbsp;&nbsp; Avg. atomic mass = Σ (mass per atom × fractional abundance)');
+  }
+});
+
 /* ---- Exp 3z ---- */
 Object.assign(K3z, {
   flameWhy() {
@@ -2281,6 +2396,7 @@ Object.assign(K0a, {
 const LABS = [
   { id: '0a', name: 'Lab Exploration', blurb: 'Equipment names, glassware and balances', K: K0a, badge: 'burette', cur: 1, mock: ['cyl', 'buret', 'volumetric', 'balance', 'massWater', 'equipName', 'safety'] },
   { id: '1a', name: 'Making Measurements', blurb: 'Rulers, volume, displacement, density', K: K1a, badge: 'density', cur: 1, mock: ['ruler', 'rulerMM', 'rectVolume', 'cylVolume', 'displacement', 'densityDisp', 'densityBar', 'errors'] },
+  { id: '2a', name: 'Atomic Mass', blurb: 'Fresnocitium beads: abundance and weighted average', K: K2a, badge: 'scale', cur: 0, mock: ['natureAvg', 'abundance', 'isoMass', 'avgAtomic', 'weighted', 'compare', 'bigger', 'errors'] },
   { id: '3a', name: 'Electrons in Atoms', blurb: 'Spectroscope, light and the Bohr model', K: K3a, badge: 'react', cur: 0 },
   { id: '3z', name: 'Found or Forgery', blurb: 'Flame tests and average atomic mass', K: K3z, badge: 'target', cur: 1 },
   { id: '4a', name: 'Law of Constant Composition', blurb: 'Copper + sulfur mass data', K: K4a, badge: 'scale', cur: 0 },
@@ -2356,10 +2472,11 @@ const PHET = [
     tasks: [
     { scr: 2, steps: ['<b>Predict first:</b> with 4 H₂ and 3 O₂, how much water forms and what is left over?', 'Then set H₂ to <b>4</b> and O₂ to <b>3</b> and check the “After Reaction” box.'], q: 'How many H₂O form, and how many O₂ are left over?', parts: [num(4, { tol: 0, unit: '', label: 'H₂O made', ans: '4' }), num(1, { tol: 0, unit: '', label: 'O₂ left over', ans: '1' })], sol: '4 H₂ need only 2 O₂ → <b>4 H₂O</b>, with <b>1 O₂</b> left. H₂ is the limiting reactant.' }] },
 
-  { id: 'isotopes', sim: 'isotopes-and-atomic-mass', screens: { 2: 'Mixtures' }, labs: ['3z', '3a'], title: 'Isotopes and Atomic Mass', blurb: 'Mix isotopes and watch the average mass.',
+  { id: 'isotopes', sim: 'isotopes-and-atomic-mass', screens: { 2: 'Mixtures' }, labs: ['2a', '3z', '3a'], title: 'Isotopes and Atomic Mass', blurb: 'Mix isotopes and watch the average mass.',
     setup: ['The sim opens on the <b>Mixtures</b> screen.', 'Click <b>C</b> (carbon) on the small periodic table (top right). The buckets change to Carbon-12 and Carbon-13.', 'Drag atoms from the buckets into the black box. The eraser (under the box) empties it.'],
     tasks: [
-    { scr: 2, steps: ['Drag any number of <b>carbon-12</b> atoms and any number of <b>carbon-13</b> atoms into the black box.', 'Count them and type the counts.', 'Calculate the average atomic mass (carbon-12 = 12.000 amu, carbon-13 = 13.003 amu) before you look at the <b>Average Atomic Mass</b> box.'], q: 'What is the average atomic mass of your mix?', parts: [anyNum('', 'Carbon-12 atoms'), anyNum('', 'Carbon-13 atoms'), { type: 'num', dep: v => { const a = vlNum(v[0]), b = vlNum(v[1]); return a >= 0 && b >= 0 && a + b > 0 ? num((12.000 * a + 13.003 * b) / (a + b), { unit: 'amu', tol: 0.006 }) : null; }, unit: 'amu', label: 'Average atomic mass', ans: '(12.000 × n₁₂ + 13.003 × n₁₃) ÷ total' }], sol: 'Average = Σ (fraction × mass). For 3 carbon-12 and 1 carbon-13: 0.75(12.000) + 0.25(13.003) = <b>12.25 amu</b>. Same math as the lead isotopes in Found or Forgery.' }] },
+    { scr: 2, steps: ['Drag any number of <b>carbon-12</b> atoms and any number of <b>carbon-13</b> atoms into the black box.', 'Count them and type the counts.', 'Calculate the average atomic mass (carbon-12 = 12.000 amu, carbon-13 = 13.003 amu) before you look at the <b>Average Atomic Mass</b> box.'], q: 'What is the average atomic mass of your mix?', parts: [anyNum('', 'Carbon-12 atoms'), anyNum('', 'Carbon-13 atoms'), { type: 'num', dep: v => { const a = vlNum(v[0]), b = vlNum(v[1]); return a >= 0 && b >= 0 && a + b > 0 ? num((12.000 * a + 13.003 * b) / (a + b), { unit: 'amu', tol: 0.006 }) : null; }, unit: 'amu', label: 'Average atomic mass', ans: '(12.000 × n₁₂ + 13.003 × n₁₃) ÷ total' }], sol: 'Average = Σ (fraction × mass). For 3 carbon-12 and 1 carbon-13: 0.75(12.000) + 0.25(13.003) = <b>12.25 amu</b>. Same math as Fresnocitium in Atomic Mass and the lead isotopes in Found or Forgery.' },
+    { scr: 2, steps: ['Click the <b>eraser</b> under the box to empty it.', 'Click <b>Cl</b> (chlorine) on the small periodic table.', 'Switch from <b>My Mix</b> to <b>Nature’s</b> mix, and read the percent of each isotope and the <b>Average Atomic Mass</b>.'], q: 'Natural chlorine’s average atomic mass is much closer to 35 than to 37. Why?', parts: [choice(['Chlorine-35 is far more abundant, so it counts more in the weighted average', 'Chlorine-37 is unstable, so it isn’t counted', 'The average always rounds down to the lighter isotope'], 0, { kw: [['abundan', 'more common', 'more of', 'most', 'percent', 'weighted', '76', '75']], nokw: ['unstable', 'round'], kwNote: 'Look at the percent of each isotope.' })], sol: 'About <b>76% of chlorine atoms are chlorine-35</b> and only 24% are chlorine-37, so the weighted average (35.45 amu) sits close to 35. Same idea as Fresnocitium in Exp 2a: the more abundant isotope counts more.' }] },
 
   { id: 'hatom', sim: 'models-of-the-hydrogen-atom', screens: { 2: 'Energy Levels' }, labs: ['3a', '3z'], title: 'Models of the Hydrogen Atom', blurb: 'Bohr model and emission lines.',
     setup: ['The sim opens on the <b>Energy Levels</b> screen with the <b>Bohr</b> model picked.', 'Click the <b>red button</b> on the light (left side) to turn it on.', 'Click the <b>+</b> on the <b>Spectrometer</b> bar (bottom) to open it.'],
@@ -2417,7 +2534,7 @@ const VIDEOS = {
   acidbase: { id: 'tbcxL9K3KBU', start: 0, title: 'Acid-Base Stoichiometry Practice: pH and pOH', why: 'Grams of acid or base → pH.' },
   titration: { id: 'Ca7o0AjwhcY', start: 0, title: 'Acid-Base Titration Stoichiometry', why: 'Finding molarity from a titration.' }
 };
-const LAB_VIDEOS = { '0a': ['practical1', 'sigfig'], '1a': ['measure', 'displacement', 'density'], '3a': ['part2_3a', 'light'], '3z': ['isotopes', 'light'], '4a': ['empirical'], '4b': ['naming', 'greensheet', 'covalent', 'acids'], '5a': ['part2_5a', 'empirical', 'percent'], '6a': ['part2_6a', 'lewis'], '7a': ['part2_7a', 'calorimetry', 'specificheat'], '8a': ['part2_8a', 'idealgas', 'dalton', 'gasstoich'], '9a': ['part2_9a', 'molarity', 'dilution', 'concentrations'], '10a': ['part2_10a', 'reactions', 'netionic', 'balance'], '11a': ['yield', 'molarmass'], '12a': ['part2_12a', 'ph', 'acidbase'], '12b': ['part2_12b', 'titration', 'molarmass'] };
+const LAB_VIDEOS = { '0a': ['practical1', 'sigfig'], '1a': ['measure', 'displacement', 'density'], '2a': ['isotopes'], '3a': ['part2_3a', 'light'], '3z': ['isotopes', 'light'], '4a': ['empirical'], '4b': ['naming', 'greensheet', 'covalent', 'acids'], '5a': ['part2_5a', 'empirical', 'percent'], '6a': ['part2_6a', 'lewis'], '7a': ['part2_7a', 'calorimetry', 'specificheat'], '8a': ['part2_8a', 'idealgas', 'dalton', 'gasstoich'], '9a': ['part2_9a', 'molarity', 'dilution', 'concentrations'], '10a': ['part2_10a', 'reactions', 'netionic', 'balance'], '11a': ['yield', 'molarmass'], '12a': ['part2_12a', 'ph', 'acidbase'], '12b': ['part2_12b', 'titration', 'molarmass'] };
 
 /* ===================== Station Rotation: game UI ===================== */
 const $ = id => document.getElementById(id);
@@ -2620,6 +2737,7 @@ function genStation() {
 const FAM = { '0a.cyl': 'cyl', '1a.displacement': 'cyl', '0a.buret': 'buret', '12b.buret': 'buret', '12b.used': 'buret', '0a.balance': 'balance', '0a.massWater': 'balance',
   '0a.equipName': 'equip', '0a.equipUse': 'equip', '5a.equipment': 'equip', '9a.glass': 'equip', '11a.parts': 'equip', '1a.ruler': 'ruler', '1a.rulerMM': 'ruler', '1a.rectVolume': 'vol', '1a.cylVolume': 'vol',
   '1a.densityDisp': 'density', '1a.densityBar': 'density', '1a.densityIdea': 'density', '9a.density': 'density', '1a.percentDiff': 'pcterr', '8a.pctError': 'pcterr', '3a.freq': 'light', '3a.energy': 'light', '3a.order': 'light',
+  '2a.avgAtomic': 'avgmass', '2a.weighted': 'avgmass', '2a.natureAvg': '2a.peratom', '2a.isoMass': '2a.peratom', '2a.abundance': '2a.abund', '2a.table': '2a.abund', '2a.compare': '2a.idea', '2a.trials': '2a.idea', '2a.bigger': '2a.idea', '2a.errors': 'errors',
   '3z.avgMass': 'avgmass', '3z.eggium': 'avgmass', '3z.whichMine': 'avgmass', '3z.flame': 'flame', '3z.flameMany': 'flame', '11a.molarMass': 'hydrate', '12b.molarMass': 'hydrate', '7a.thermo': 'thermo',
   '7a.qSolution': 'heat', '7a.qReaction': 'heat', '7a.qWater': 'heat', '7a.metalC': 'heat', '7a.massSoln': 'heat', '8a.readTube': 'gastube', '9a.molarity': 'molarity', '9a.dilution': 'molarity', '12b.standardize': 'titr', '12b.citric': 'titr', '12b.stdTable': 'titr', '7a.table': 'heat', '6a.egGeom': 'vsepr', '6a.kit': 'vsepr', '9a.molality': 'molarity',
   '12a.fromPH': 'ph', '12a.toPH': 'ph', '12a.acidMass': 'ph', '12a.baseMass': 'ph', '12a.cabbage': 'cabbage', '6a.geomModel': 'vsepr', '6a.geomFormula': 'vsepr', '6a.angle': 'vsepr', '11a.theory': 'yield', '11a.actual': 'yield', '11a.percentYield': 'yield', '8a.gramsH2': 'yield',
@@ -3299,6 +3417,86 @@ const BENCH_SALT = Object.assign({}, BENCH_WATER, {
   ]
 });
 VBENCH.push(BENCH_SALT);
+/* ====================== Bench 9: Fresnocitium (Exp 2a) ====================== */
+// same 100 mL beaker for every weighing, like the manual: empty → Nature's Mix → sort → red, black, white (weigh, then count)
+const beadDots = (groups, o) => { // groups: [[color, n]], packed from the bottom of the beaker, colors mixed by a fixed order
+  const cols = o.cols, list = []; groups.forEach(([c, k]) => { for (let j = 0; j < k; j++) list.push(c); });
+  const order = o.order ? o.order.filter(i => i < list.length) : list.map((_, i) => i);
+  return order.map((idx, j) => { const r = Math.floor(j / cols), c = j % cols; return `<circle cx="${o.x0 + c * o.dx + (r % 2 ? o.dx / 2 : 0)}" cy="${o.y0 - r * o.dy}" r="${o.r}" fill="${list[idx]}" stroke="#2f4d70" stroke-width=".7"/>`; }).join('');
+};
+function beadBeaker(groups, order, aria) {
+  let t = `<svg viewBox="0 0 200 210" role="img" aria-label="${esc(aria || 'A 100 mL beaker')}"><path d="M34 22 L42 30 L42 186 Q42 200 56 200 L144 200 Q158 200 158 186 L158 30 L166 22" fill="#f4f9ff" stroke="#8aa6c8" stroke-width="3" stroke-linejoin="round"/>`;
+  t += beadDots(groups, { cols: 15, x0: 51, y0: 192, dx: 6.9, dy: 6.2, r: 3.3, order });
+  [[60, '100'], [100, '75'], [140, '50']].forEach(([y, l]) => { t += `<line x1="42" y1="${y}" x2="58" y2="${y}" stroke="#7f93b3" stroke-width="2"/><text x="62" y="${y + 4}" font-size="10" fill="#7f93b3" font-weight="700">${l}</text>`; });
+  return t + `${shine(48, 40, 5, 140)}</svg>`;
+}
+const beadBin = shaken => `<svg viewBox="0 0 200 150" role="img" aria-label="Supply bin of Fresnocitium beads with the lid on"><g><rect x="20" y="40" width="160" height="96" rx="10" fill="#eef3fb" stroke="#2f4d70" stroke-width="2.5"/><rect x="14" y="30" width="172" height="16" rx="6" fill="#9fb0ff" stroke="#2f4d70" stroke-width="2.5"/>${beadDots([[FRESNO[0][1], 60], [FRESNO[1][1], 45], [FRESNO[2][1], 35]], { cols: 22, x0: 30, y0: 128, dx: 6.6, dy: 6, r: 3, order: shuffle([...Array(140).keys()]) })}</g></svg>`;
+const beadPile = c => `<svg viewBox="0 0 60 60" aria-hidden="true">${[[20, 44], [30, 44], [40, 44], [25, 36], [35, 36], [30, 28], [15, 50], [45, 50], [30, 50]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5.5" fill="${c}" stroke="#2f4d70" stroke-width="1.2"/>`).join('')}</svg>`;
+const beakerIcon = `<svg viewBox="0 0 60 60" aria-hidden="true"><path d="M14 8 L18 12 L18 50 Q18 54 22 54 L38 54 Q42 54 42 50 L42 12 L46 8" fill="#f4f9ff" stroke="#8aa6c8" stroke-width="2.5"/></svg>`;
+// counting tray: one color lined up in rows of 10
+function beadTray(c, n, name) {
+  const rows = Math.ceil(n / 10), h = rows * 14 + 16;
+  let t = `<svg viewBox="0 0 190 ${h}" role="img" aria-label="${n} ${name} beads lined up in rows of 10"><rect x="2" y="2" width="186" height="${h - 4}" rx="10" fill="#fffaf0" stroke="#d9b54a" stroke-width="2"/>`;
+  for (let k = 0; k < n; k++) { const r = Math.floor(k / 10), col = k % 10; t += `<circle cx="${20 + col * 14 + (col >= 5 ? 8 : 0)}" cy="${15 + r * 14}" r="5.2" fill="${c}" stroke="#2f4d70" stroke-width="1"/>`; }
+  return t + '</svg>';
+}
+const BENCH_BEADS = {
+  id: 'beads', labs: ['2a'], title: 'Fresnocitium Atomic Mass', blurb: 'Scoop, sort, weigh and count bead “atoms”, then find the average atomic mass.',
+  setup() { const d = fresnoRun(); return { d, stage: 0, shaken: false, wd: [false, false, false], cur: -1, order: shuffle([...Array(d.N).keys()]) }; },
+  shown(s) { const d = s.d; return s.stage === 1 || (s.stage >= 4 && s.cur < 0) ? d.beaker : s.stage === 3 ? d.wMix : s.stage >= 4 ? d.w[s.cur] : 0; },
+  inBeaker(s) { const d = s.d; return s.stage === 2 || s.stage === 3 ? FRESNO.map((c, i) => [c[1], d.n[i]]) : s.stage >= 4 && s.cur >= 0 ? [[FRESNO[s.cur][1], d.n[s.cur]]] : []; },
+  scene(s) {
+    const d = s.d, onBal = s.stage === 1 || s.stage >= 3, beaker = this.inBeaker(s), order = s.stage >= 4 ? null : s.order;
+    const bk = drag => `<${drag ? `button type="button" class="vl-item vl-beaker${VL.sel === 'beaker' ? ' sel' : ''}" data-drag="beaker" aria-label="The 100 mL beaker"` : 'div class="vl-beaker"'}>${beadBeaker(beaker, order, 'The 100 mL beaker' + (beaker.length ? ' with beads' : ', empty'))}</${drag ? 'button' : 'div'}>`;
+    const piles = s.stage >= 4 ? FRESNO.map((c, i) => (!s.wd[i] ? shelfBtn('c' + i, beadPile(c[1]), `${c[0]} atoms`) : '')).join('') : '';
+    const tray = s.stage >= 4 && s.cur >= 0 ? `<p class="small-note">The ${FRESNO[s.cur][0].toLowerCase()} atoms, lined up in rows of 10 so you can count them.</p>${beadTray(FRESNO[s.cur][1], d.n[s.cur], FRESNO[s.cur][0].toLowerCase())}` : s.stage >= 4 ? '<p class="small-note">Sorted into red, black and white piles (on the shelf). Weigh one color at a time in the beaker.</p>' : '<p class="small-note">Sort the atoms here after you weigh Nature’s Mix.</p>';
+    return `<div class="vl-shelf">${s.stage === 0 ? shelfBtn('beaker', beakerIcon, '100 mL beaker (empty)') : ''}${piles}<span class="vl-hint">Same beaker for every weighing.</span></div>
+    <div class="vl-row"><div class="vl-st" data-drop="balance" tabindex="0" role="button" aria-label="Analytical balance"><div class="vl-st-label">Analytical balance</div>${onBal ? bk(s.stage === 1) : ''}<div id="vlBal">${vlBalance(this.shown(s).toFixed(4))}</div></div>
+    <div class="vl-st" data-drop="bin" tabindex="0" role="button" aria-label="Supply bin of Fresnocitium"><div class="vl-st-label">Supply bin (lid on)</div>${s.stage === 2 ? bk(true) : beadBin(s.shaken)}${s.stage <= 1 ? `<div class="vl-ctl"><button type="button" class="btn${s.shaken ? '' : ' primary'}" id="fShake">${s.shaken ? 'Shaken ✓' : 'Shake the bin'}</button></div>` : ''}</div>
+    <div class="vl-st wide"><div class="vl-st-label">Sorting and counting tray</div><div id="vlTray">${tray}</div>${s.stage === 3 && VL.step >= 2 ? '<div class="vl-ctl"><button type="button" class="btn primary" id="fSort">Sort by color</button></div>' : ''}</div></div>`;
+  },
+  restore(s) {
+    const sh = $('fShake'); if (sh) sh.onclick = () => { s.shaken = true; vlScene(); vlSay('Lid held on, shaken and flipped: the atoms are well mixed.', 'good'); };
+    const so = $('fSort'); if (so) so.onclick = () => { s.stage = 4; s.cur = -1; vlScene(); vlSay('Sorted! The empty beaker is back on the balance. Drag the <b>red</b> atoms into it first.', 'good'); vlSteps(); };
+  },
+  async drop(s, what, where) {
+    const d = s.d;
+    if (what === 'beaker' && where === 'balance') {
+      if (s.stage === 0) { s.stage = 1; vlScene(); await vlWeigh('vlBal', d.beaker, 4); vlSay('That’s the empty beaker. Record every digit.', 'good'); return true; }
+      if (s.stage === 2) { s.stage = 3; vlScene(); await vlWeigh('vlBal', d.wMix, 4); vlSay('Beaker + Nature’s Mix. Record every digit.', 'good'); return true; }
+      return 'The beaker is already on the balance.';
+    }
+    if (what === 'beaker' && where === 'bin') {
+      if (s.stage !== 1) return 'Weigh the empty beaker first.';
+      if (VL.step < 1) return 'Record the mass of the empty beaker first (step 1).';
+      if (!s.shaken) return 'Shake the bin first (hold the lid on), so your scoop is a fair sample.';
+      s.stage = 2; vlScene(); vlSay('Scooped a full beaker of Fresnocitium. Put it back on the balance.', 'good'); return true;
+    }
+    const m = /^c(\d)$/.exec(what);
+    if (m && where === 'balance') {
+      const i = +m[1], next = s.wd.indexOf(false);
+      if (s.stage < 4) return 'Weigh Nature’s Mix and sort the atoms first.';
+      if (i !== next) return `Do the ${FRESNO[next][0].toLowerCase()} atoms first (the manual goes red, black, then white).`;
+      if (VL.step < 2 + i) return `Record the ${FRESNO[i - 1][0].toLowerCase()} atoms’ mass and count first.`;
+      s.wd[i] = true; s.cur = i; vlScene(); await vlWeigh('vlBal', d.w[i], 4); vlSay(`Beaker + ${FRESNO[i][0].toLowerCase()} atoms. Record the mass, then count them in the tray.`, 'good'); return true;
+    }
+    return what === 'beaker' ? 'Put the beaker on the balance or scoop with it at the bin.' : 'Put the atoms in the beaker on the balance.';
+  },
+  steps: [
+    { title: 'Mass of the empty beaker', say: 'The balance reads 0.0000 g (tared). Drag the <b>empty 100 mL beaker</b> onto the balance.', act: s => s.stage >= 1, parts: s => [num(s.d.beaker, { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of beaker (empty)' })], sol: s => `<b>${s.d.beaker.toFixed(4)} g</b>: copy every digit.` },
+    { title: 'Scoop and weigh Nature’s Mix', say: '<b>Shake the bin</b>, then drag the beaker to the bin to scoop a full beaker of atoms. Put it back on the balance.', act: s => s.stage >= 3, parts: s => [num(s.d.wMix, { dp: 4, unit: 'g', tol: 0.00006, label: 'Mass of beaker + Nature’s Mix' })], sol: s => `<b>${s.d.wMix.toFixed(4)} g</b>.` },
+    ...FRESNO.map((c, i) => ({ title: `${c[0]} atoms: weigh and count`, say: s => `${i === 0 ? 'Press <b>Sort by color</b>. Then drag' : 'Drag'} the <b>${c[0].toLowerCase()} atoms</b> into the beaker on the balance. Record the mass, then count them in the tray.`, act: s => s.wd[i],
+      parts: s => [num(s.d.w[i], { dp: 4, unit: 'g', tol: 0.00006, label: `Mass of beaker + ${c[0]} atoms` }), num(s.d.n[i], { tol: 0, unit: '', ans: String(s.d.n[i]), label: `Number of ${c[0]} atoms` })], sol: s => `<b>${s.d.w[i].toFixed(4)} g</b> and <b>${s.d.n[i]}</b> ${c[0].toLowerCase()} atoms (${Math.floor(s.d.n[i] / 10)} full rows of 10${s.d.n[i] % 10 ? ` + ${s.d.n[i] % 10}` : ''}).` })),
+    { title: 'Q2: mass per atom of the mix', say: 'Mass of Nature’s Mix, total number of atoms, and the average mass per atom in the mix.', parts: s => { const d = s.d; return [num(d.mMix, { dp: 4, unit: 'g', tol: 0.00011, label: 'A. Mass of Nature’s Mix' }), num(d.N, { tol: 0, unit: '', ans: String(d.N), label: 'B. Total number of atoms' }), num(d.perMix, { sf: d.sfMix, unit: 'g', rel: 0.0005, label: 'C. Average mass per atom' })]; },
+      sol: s => { const d = s.d; return `${d.wMix.toFixed(4)} − ${d.beaker.toFixed(4)} = <b>${d.mMix.toFixed(4)} g</b>; ${d.n.join(' + ')} = <b>${d.N}</b>; ${d.mMix.toFixed(4)} ÷ ${d.N} = <b>${sfHTML(d.perMix, d.sfMix)} g</b>.`; } },
+    { title: 'Q3: percent abundance', say: 'Abundance (%) = number of atoms ÷ total number of atoms × 100.', parts: s => FRESNO.map((c, i) => num(s.d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, ans: s.d.pct[i].toFixed(2), label: c[0] })), sol: s => FRESNO.map((c, i) => `${c[0]}: ${s.d.n[i]} ÷ ${s.d.N} × 100 = <b>${s.d.pct[i].toFixed(2)}%</b>`).join('<br>') },
+    { title: 'Q3: mass per atom of each isotope', say: 'Mass of the atoms = (beaker + atoms) − empty beaker. Divide by the count.', parts: s => FRESNO.map((c, i) => num(s.d.per[i], { sf: s.d.sf[i], unit: 'g', rel: 0.0005, label: c[0] })), sol: s => FRESNO.map((c, i) => `${c[0]}: ${s.d.m[i].toFixed(4)} ÷ ${s.d.n[i]} = <b>${sfHTML(s.d.per[i], s.d.sf[i])} g</b>`).join('<br>') },
+    { title: 'Q3: average atomic mass', say: 'Average atomic mass = Σ (mass per atom × abundance as a decimal).', ref: s => tableHTML(FRESNO.map((c, i) => [c[0], `${s.d.pct[i].toFixed(2)}%`, `${sfHTML(s.d.per[i], s.d.sf[i])} g`]), ['Isotope', 'Abundance', 'Mass per atom']), parts: s => [num(s.d.avg, { unit: 'g', rel: 0.0015, ans: s.d.avg.toPrecision(4), label: 'Average atomic mass' })], rec: (s, v) => { s.avgR = v[0]; }, sol: s => FRESNO.map((c, i) => `${s.d.per[i].toPrecision(4)}(${(s.d.pct[i] / 100).toFixed(4)})`).join(' + ') + ` = <b>${s.d.avg.toPrecision(4)} g</b>.` },
+    { title: 'Q4: do they match?', say: s => `Your Q2C mass per atom was <b>${sfHTML(s.d.perMix, 4)} g</b> and your average atomic mass was <b>${(+s.avgR || s.d.avg).toPrecision(4)} g</b>. Should these match?`, parts: () => [conceptPart('Yes: both are the total mass of the atoms divided by the total number of atoms; small differences come from weighing and rounding', ['No: the equation always gives a bigger number than mass ÷ atoms', 'No: they measure different things, so they shouldn’t match'], { kw: [['yes', 'should match', 'same', 'equal', 'match', 'agree', 'close']], nokw: [' no ', 'shouldn t', 'should not'] })], sol: () => 'They <b>should match</b>: the weighted average simplifies to total mass ÷ total atoms. Small differences come from weighing the mix and each color separately, and from rounding.' }
+  ]
+};
+VBENCH.push(BENCH_BEADS);
+
 
 /* ====================== hands-on stations for the mock practical ====================== */
 // a part graded against what the student actually did at the station
