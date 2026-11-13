@@ -1987,10 +1987,12 @@ const K10a = {
       hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. Something burning in O₂ → combustion (a special redox your lab manual lists on its own). Any other uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   station() {
-    const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3)));
+    // in the mock practical this station gets the mixing bench, so use only chemicals that are on its shelf
+    const live = buildingMock, onShelf = x => x.r.every(f => VR[f.replace(/\((s|l|g|aq)\)$/, '')]);
+    const rx = pick(RX.filter(x => x.tube && x.p.length && x.r.length === 2 && (x.ppt || x.gas || x.s2 === 1 || x.s2 === 3) && (!live || onShelf(x))));
     const others = shuffle(RX.filter(x => x.tube && x.obs !== rx.obs && x.s2 !== rx.s2)).slice(0, 3).map(x => x.obs), opts = shuffle([rx.obs, ...others]);
     const beg = lvl() === 'beg', parts = [choice(opts, opts.indexOf(rx.obs), Object.assign({ label: 'Observation', w: 2 }, lvl() === 'beg' ? {} : obsKw(rx))), s2Part(rx.s2, { label: 'Type of reaction (Scheme 2)', w: 2 }), beg ? balPart(rx, { label: 'Balance the equation', w: 6 }) : eqPart(rx, { label: 'Balanced equation with phases', w: 6 })];
-    return { tag: 'Types of reactions station', gs: !beg, prompt: `Mix the two bottles at this station: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction (Scheme 2). Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
+    return { tag: 'Types of reactions station', gs: !beg, live, mix: rx.r.map(f => f.replace(/\((s|l|g|aq)\)$/, '')), prompt: `${live ? 'Mix these two chemicals in the test tube at this station' : 'Mix the two bottles at this station'}: <b>${rxPlain(rx.r)}</b>. Record your observation and the type of reaction (Scheme 2). Then ${beg ? '<b>balance the equation</b> (the products are given)' : '<b>predict the products</b> and write the <b>balanced equation with phases</b>'}.`, art: tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)), parts,
       hint: 'Swap partners (double displacement) or let the metal replace the ion (single displacement). Fix each formula from the ion charges, check the solubility rules for (s) vs (aq), then balance.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   predict() {
@@ -2960,7 +2962,7 @@ const needsSol = q => q.gs !== false && (q.gs || /solubility|green sheet|insolub
 function qHTML(q, opt = {}) {
   let t = `<p class="prompt">${q.prompt}</p>`;
   if (q.eq) t += `<div class="eqline">${q.eq}</div>`;
-  if (q.art) t += `<div class="artbox">${q.art}</div>`;
+  if (q.art && !(q.live && mock && mock.phase !== 'done')) t += `<div class="artbox">${q.art}</div>`;
   if (q.ref) t += `<div class="ref">${q.ref}</div>`;
   if (q.cab) t += cabBox();
   if (q.pt !== false && (q.pt || /g\/mol|molar mass/i.test(`${q.prompt} ${q.hint || ''} ${q.solution || ''}`))) t += ptBox();
@@ -3164,6 +3166,9 @@ function buildPractical0(ver, timer) {
   stations.splice(rint(0, stations.length), 0, genSkills(used, byVer));
   stations.splice(rint(0, stations.length), 0, genStation());
   stations.forEach(st => 'ABC'.split('').forEach(V => { const q = st.versions[V]; if (q && q.skill === 'read') q.parts.forEach(pt => { if (pt.type === 'num') { pt.read = true; if (pt.rtol == null) pt.rtol = RTOL[pt.unit] != null ? RTOL[pt.unit](pt) : null; } }); }));
+  // a "mix the two chemicals" question gets the real mixing bench at its station
+  stations.forEach(st => { if (st.hands || !'ABC'.split('').some(V => st.versions[V] && st.versions[V].live)) return;
+    const s = BENCH_MIX.setup(); st.hands = { bench: BENCH_MIX, s, snap: () => (s.res ? `In your test tube: ${s.added.map(k => fhtml(k)).join(' + ')}. ${s.res.text.replace(/: .*$/, '.')}` : 'Nothing was mixed in the test tube.') }; });
   save();
   const n = stations.length, start = rint(0, n - 1);
   mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
