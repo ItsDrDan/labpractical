@@ -93,7 +93,7 @@ for (const L of X.LABS) for (const k of Object.keys(L.K)) many(L.id, k, 15, q =>
 for (const L of X.LABS) for (const k of Object.keys(L.K)) many(L.id, k, 12, q => {
   const h = X.setupHint(q); if (!h) return '';
   if (/<b>(?!\?<\/b>)/.test(h)) return `setup hint still shows a bold result: ${strip(h).slice(0, 80)}`;
-  if (q.parts.length > 1) for (const p of q.parts) { if (p.type !== 'num') continue; const a = strip(p.ans); if (a.length > 3 && new RegExp('(^|[^\\d.,])' + a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d]|\\.\\d)').test(strip(h))) return `setup hint shows the answer ${a}: ${strip(h).slice(0, 90)}`; }
+  if (q.parts.length > 1) for (const p of q.parts) { if (p.type !== 'num') continue; const a = strip(p.ans); if (a.length > 3 && new RegExp('(^|[^\\d.,−-])' + a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d]|\\.\\d)').test(strip(h))) return `setup hint shows the answer ${a}: ${strip(h).slice(0, 90)}`; }
   return '';
 });
 // 8) Scheme 2: a metal + acid question explains why "gas evolution" is not the answer

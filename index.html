@@ -23,9 +23,9 @@ button,input{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cu
 html.dd-embedded .topbar{position:relative}
 .tb{max-width:1180px;margin:auto;min-height:var(--topbar);padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .tb-brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:1.12rem;white-space:nowrap;margin-right:auto}.tb-brand img{width:40px;height:40px;display:block}
-.seg{display:inline-flex;background:#e9ebf5;border-radius:14px;padding:4px;gap:4px}
-.seg button{border:0;background:none;border-radius:11px;padding:8px 18px;font-weight:800;color:var(--muted);min-height:46px;white-space:nowrap}
-.seg button.active{background:var(--accent);color:#fff;box-shadow:0 2px 6px #4b57d14d}
+
+
+
 .tb-xp{display:flex;align-items:center;gap:9px;min-width:160px}.tb-xp .ico{width:34px;height:34px;display:grid;place-items:center;background:var(--lav);border-radius:10px;color:var(--accent-d)}
 .tb-xp b{display:block;font-size:.82rem;line-height:1.1}.tb-xp small{display:block;font-size:.72rem;color:var(--faint);font-weight:700}
 .xpbar{height:6px;width:110px;background:#e9eaf3;border-radius:9px;overflow:hidden;margin:4px 0 2px}.xpbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#72c9a8,#7884ea);border-radius:9px;transition:width .5s}
@@ -49,13 +49,13 @@ body.calc-open .tb-btn#calcBtn{background:#ffd166;border-color:#c99a1e}
 .mode-switch button.active{border-color:var(--accent);background:linear-gradient(135deg,#f3f4ff,#fff);box-shadow:0 0 0 3px #4b57d126,var(--shadow)}.mode-switch button.active .ms-ico{background:var(--accent);color:#fff}
 
 /* pickers */
-.featured{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
-.feature-card{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--line);background:linear-gradient(135deg,#fff,#f7f6ff);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--shadow);min-height:92px}
-.feature-card img{width:60px;height:60px;flex:none}.feature-card b{display:block;font-family:var(--font-display);font-weight:600;font-size:1.15rem}.feature-card small{color:var(--muted);display:block;line-height:1.35}
-.feature-card.active{border-color:var(--accent);box-shadow:0 0 0 3px #4b57d126,var(--shadow)}
+
+
+
+
 .divider{display:flex;align-items:center;gap:12px;margin:14px 2px 12px;color:var(--faint);font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
 .divider::before,.divider::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,#d5d9ea 0 8px,transparent 8px 14px)}
-.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px;margin-bottom:16px}
+
 .pick{display:grid;grid-template-columns:auto 1fr;gap:2px 11px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:11px 12px;box-shadow:var(--shadow);min-height:74px}
 .pick:hover{border-color:#b9bfe8}.pick.active{border-color:var(--accent);box-shadow:0 0 0 3px #4b57d126,var(--shadow)}
 .pick img{grid-row:span 3;width:48px;height:48px}.pick b{font-size:.98rem;line-height:1.25}.pick small{color:var(--muted);font-size:.8rem;line-height:1.3}
@@ -72,7 +72,7 @@ main.panel,.mainpanel{padding:20px;scroll-margin-top:calc(var(--topbar) + 10px)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;font-size:1.02rem}.btn.primary:hover{background:var(--accent-d)}
 .btn.pulse{border-color:var(--amber-line);background:var(--amber);color:var(--amber-ink)}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tag{font-size:.78rem;font-weight:800;color:var(--muted);background:#f2f3f8;border-radius:99px;padding:4px 10px}.tag.quiz{background:var(--lav);color:#4b4590}
-.coach{display:flex;gap:10px;align-items:flex-start;background:var(--accent);color:#fff;border-radius:14px;padding:11px 15px;margin-bottom:12px;font-size:1.04rem;font-weight:700;line-height:1.4}.coach:empty{display:none}
+
 .question{border:1px solid var(--line);border-radius:var(--r-md);background:#fbfbfe;padding:16px}
 .equation{text-align:center;font-size:clamp(1.5rem,5vw,2.3rem);font-weight:800;background:var(--accent-soft);border-radius:var(--r-sm);padding:14px;margin-bottom:12px;overflow-x:auto;color:#26326a;letter-spacing:.02em}
 .equation:empty{display:none}.equation.text{font-size:clamp(1.15rem,3.2vw,1.45rem);font-weight:750;letter-spacing:0}
@@ -90,11 +90,11 @@ table.data{margin:auto;border-collapse:collapse;font-size:1.1rem;background:#fff
 .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-top:14px}
 .choice{border:1.5px solid var(--line2);background:#fff;border-radius:12px;padding:12px 16px;min-height:56px;font-size:1.06rem;font-weight:750;color:#2b3760;text-align:left}
 .choice:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}.choice.right{border-color:#3a9a71;background:var(--mint);color:var(--mint-ink)}.choice.wrong{border-color:#d4677a;background:var(--rose);color:var(--rose-ink)}
-.tapper{display:flex;justify-content:center;align-items:flex-end;flex-wrap:wrap;gap:4px;margin:4px 0 12px}
-.tapper .digit{min-width:52px;height:66px;border:2px solid var(--line2);border-radius:12px;background:#fff;font:800 2rem/1 var(--font);color:#26326a}
-.tapper .digit.on{background:var(--mint);border-color:#3a9a71;color:var(--mint-ink);transform:translateY(-3px);box-shadow:0 4px 10px #23704f22}
-.tapper .digit.miss{border-color:#d4677a;background:var(--rose)}.tapper .pt{font:800 2.2rem/1 var(--font);color:#26326a;padding:0 2px 6px}
-.tapper .rest{font-weight:800;font-size:1.5rem;color:var(--faint);padding:0 6px 14px}
+
+
+
+
+
 .typing-note{font-size:.85rem;color:var(--faint);margin:8px 2px 0}
 .feedback{margin-top:14px;padding:12px 15px;border-radius:var(--r-md);display:none;font-size:1.04rem}
 .feedback.good{display:block;border:1px solid var(--mint-line);background:var(--mint);color:var(--mint-ink)}
@@ -107,36 +107,36 @@ table.data{margin:auto;border-collapse:collapse;font-size:1.1rem;background:#fff
 .calc-tip{font-size:.92rem;color:var(--muted);margin-top:8px}
 .next-row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.next-row .btn.primary{min-width:220px;min-height:56px;font-size:1.08rem}
 .hl{font-family:var(--font);font-weight:800;letter-spacing:.03em;white-space:nowrap}
-.d-sig{color:#23704f;background:#dff3e8;border-radius:4px;padding:0 1px}.d-lead,.d-trail{color:#9aa1b4}.d-exp{color:#656c83;white-space:nowrap}.hl .pt{font-style:normal}
-b.d-sig,b.d-lead,b.d-trail{font-weight:800}
+.d-exp{color:#656c83;white-space:nowrap}.hl .pt{font-style:normal}
+
 .legend{font-size:.9rem;opacity:.9}
 mark{background:#ffe08a;border-radius:4px;padding:0 2px;color:inherit}
 .note-small{font-size:.82rem;color:var(--faint);margin:14px 0 0}
 
 /* guide */
-.guide-toggle{display:flex;align-items:center;gap:12px;margin-top:12px;padding:10px 14px;border:1px solid var(--mint-line);border-radius:var(--r-md);background:var(--mint);cursor:pointer;color:var(--mint-ink);font-weight:800}
-.guide-toggle input{width:22px;height:22px;accent-color:#2f8a64;flex:none;margin:0}.guide-toggle small{display:block;font-weight:600;color:#4b6c60;font-size:.84rem}
-.guide{margin-top:10px;display:grid;gap:8px}
-.gstep{border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:10px 12px}
-.gstep.current{border:2px solid #8b95ee;box-shadow:0 4px 14px #4b57d114}.gstep.done{background:#f3fbf7;border-color:#cbe9db}.gstep.later{display:none}
-.gstep .gnum{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}.gstep.done .gnum{color:var(--mint-ink)}
-.gstep .gask{font-weight:700;margin:2px 0 8px;font-size:1.05rem}
-.gstep .gchoices{display:flex;flex-wrap:wrap;gap:7px}.gstep .gchoices .choice{min-height:46px;padding:8px 13px;font-size:1rem}
-.gstep .gwhy{margin-top:7px;font-size:.95rem;color:var(--mint-ink)}.gstep .gwhy.bad{color:var(--rose-ink)}
+
+
+
+
+
+
+
+
+
 
 /* learn */
-.example{border:1px solid #d9ddf3;border-radius:var(--r-md);padding:16px;background:#fbfbff;margin-bottom:14px}
-.ex-label{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+
+
 .idea{display:flex;gap:11px;background:var(--amber);border:1px solid var(--amber-line);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:12px;color:#5b4714;font-size:1.04rem}
 .idea ul{margin:4px 0 0;padding-left:20px}
-.ex-steps{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}.ex-steps li{border:1px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:10px 13px}
-.ex-steps li b.ok{color:var(--mint-ink)}
-.ex-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+
+
+
 
 /* report */
-.report-score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.report-score b{font-size:2.2rem;color:var(--accent-d);font-family:var(--font-display)}
-.report-list{list-style:none;padding:0;margin:10px 0;display:grid;gap:6px}.report-list li{padding:8px 12px;border-radius:12px;background:var(--rose);border:1px solid var(--rose-line)}.report-list li.ok{background:var(--mint);border-color:var(--mint-line)}
-.quiz-bar{height:8px;border-radius:9px;background:#eceef5;overflow:hidden;margin:-2px 0 12px}.quiz-bar span{display:block;height:100%;background:linear-gradient(90deg,#72c9a8,#7884ea)}
+
+
+
 
 /* progress */
 .section{margin-top:18px;padding:20px}
@@ -178,13 +178,13 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 @media(max-width:760px){
  .tb{gap:8px;padding:8px 10px}.tb-brand{font-size:1rem}.tb-brand img{width:34px;height:34px}.tb-xp{min-width:0}.tb-xp .xpbar{width:70px}.tb-btn .lbl{display:none}
  .topbar{position:relative}
- .seg button{padding:8px 13px}.intro img{width:64px;height:64px}
- .mode-switch,.featured{grid-template-columns:1fr}.mode-switch button{min-height:70px}
- .picker{grid-template-columns:1fr 1fr}.pick{grid-template-columns:1fr;padding:10px}.pick img{grid-row:auto;width:40px;height:40px}
+ .intro img{width:64px;height:64px}
+ .mode-switch{grid-template-columns:1fr}.mode-switch button{min-height:70px}
+ .pick{grid-template-columns:1fr;padding:10px}.pick img{grid-row:auto;width:40px;height:40px}
  main.panel,.mainpanel{padding:14px}.question{padding:12px}.prompt{font-size:1.1rem}
  .actions{grid-template-columns:1fr 1fr}.stat-row{grid-template-columns:1fr 1fr}.stat.rank{grid-column:1/-1}
  .lesson-layout,.rule-grid{grid-template-columns:1fr}.answer input{flex:1 1 100%}.answer .btn.primary{flex:1}.next-row .btn.primary{width:100%}
- .tapper .digit{min-width:42px;height:58px;font-size:1.7rem}
+ 
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important}}
 
@@ -203,15 +203,15 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .cat:hover{border-color:#aab2ea}.cat img{width:86px;height:86px}.cat b{font-family:var(--font-display);font-weight:600;font-size:1.15rem;line-height:1.2}.cat small{color:var(--muted);font-size:.86rem;line-height:1.3}
 .cat .tick{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:2px solid var(--line2);background:#fff;display:grid;place-items:center;color:#fff}
 .cat.on{border-color:var(--accent);background:linear-gradient(180deg,#f3f4ff,#fff);box-shadow:0 0 0 3px #4b57d126,var(--shadow)}.cat.on .tick{background:var(--accent);border-color:var(--accent)}
-.chips-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:6px 16px 16px;margin-top:12px}
+
 .chips{display:flex;flex-direction:column;gap:10px}.chip-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.chip-row>span{font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);min-width:150px}
 .chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line2);background:#fff;border-radius:99px;padding:9px 16px;min-height:46px;font-weight:800;color:#3d4a73}
 .chip::before{content:'';width:18px;height:18px;border-radius:6px;border:2px solid var(--line2);flex:none}
 .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-d)}.chip.on::before{background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l5 5 9-10' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--accent)}
 .chip .stat{font-size:.75rem;color:var(--faint);background:none;padding:0;border-radius:0}
-.skill-card{display:flex;align-items:center;gap:14px;width:100%;margin-top:12px;text-align:left;border:1px solid #ead9a0;background:linear-gradient(135deg,#fffbf1,#fbf4ff);border-radius:var(--r-lg);padding:12px 16px;box-shadow:var(--shadow)}
-.skill-card img{width:58px;height:58px;flex:none}.skill-card b{display:block;font-family:var(--font-display);font-weight:600;font-size:1.15rem}.skill-card small{color:var(--muted)}.skill-card .go{margin-left:auto;font-size:1.4rem;color:var(--accent-d)}
-.skill-card.on{border-color:var(--accent);box-shadow:0 0 0 3px #4b57d126,var(--shadow)}
+
+
+
 .empty{padding:26px 16px;text-align:center;color:var(--muted);font-weight:700;font-size:1.08rem;border:2px dashed var(--line2);border-radius:var(--r-md)}
 .empty .ui{transform:rotate(-90deg)}
 .btn[aria-pressed="true"]{background:var(--mint);border-color:var(--mint-line);color:var(--mint-ink)}
@@ -336,25 +336,25 @@ body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
 
 /* mascot */
 .play-left{display:flex;align-items:center;gap:10px;min-width:0}
-.sleuth{width:86px;height:86px;flex:none;object-fit:contain;transform-origin:50% 85%;margin:-10px 0 -8px -6px}
-.sleuth[data-mood="idle"]{animation:sl-float 3.2s ease-in-out infinite}
-.sleuth[data-mood="thinking"]{animation:sl-tilt 2.4s ease-in-out infinite}
-.sleuth[data-mood="correct"]{animation:sl-bounce .7s ease-out 2}
-.sleuth[data-mood="oops"]{animation:sl-wobble .6s ease-in-out 1}
-.sleuth[data-mood="victory"]{animation:sl-bounce .6s ease-out 3}
-@keyframes sl-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}92%{transform:translateY(-1px) scaleY(1)}95%{transform:scaleY(.94)}}
-@keyframes sl-tilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-@keyframes sl-bounce{0%,100%{transform:translateY(0)}35%{transform:translateY(-14px) scale(1.06)}60%{transform:translateY(0) scale(.97,1.03)}}
-@keyframes sl-wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-9deg)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}}
-@media(max-width:760px){.sleuth{width:64px;height:64px}.intro img{width:84px;height:84px}}
-@media(prefers-reduced-motion:reduce){.sleuth{animation:none!important}}
+
+
+
+
+
+
+
+
+
+
+@media(max-width:760px){.intro img{width:84px;height:84px}}
+
 
 /* phone polish */
-.tapper .digits{display:flex;flex-wrap:nowrap;align-items:flex-end;gap:4px}
+
 @media(max-width:760px){
  .answer{gap:8px}.answer input{flex:1 1 0;min-width:0}.answer .unit{flex:none;font-size:1.05rem}.answer .btn.primary{flex:1 1 100%}
- .tapper .digit{min-width:0;width:min(42px,calc((100vw - 96px) / var(--n)));height:56px;font-size:clamp(1.2rem,6vw,1.7rem);padding:0}
- .tapper .pt{font-size:1.8rem}.tapper .rest{font-size:1.2rem;padding-bottom:12px}
+ 
+ 
  .actions .btn{white-space:nowrap;font-size:.95rem;padding:10px 8px}
  .pair-zoom{grid-template-columns:1fr}
 }
@@ -3077,7 +3077,7 @@ function setupHint(q) {
   const out = q.solution.replace(new RegExp('(=\\s*)[^=<>]*?→\\s*' + B, 'g'), '$1<b>?</b>').replace(new RegExp(B, 'g'), '<b>?</b>');
   // a later step may reuse an earlier answer: hide that too
   const keys = (q.parts.length > 1 ? q.parts : []).filter(p => p.type === 'num' && p.ans != null).map(p => String(p.ans).replace(/<[^>]+>/g, '').trim()).filter(k => k.length > 1).sort((x, y) => y.length - x.length);
-  const hide = t => keys.reduce((t2, k) => t2.replace(new RegExp('(^|[^\\d.,])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d]|\\.\\d)', 'g'), '$1(your answer)'), t);
+  const hide = t => keys.reduce((t2, k) => t2.replace(new RegExp('(^|[^\\d.,−-])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d]|\\.\\d)', 'g'), '$1(your answer)'), t);
   const safe = out.split(/(<[^>]*>)/).map(t => (t[0] === '<' ? t : hide(t))).join('');
   return /\d/.test(safe.replace(/<[^>]+>/g, '')) ? safe : '';
 }
@@ -3205,11 +3205,11 @@ function buildPractical0(ver, timer) {
   P.mockLabs = P.mockLabs || {};
   const set = labSet(), order = shuffle(set).sort((a, b) => (P.mockLabs[a] || 0) - (P.mockLabs[b] || 0));
   const seq = []; while (seq.length < MOCK_N - MOCK_GEN && order.length) seq.push(order[seq.length % order.length]);
-  const used = new Set(['equip']); let stations = [], nh = 0;
+  const used = new Set(['equip']), seen = []; let stations = [], nh = 0; // seen: labs on this mock, counted toward the rotation only when it is turned in
   // labs with the fewest question types pick first, so they don't run out of fresh ones
   seq.sort((a, b) => Object.keys(labById(a).K).length - Object.keys(labById(b).K).length).forEach(id => {
     const l = labById(id);
-    if (!stations.some(st => st.lab === id) && HANDS[id] && nh < 3 && Math.random() < 0.6 && HFAM[id].every(f => !used.has(f))) { stations.push(HANDS[id]()); HFAM[id].forEach(f => used.add(f)); nh++; P.mockLabs[id] = (P.mockLabs[id] || 0) + 1; return; }
+    if (!stations.some(st => st.lab === id) && HANDS[id] && nh < 3 && Math.random() < 0.6 && HFAM[id].every(f => !used.has(f))) { stations.push(HANDS[id]()); HFAM[id].forEach(f => used.add(f)); nh++; seen.push(id); return; }
     const all = [...new Set(l.mock || Object.keys(l.K))], fresh = shuffle(all.filter(k => !used.has(famOf(id, k))));
     const pickK = [], fams = new Set();
     // A, B and C should be about the same job: same kind of skill, about the same number of answers.
@@ -3220,7 +3220,7 @@ function buildPractical0(ver, timer) {
     fresh.forEach(k => { if (pickK.length < 3 && !pickK.includes(k) && close(k)) pickK.push(k); });
     if (!pickK.length) shuffle(all).forEach(k => { if (pickK.length < 3 && !pickK.includes(k)) pickK.push(k); }); // only if nothing fresh is left; otherwise reuse a fresh type
     const v = {}; 'ABC'.split('').forEach((V, i) => { const k = pickK[i % pickK.length]; v[V] = makeQ(id, k); used.add(famOf(id, k)); });
-    stations.push({ lab: id, title: l.name, versions: v }); P.mockLabs[id] = (P.mockLabs[id] || 0) + 1;
+    stations.push({ lab: id, title: l.name, versions: v }); seen.push(id);
   });
   stations = shuffle(stations);
   // at most 2 instrument readings on any one sheet (lab stations ≤ 1, plus the general Measurements station)
@@ -3244,7 +3244,7 @@ function buildPractical0(ver, timer) {
     const s = BENCH_MIX.setup(); st.hands = { bench: BENCH_MIX, s, snap: () => (s.res ? `In your test tube: ${s.added.map(k => fhtml(k)).join(' + ')}. ${s.res.text.replace(/: .*$/, '.')}` : 'Nothing was mixed in the test tube.') }; });
   save();
   const n = stations.length, start = rint(0, n - 1);
-  mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0 };
+  mock = { ver, timer, stations, order: Array.from({ length: n }, (_, i) => (start + i) % n), pos: 0, answers: {}, phase: 'work', deadline: 0, seen };
 }
 function startMock() {
   let v = document.querySelector('#vpick .vbtn.on'); v = v ? v.dataset.v : 'R'; if (v === 'R') v = pick(['A', 'B', 'C']);
@@ -3310,7 +3310,7 @@ function turnIn() {
   if (!mock || mock.phase === 'done') return;
   clearInterval(tick);
   mock.stations.forEach((s, i) => { const row = $('mockRun').querySelector(`.wrow[data-st="${i}"]`); if (row) mock.answers[i] = readParts(row, s.versions[mock.ver].parts); });
-  mock.phase = 'done'; let total = 0;
+  mock.phase = 'done'; let total = 0; P.mockLabs = P.mockLabs || {}; (mock.seen || []).forEach(id => { P.mockLabs[id] = (P.mockLabs[id] || 0) + 1; });
   const rows = mock.stations.map((s, i) => {
     const q = s.versions[mock.ver], vals = mock.answers[i] || q.parts.map(() => ({ val: '' })), res = gradeAll(q.parts, vals, true);
     const wt = q.parts.map(pt => pt.w || 1), wsum = wt.reduce((a, b) => a + b, 0), pts = Math.round(res.reduce((a, r, k) => a + r.score * wt[k], 0) / wsum * 10 * 2) / 2; total += pts;
