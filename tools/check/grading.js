@@ -99,6 +99,17 @@ for (const L of X.LABS) for (const k of Object.keys(L.K)) many(L.id, k, 12, q =>
 // 8) Scheme 2: a metal + acid question explains why "gas evolution" is not the answer
 many('10a', 'scheme2', 200, q => { const p = q.parts[0], i = p.options.indexOf('Gas evolution'); return /Zn/.test(strip(q.prompt)) && /HCl/.test(strip(q.prompt)) && !/redox/i.test(p.why[i] || '') ? 'Zn + HCl: no redox explanation on Gas evolution' : ''; });
 
+// 9) fixes from the Nov 2026 most-missed review (tools/item-analysis.js)
+const G = (p, val) => X.gradePart(p, val, p.unit || '', false);
+many('12b', 'molarMass', 1, q => { const p = q.parts[0]; return !G(p, '126.1').ok || !G(p, '126.1').warn ? '126.1 for 126.06 g/mol should be right with a decimal-places notice' : G(p, '126').ok ? '126 for 126.06 g/mol must be wrong' : ''; });
+many('11a', 'molarMass', 1, q => (!G(q.parts[0], '474.4').ok ? '474.4 for 474.37 g/mol should be right with a notice' : ''));
+many('2a', 'abundance', 40, q => { const p = q.parts[0]; return !G(p, p.v.toFixed(1)).ok ? `abundance ${p.ans} typed ${p.v.toFixed(1)} rejected` : ''; });
+many('4b', 'acid', 60, q => { const p = q.parts[0]; return p.type === 'name' && !G(p, p.ans + ' (aq)').ok ? `"${p.ans} (aq)" rejected` : ''; });
+many('5a', 'formula', 60, q => { const p = q.parts[0], f = p.accept[0], one = f.replace(/([A-Za-z])(?![a-z0-9])/g, '$11'); return one !== f && (G(p, one).ok || !/subscripts of 1/.test(G(p, one).note)) ? `${one} for ${f}: no "subscripts of 1" note` : ''; });
+many('0a', 'buret', 60, q => { const p = q.parts[0], v = p.v, up = 2 * Math.floor(v) + 1 - v; return Math.abs(up - v) > 0.25 && !/top-down/.test(G(p, up.toFixed(2)).note || '') ? `buret ${v} read upward as ${up.toFixed(2)}: no top-down note` : ''; });
+many('3a', 'energy', 30, q => { const p = q.parts[0]; return G(p, String(p.v * 1e-9)).ok || !/nm to m/.test(G(p, String(p.v * 1e-9)).note || '') ? 'photon energy without nm→m: no conversion note' : ''; });
+many('8a', 'idea', 40, q => (!q.hint || /gas collection tube/.test(q.hint) && !/vapor pressure/.test(q.prompt) ? `gas lab idea has the wrong hint: ${strip(q.prompt).slice(0, 40)}` : ''));
+
 console.log(`${n} grading and content checks run.`);
 if (fails.length) { console.log(`${fails.length} problem(s):\n` + [...new Set(fails)].join('\n')); process.exit(1); }
 console.log('All grading checks passed.');

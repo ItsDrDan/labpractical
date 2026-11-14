@@ -940,7 +940,7 @@ function wordMatch(raw, accepts) {
   return accepts.some(a => { const n = normWords(a), nn = n.replace(/ /g, ''); if (tt === nn) return true; const allow = nn.length >= 12 ? 2 : nn.length >= 6 ? 1 : 0; return allow && tt.slice(-3) === nn.slice(-3) && lev(tt, nn) <= allow; });
 }
 // roman numeral spacing etc. for compound names: "iron(III) chloride" == "iron (iii) chloride" == "iron 3 chloride"? (no: roman numerals required)
-const normName = s => normWords(s).replace(/aluminium/g, 'aluminum').replace(/sulph/g, 'sulf').replace(/\(ll+\)|\bll+\b/g, m => m.replace(/l/g, 'i')).replace(/\b(i{1,3}|iv|v|vi{0,3})\b/g, m => m.toUpperCase()).replace(/\s+/g, ' ');
+const normName = s => normWords(s).replace(/\b(aq|aqueous)\b/g, ' ').replace(/aluminium/g, 'aluminum').replace(/sulph/g, 'sulf').replace(/\(ll+\)|\bll+\b/g, m => m.replace(/l/g, 'i')).replace(/\b(i{1,3}|iv|v|vi{0,3})\b/g, m => m.toUpperCase()).replace(/\s+/g, ' ');
 
 /* ---------- units ---------- */
 const UNIT_ALIASES = {
@@ -1136,7 +1136,7 @@ function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'text' && p.kw) { const t = ' ' + normWords(val) + ' ', neg = /\b(no|not|nothing|none|never|without|didn t|doesn t|don t|wasn t|isn t)( \w+){0,2} $/, ok = p.kw.some(w => { if (/^ ?(no|not|nothing|none|clear|same|stay)/.test(w)) return t.includes(w); let i = t.indexOf(w); while (i >= 0) { if (!neg.test(t.slice(0, i).replace(/\S*$/, ''))) return true; i = t.indexOf(w, i + 1); } return false; }); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Describe what you saw: a solid, bubbles, a smell, heat, a coating, a color change, or no change.' }; }
   if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.whyText) { const tw = ' ' + normWords(val) + ' ', h = p.whyText.find(([ws]) => ws.some(w => tw.includes(' ' + w + ' '))); if (h) return { score: 0, ok: false, note: h[1] }; } if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
-  if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
+  if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; else if (!ok && p.accept.some(a => normFormula(a) === normFormula(String(val).replace(/([A-Za-z)\]])1(?![0-9])/g, '$1')))) note = 'Leave out subscripts of 1: write NaCl, not Na1Cl1.'; return { score: ok ? 1 : 0, ok, note }; }
   if (p.type === 'coef') { const raw = String(val).split(',').map(x => x.trim()); if (raw.length !== p.vals.length || raw.some(x => x !== '' && !/^[1-9]\d*$/.test(x))) return { score: 0, ok: false, note: 'Use whole numbers only, one in each box (leave a box blank or write 1 for a coefficient of 1).' }; const got = raw.map(x => (x === '' ? 1 : +x)); const ok = p.vals.every((c, i) => got[i] === c); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Count each element on both sides. Use the smallest whole numbers.' }; }
   return { score: 0, ok: false };
 }
@@ -1499,7 +1499,7 @@ const K0a = {
   },
   buret() {
     const v = offLine(2, 48, 2);
-    return { tag: 'Buret reading', prompt: 'Record the volume reading on this <b>50 mL buret</b>.', art: buretSVG(v), parts: [num(v, { dp: 2, unit: 'mL', tol: 0.02 })],
+    return { tag: 'Buret reading', prompt: 'Record the volume reading on this <b>50 mL buret</b>.', art: buretSVG(v), parts: [num(v, { dp: 2, unit: 'mL', tol: 0.02, slip: x => { const up = 2 * Math.floor(v) + 1 - v; return Math.abs(up - v) > 0.06 && Math.abs(x - up) < 0.04 ? 'A buret reads <b>top-down</b>: start at the number just above the meniscus and count the lines <b>down</b> to it.' : ''; } })],
       hint: 'Buret numbers get bigger going <b>down</b>. Lines are every 0.1 mL, so record to 0.01 mL.', solution: `Reading down from the top: about <b>${dpStr(v, 2)} mL</b>.`, video: 'titration', skill: 'read' };
   },
   volumetric() {
@@ -1600,7 +1600,7 @@ const K3a = {
   energy() {
     const nm = rint(410, 680), E = 6.626e-34 * 2.998e8 / (nm * 1e-9);
     return { tag: 'Photon energy', prompt: `What is the energy of one photon of <b>${nm} nm</b> light?`, eq: 'E = hc / λ &nbsp;&nbsp; h = 6.626 × 10<sup>−34</sup> J·s &nbsp;&nbsp; c = 2.998 × 10<sup>8</sup> m/s',
-      parts: [num(E, { sf: 3, unit: 'J' })], hint: 'Convert nm to m first.', solution: `E = (6.626 × 10⁻³⁴)(2.998 × 10⁸) ÷ (${nm} × 10⁻⁹) = <b>${sfHTML(E, 3)} J</b>.`, video: 'light', skill: 'calc' };
+      parts: [num(E, { sf: 3, unit: 'J', slip: x => Math.abs(x - E * 1e-9) < E * 1e-9 * 0.01 ? 'Convert nm to m first: 1 nm = 10<sup>−9</sup> m.' : '' })], hint: 'Convert nm to m first (× 10⁻⁹). The answer is tiny, about 10⁻¹⁹ J: type it in E notation (for example 1.23E-19).', solution: `E = (6.626 × 10⁻³⁴)(2.998 × 10⁸) ÷ (${nm} × 10⁻⁹) = <b>${sfHTML(E, 3)} J</b>.`, video: 'light', skill: 'calc' };
   },
   rydberg() {
     const LINES = [[3, 'Red'], [4, 'Green (blue-green)'], [5, 'Violet']], k = rint(0, 2), ni = LINES[k][0], lam = 1 / ((1 / 91.13) * (1 / 4 - 1 / (ni * ni)));
@@ -1843,7 +1843,7 @@ const K7a = {
     const up = chance(0.5), Ti = rnd(20.5, 24.5, 1), Tf = +(Ti + (up ? 1 : -1) * rnd(1.5, 8, 1)).toFixed(1), solid = up ? 'sodium carbonate (Na₂CO₃)' : 'citric acid (H₃C₆H₅O₇)';
     return { tag: 'Exothermic or endothermic?', prompt: `A spoonful of ${solid} is dissolved in water in a calorimeter. The temperature goes from <b>${Ti.toFixed(1)} °C</b> to <b>${Tf.toFixed(1)} °C</b>.`,
       parts: [choice(['Went up', 'Went down'], up ? 0 : 1, { label: 'Did the temperature go up or down?' }), choice(['Exothermic', 'Endothermic'], up ? 0 : 1, { label: 'Is the process exothermic or endothermic?' })],
-      hint: 'Warmer water means the process released heat into it.', solution: up ? 'The water warmed up, so the dissolving <b>released</b> heat: <b>exothermic</b>.' : 'The water cooled down, so the dissolving <b>absorbed</b> heat from the water: <b>endothermic</b>.', video: 'calorimetry', skill: 'concept' };
+      hint: 'The water is the surroundings. If it warms up, the process released heat into it (exothermic). If it cools down, the process took heat from it (endothermic).', solution: up ? 'The water warmed up, so the dissolving <b>released</b> heat: <b>exothermic</b>.' : 'The water cooled down, so the dissolving <b>absorbed</b> heat from the water: <b>endothermic</b>.', video: 'calorimetry', skill: 'concept' };
   },
   qSolution() {
     const ms = rnd(48, 58, 4), up = chance(0.55), dT = +(up ? rnd(2.1, 25, 1) : -rnd(2.1, 12, 1)).toFixed(1), q = ms * 4.184 * dT, sf = Math.min(4, sfCount(Math.abs(dT).toFixed(1)));
@@ -1870,7 +1870,7 @@ const K7a = {
   qWater() {
     const cal = rnd(3.2, 6.8, 4), w = rnd(45, 55, 4), Ti = rnd(22, 27, 1), Tf = +(Ti - rnd(8, 16, 1)).toFixed(1), dT = +(Tf - Ti).toFixed(1), q = w * 4.184 * dT, sf = Math.min(4, sfCount(Math.abs(dT).toFixed(1)));
     return { tag: 'Heat lost by the water', prompt: 'Ice melted in the calorimeter water. Calculate q<sub>water</sub> (keep the sign).', eq: 'q = m × c × ΔT', ref: tableHTML([['Mass of calorimeter (empty)', `${cal.toFixed(4)} g`], ['Mass of calorimeter + water', `${(cal + w).toFixed(4)} g`], ['Initial temperature of water', `${Ti.toFixed(1)} °C`], ['Final temperature of water', `${Tf.toFixed(1)} °C`]]),
-      parts: [num(q, { sf, unit: 'J', slip: x => Math.abs(x + q) < Math.abs(q) * 0.01 ? 'The water got colder, so ΔT and q<sub>water</sub> are negative.' : '' })], hint: 'Mass of water = (calorimeter + water) − calorimeter. ΔT = final − initial.', solution: `m = ${w.toFixed(4)} g, ΔT = ${Tf.toFixed(1)} − ${Ti.toFixed(1)} = ${dT.toFixed(1)} °C. q = ${w.toFixed(4)} × 4.184 × (${dT.toFixed(1)}) = <b>${sfHTML(q, sf)} J</b>.`, video: 'calorimetry', skill: 'calc' };
+      parts: [num(q, { sf, unit: 'J', slip: x => Math.abs(x + q) < Math.abs(q) * 0.01 ? 'The water got colder, so ΔT and q<sub>water</sub> are negative.' : '' })], hint: `Mass of water = (calorimeter + water) − calorimeter. ΔT = final − initial, so it is negative when the water cools (keep the minus sign). ΔT = ${Math.abs(dT).toFixed(1)} has ${sf} sig figs (subtraction keeps the tenths place), so q has ${sf}.`, solution: `m = ${w.toFixed(4)} g, ΔT = ${Tf.toFixed(1)} − ${Ti.toFixed(1)} = ${dT.toFixed(1)} °C. q = ${w.toFixed(4)} × 4.184 × (${dT.toFixed(1)}) = <b>${sfHTML(q, sf)} J</b>.`, video: 'calorimetry', skill: 'calc' };
   },
   parts() {
     const q = pick([['What is the cardboard lid on the calorimeter for?', ['It keeps heat from escaping to the room', 'It stops the thermometer from breaking', 'It makes the reaction faster'], 'The lid <b>prevents heat loss</b> to the surroundings.', [['heat', 'energy', 'warm', 'temperature'], ['escap', 'loss', 'lose', 'leav', 'insulat', 'keep', 'trap', 'prevent', 'stop', 'in ']]], ['Why is a plastic cup nested inside a Styrofoam cup?', ['The extra layer insulates, slowing heat transfer with the room', 'So you can weigh it more easily', 'Plastic reacts with the water to make heat'], 'Two cups = <b>extra insulation</b>, so almost all the heat stays in the solution.', [['insulat', 'escap', 'loss', 'lose', 'keep', 'trap', 'slow', 'stays', 'prevent']]], ['In this lab, which part is the “surroundings”?', ['The water (solution) in the cup, where the thermometer is', 'The air in the room', 'The solid that dissolves'], 'The thermometer measures the <b>water/solution</b>, so the water is the surroundings and the reaction is the system.', [['water', 'solution']], ['air', 'room', 'solid']]]);
@@ -1950,10 +1950,10 @@ const K8a = {
       parts: [num(e, { unit: '%', rel: 0.02, tol: 0.05, ans: e.toFixed(2) })], hint: 'Subtract, divide by the accepted value, × 100. A negative sign means the result was too low.', solution: `(${Rx.toFixed(5)} − 0.08206) ÷ 0.08206 × 100 = <b>${e.toFixed(2)}%</b>.`, video: 'idealgas', skill: 'calc' };
   },
   idea() {
-    const q = pick([['Why do you subtract the vapor pressure of water from the room pressure?', ['The gas in the tube is a mix of H₂ and water vapor (Dalton’s law)', 'Water vapor makes the room pressure too low', 'The HCl adds extra pressure'], 'Gas collected over water also contains <b>water vapor</b>, so P<sub>H₂</sub> = P<sub>room</sub> − P<sub>water</sub>.', [['water vapor', 'vapor', 'water', 'dalton', 'h2o', 'steam']], ['too low', 'room pressure low']],
-      ['The magnesium ribbon was not cleaned well (it had an oxide coating). Compared with what that mass of pure Mg should make, how much H₂ do you collect?', ['Too low: less pure Mg reacts, so less H₂ forms', 'Too high: the oxide makes extra H₂', 'No change'], 'Some of the mass is MgO, not Mg, so <b>less H₂</b> forms than expected. (On the report, Q6 asks which <i>measured value</i> is affected: that is the <b>mass of Mg</b>, which is too high because it includes the oxide. Either way, R comes out lower.)', [['less', 'lower', 'too low', 'decrease', 'smaller', 'fewer']], ['more', 'higher', 'increase', 'too high', 'no change', 'same']],
-      ['How do you know all the magnesium has reacted?', ['The ribbon is gone and bubbles stop forming', 'The water turns pink', 'The tube gets cold'], 'When the Mg is <b>gone and the bubbling stops</b>, the reaction is done.', [['gone', 'disappear', 'bubbl', 'no more', 'stop', 'dissolv', 'used up', 'no ribbon', 'no mg', 'no magnesium']]]]);
-    return { tag: 'Gas lab ideas', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about what is really inside the gas collection tube.', solution: q[2], video: 'dalton', skill: 'concept' };
+    const q = pick([['Why do you subtract the vapor pressure of water from the room pressure?', ['The gas in the tube is a mix of H₂ and water vapor (Dalton’s law)', 'Water vapor makes the room pressure too low', 'The HCl adds extra pressure'], 'Gas collected over water also contains <b>water vapor</b>, so P<sub>H₂</sub> = P<sub>room</sub> − P<sub>water</sub>.', [['water vapor', 'vapor', 'water', 'dalton', 'h2o', 'steam']], ['too low', 'room pressure low'], 'Think about what is really inside the gas collection tube. The room pressure pushes on all of it.'],
+      ['The magnesium ribbon was not cleaned well (it had an oxide coating). Compared with what that mass of pure Mg should make, how much H₂ do you collect?', ['Too low: less pure Mg reacts, so less H₂ forms', 'Too high: the oxide makes extra H₂', 'No change'], 'Some of the mass is MgO, not Mg, so <b>less H₂</b> forms than expected. (On the report, Q6 asks which <i>measured value</i> is affected: that is the <b>mass of Mg</b>, which is too high because it includes the oxide. Either way, R comes out lower.)', [['less', 'lower', 'too low', 'decrease', 'smaller', 'fewer']], ['more', 'higher', 'increase', 'too high', 'no change', 'same'], 'Only Mg metal reacts with HCl to make H₂. MgO reacts too, but it makes water, not H₂. If part of the weighed ribbon is oxide, how much Mg is really there?'],
+      ['How do you know all the magnesium has reacted?', ['The ribbon is gone and bubbles stop forming', 'The water turns pink', 'The tube gets cold'], 'When the Mg is <b>gone and the bubbling stops</b>, the reaction is done.', [['gone', 'disappear', 'bubbl', 'no more', 'stop', 'dissolv', 'used up', 'no ribbon', 'no mg', 'no magnesium']], null, 'Mg + 2 HCl → MgCl₂ + H₂. What do you see while H₂ is still forming, and what is left when the Mg runs out?']]);
+    return { tag: 'Gas lab ideas', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] || undefined })], hint: q[5], solution: q[2], video: 'dalton', skill: 'concept' };
   }
 };
 
@@ -2095,7 +2095,7 @@ const K11a = {
     return { tag: 'Vacuum filtration', prompt: 'This is part of the vacuum filtration setup used to collect the alum crystals. What is it called?', art: eqDraw(e), parts: [textPart(e[5], { ans: e[1], partial: eqPartial(e) })], hint: `It ${e[2]}.`, solution: `<b>${e[1]}</b>: it ${e[2]}.`, video: 'yield', skill: 'equip' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.12, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of alum, <b>KAl(SO<sub>4</sub>)<sub>2</sub>·12H<sub>2</sub>O</b>.', parts: [num(ALUM, { unit: 'g/mol', tol: 0.12, dp: 2, ans: '474.37' })], hint: 'Add K + Al + 2 SO₄, then add 12 waters (12 × 18.015).', solution: 'K 39.10 + Al 26.98 + 2(S 32.06 + 4 O 15.999) + 12(18.015) = <b>474.37 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   theory() {
     const al = rnd(0.45, 1.05, 4), y = al / 26.98 * ALUM;
@@ -2167,7 +2167,7 @@ const K12b = {
       parts: [num(V, { dp: 2, unit: 'mL', tol: 0.03, slip: x => Math.abs(x - b) < 0.05 ? 'That’s the final reading. Subtract the initial reading.' : '' })], hint: 'Volume used = final − initial. Both go to 0.01 mL.', solution: `${b.toFixed(2)} − ${a.toFixed(2)} = <b>${V.toFixed(2)} mL</b>.`, video: 'titration', skill: 'read' };
   },
   molarMass() {
-    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.06, { unit: 'g/mol', tol: 0.03, ans: '126.06' })], hint: 'Add H₂C₂O₄ (90.034) and 2 waters (2 × 18.015).', solution: '2(1.008) + 2(12.011) + 4(15.999) + 2(18.015) = <b>126.06 g/mol</b>.', video: 'molarmass', skill: 'calc' };
+    return { tag: 'Molar mass of a hydrate', prompt: 'Calculate the molar mass of oxalic acid dihydrate, <b>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O</b>.', parts: [num(126.06, { unit: 'g/mol', tol: 0.03, dp: 2, ans: '126.06' })], hint: 'Add H₂C₂O₄ (90.034) and 2 waters (2 × 18.015). Report to 2 decimal places.', solution: '2(1.008) + 2(12.011) + 4(15.999) + 2(18.015) = <b>126.06 g/mol</b>.', video: 'molarmass', skill: 'calc' };
   },
   standardize() {
     const Vs = offLine(18, 42, 2), M = rnd(0.09, 0.12, 4), m = +(M * Vs / 1000 / 2 * 126.06).toFixed(4), Mx = m / 126.06 * 2 / (Vs / 1000);
@@ -2320,7 +2320,7 @@ const K2a = {
     const d = fresnoRun(), i = rint(0, 2), c = FRESNO[i];
     return { tag: 'Percent abundance', prompt: `A student sorted a scoop of Fresnocitium and counted each color. What is the <b>percent abundance of the ${c[0].toLowerCase()} isotope</b>?`, eq: 'Abundance (%) = (number of atoms ÷ total number of atoms) × 100',
       ref: tableHTML(FRESNO.map((x, k) => [`Number of ${x[0]} atoms`, d.n[k]])),
-      parts: [num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, ans: d.pct[i].toFixed(2), slip: x => Math.abs(x - d.pct[i] / 100) < 0.002 ? 'That’s the fraction. Multiply by 100 for a percent.' : Math.abs(x - d.n[i] / (d.N - d.n[i]) * 100) < 0.05 ? 'Divide by the <b>total</b> of all three colors, including this one.' : '' })],
+      parts: [num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, dp: 2, ans: d.pct[i].toFixed(2), slip: x => Math.abs(x - d.pct[i] / 100) < 0.002 ? 'That’s the fraction. Multiply by 100 for a percent.' : Math.abs(x - d.n[i] / (d.N - d.n[i]) * 100) < 0.05 ? 'Divide by the <b>total</b> of all three colors, including this one.' : '' })],
       hint: 'Add up all three colors for the total, then divide this color’s count by it and × 100.', solution: `Total = ${d.n.join(' + ')} = ${d.N}. ${d.n[i]} ÷ ${d.N} × 100 = <b>${d.pct[i].toFixed(2)}%</b> ${c[0].toLowerCase()}.`, video: 'isotopes', skill: 'calc' };
   },
   isoMass() {
@@ -2334,14 +2334,14 @@ const K2a = {
     const d = fresnoRun(), pc = d.pct.map(x => +x.toFixed(2)), pm = d.per.map(x => +x.toPrecision(4)), avg = pm.reduce((s, x, i) => s + x * pc[i] / 100, 0), plain = pm.reduce((a, b) => a + b, 0) / 3;
     return { tag: 'Average atomic mass', prompt: 'Use the completed Trial 1 table to calculate the <b>average atomic mass</b> of Fresnocitium.', eq: 'Average atomic mass = (mass<sub>1</sub>·abundance<sub>1</sub>) + (mass<sub>2</sub>·abundance<sub>2</sub>) + … &nbsp;&nbsp; (abundances as decimals)',
       ref: tableHTML(FRESNO.map((c, i) => [c[0], `${pc[i].toFixed(2)}%`, `${pm[i].toPrecision(4)} g`]), ['Isotope color', 'Percent abundance', 'Average mass per atom']),
-      parts: [num(avg, { unit: 'g', rel: 0.001, ans: avg.toPrecision(4), slip: x => Math.abs(x - avg * 100) < avg * 0.5 ? 'Change each percent to a decimal (÷ 100) before multiplying.' : Math.abs(x - plain) < plain * 0.002 && Math.abs(plain - avg) > avg * 0.003 ? 'That’s a plain average of the three masses. Weight each mass by its abundance.' : '' })],
+      parts: [num(avg, { unit: 'g', rel: 0.001, sf: 4, ans: avg.toPrecision(4), slip: x => Math.abs(x - avg * 100) < avg * 0.5 ? 'Change each percent to a decimal (÷ 100) before multiplying.' : Math.abs(x - plain) < plain * 0.002 && Math.abs(plain - avg) > avg * 0.003 ? 'That’s a plain average of the three masses. Weight each mass by its abundance.' : '' })],
       hint: 'Percent ÷ 100 gives the fractional abundance. Multiply each isotope’s mass by its fraction, then add the three.',
       solution: FRESNO.map((c, i) => `${pm[i].toPrecision(4)}(${(pc[i] / 100).toFixed(4)})`).join(' + ') + ` = <b>${avg.toPrecision(4)} g</b>. That is the weighted average mass of one Fresnocitium atom.`, video: 'isotopes', skill: 'calc' };
   },
   table() {
     const d = fresnoRun();
     return { tag: 'Trial 1 results table', prompt: 'Fill in the report-sheet table for Trial 1 (<b>Question 3A</b>): the percent abundance and the average mass per atom of each isotope.', ref: fresnoRaw(d),
-      parts: [...FRESNO.map((c, i) => num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, ans: d.pct[i].toFixed(2), label: `${c[0]}: percent abundance` })), ...FRESNO.map((c, i) => num(d.per[i], { sf: d.sf[i], unit: 'g', rel: 0.0005, label: `${c[0]}: average mass per atom`, slip: x => Math.abs(x - d.w[i] / d.n[i]) < d.per[i] * 0.02 ? 'Subtract the empty beaker first.' : '' }))],
+      parts: [...FRESNO.map((c, i) => num(d.pct[i], { unit: '%', rel: 0.002, tol: 0.02, dp: 2, ans: d.pct[i].toFixed(2), label: `${c[0]}: percent abundance` })), ...FRESNO.map((c, i) => num(d.per[i], { sf: d.sf[i], unit: 'g', rel: 0.0005, label: `${c[0]}: average mass per atom`, slip: x => Math.abs(x - d.w[i] / d.n[i]) < d.per[i] * 0.02 ? 'Subtract the empty beaker first.' : '' }))],
       hint: 'Abundance = count ÷ total count × 100. Mass per atom = (beaker + atoms − empty beaker) ÷ count.',
       solution: `Total atoms = ${d.N}.<br>` + FRESNO.map((c, i) => `${c[0]}: ${d.n[i]} ÷ ${d.N} × 100 = <b>${d.pct[i].toFixed(2)}%</b>; (${d.w[i].toFixed(4)} − ${d.beaker.toFixed(4)}) ÷ ${d.n[i]} = <b>${sfHTML(d.per[i], d.sf[i])} g</b>`).join('<br>'), video: 'isotopes', skill: 'calc' };
   },
@@ -3008,7 +3008,9 @@ const labSet = () => { const k = labPick(), li = labIds(); if (li) { const f = l
 const labPickName = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o ? `${o.name}’s class` : 'Your class'; } if (k.kind === 'link') return k.prof ? `${k.prof}’s class` : 'Your class’s labs'; return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
 const profOf = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).name || ''; if (k.kind === 'link') return k.prof || ''; if (k.kind === 'sec') return k.sec === '25787' ? 'Dr. Dan / Professor Xiong' : 'Dr. Dan'; if (k.kind === 'dan') return 'Dr. Dan'; return ''; };
 const labTitle = id => `Exp ${id} · ${labById(id).name}`;
-function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.ddTrack({ game: 'labpractical', course: '3A', mode, topic: `Exp ${q.lab} ${q.labName} · ${q.tag}`, correct: !!ok, tries: ok ? '' : 'slip:' + (slip || 'other'), slip: ok ? '' : (slip || 'other') }); } catch (e) {} }
+// item = the kind of question (numbers change each time); pick = why it was missed: 0 right, 1 wrong value, 2 right value but sig figs/precision/units, 3 left blank or answer shown
+const SLIP_PICK = { value: 1, sigfigs: 2, units: 2, 'precision-or-units': 2, blank: 3, revealed: 3 };
+function ddLog(mode, q, ok, slip) { try { if (!window.ddTrack) return; window.ddTrack({ game: 'labpractical', course: '3A', mode, topic: `Exp ${q.lab} ${q.labName} · ${q.tag}`, correct: !!ok, tries: ok ? '' : 'slip:' + (slip || 'other'), slip: ok ? '' : (slip || 'other'), item: `${q.lab}.${q.kind}`, pick: ok ? 0 : (SLIP_PICK[slip] || 1), key: 0, ver: 'lp1' }); } catch (e) {} }
 
 /* ---------- Yellow Sheet periodic table (for molar mass questions) ---------- */
 const PT_SRC = 'assets/yellow-sheet-periodic-table.webp';
@@ -3336,7 +3338,7 @@ function turnIn() {
   const rows = mock.stations.map((s, i) => {
     const q = s.versions[mock.ver], vals = mock.answers[i] || q.parts.map(() => ({ val: '' })), res = gradeAll(q.parts, vals, true);
     const wt = q.parts.map(pt => pt.w || 1), wsum = wt.reduce((a, b) => a + b, 0), pts = Math.round(res.reduce((a, r, k) => a + r.score * wt[k], 0) / wsum * 10 * 2) / 2; total += pts;
-    if (q.lab !== 'gen') { bumpLab(q.lab, pts >= 10); ddLog('Mock Practical', q, pts >= 10, res.find(r => !r.ok) ? (res.find(r => !r.ok).valueOk ? 'precision-or-units' : 'value') : ''); }
+    if (q.lab !== 'gen') { bumpLab(q.lab, pts >= 10); const bad = res.filter(r => !r.ok); ddLog('Mock Practical', q, pts >= 10, !bad.length ? '' : res.every(r => r.empty) ? 'blank' : bad.some(r => !r.valueOk) ? 'value' : 'precision-or-units'); }
     if (pts >= 10) P.skill[q.skill] = (P.skill[q.skill] || 0) + 1; else if (q.lab !== 'gen') queueRedo(q.lab, q.kind, 0);
     const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (String(v.val || '').startsWith('T:') ? tv(v.val) : v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; const share = 10 * (p.w || 1) / q.parts.reduce((a, b) => a + (b.w || 1), 0), bdTxt = r && r.bd ? ` <small class="bd">${r.bd.map(b => `${b[0]} ${+(b[1] * share).toFixed(1)}/${+(b[2] * share).toFixed(1)}`).join(' · ')}</small>` : p.type === 'eq' && r ? ` <small class="bd">Equation ${+(r.score * share).toFixed(1)}/${+share.toFixed(1)} (reactants 1 · products 3 · balanced 1 · phases 1, out of 6)</small>` : ''; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}${bdTxt}</div>`; }).join('');
     return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${stShared(s)}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;

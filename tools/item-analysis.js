@@ -16,7 +16,11 @@
    reports) returns answer and wrong counts per game, mode and topic. Lab practical questions are
    generated with new numbers each time, so the unit here is the KIND of question (e.g. 7a Calorimetry ·
    Heat lost by the water), not one fixed item, and there is no mis-key check: a high miss rate means
-   "reteach this skill or look at the question's wording and hints", not "the key is wrong". */
+   "reteach this skill or look at the question's wording and hints", not "the key is wrong".
+
+   From game version lp1 (Nov 2026) each answer also sends item = <lab>.<kind> and pick = why it was missed
+   (0 right, 1 wrong value, 2 right value but sig figs/precision/units, 3 left blank or answer shown), so the
+   report can split misses into those reasons. Older answers only have the plain counts. */
 "use strict";
 const fs = require("fs"), path = require("path");
 const ROOT = path.resolve(__dirname, "..");
@@ -72,19 +76,25 @@ function analyze(data, labs) {
 
 function report(data, labs, R) {
   const name = id => (labs.get(id) || {}).name || "";
+  // why it was missed, from the per-item picks (game version lp1 and later); they cover all modes, so --mode leaves them out
+  const why = new Map((modeArg ? [] : data.items || []).map(it => [it.item, it]));
+  const whyOf = o => { const it = why.get(`${o.lab}.${o.kind}`); if (!it || !it.picks) return ""; const [, v = 0, f = 0, b = 0] = it.picks; return v + f + b ? `${v} wrong value · ${f} sig figs/units only · ${b} blank or shown` : ""; };
+  const hasWhy = why.size > 0;
   const kindLabel = o => `${o.lab} ${name(o.lab)} · ${[...o.tags].join(" / ")}`;
   const missRate = o => o.w / o.n;
   const L = [`# Station Rotation item analysis (${data.days || days} days${modeArg ? ", " + MODES[modeArg] + " only" : ""}, generated ${data.generated || new Date().toISOString()})`, "",
     `First answers: ${R.N} · correct: ${pct(R.N - R.W, R.N)} · question kinds with answers: ${R.byKind.size} · ranked (${MIN}+ answers): ${[...R.byKind.values()].filter(o => o.n >= MIN).length}`, "",
     "Counts are first answers (a student's first try at each question). Lab practical numbers change every time, so each row is a kind of question, not one fixed item.",
-    "With only a few answers a percentage can swing a lot: read the Answers column before acting on a row.", "",
+    "With only a few answers a percentage can swing a lot: read the Answers column before acting on a row.",
+    "A Mock Practical answer counts as missed unless the station earned all 10 points, so a lost sig-fig or unit point, or a station left blank, is a miss too." +
+    (hasWhy ? " The Why missed column splits newer answers by reason." : " Answers from game version lp1 on also record why each one was missed; the report shows that split once they arrive."), "",
     "## By mode", "", "| Mode | Answers | Correct |", "|---|---|---|",
     ...[...R.byMode].sort((a, b) => b[1].n - a[1].n).map(([m, o]) => `| ${m} | ${o.n} | ${pct(o.n - o.w, o.n)} |`), ""];
 
   const ranked = [...R.byKind.values()].filter(o => o.n >= MIN).sort((a, b) => missRate(b) - missRate(a) || b.n - a.n);
   L.push(`## Most-missed question kinds (${MIN}+ answers; reteach these)`, "");
-  if (ranked.length) L.push("| Question kind | Answers | Missed | Correct | Answered in |", "|---|---|---|---|---|",
-    ...ranked.slice(0, 30).map(o => `| ${cell(kindLabel(o))} | ${o.n} | ${o.w} | ${pct(o.n - o.w, o.n)} | ${Object.entries(o.modes).map(([m, c]) => `${m} ${c}`).join(", ")} |`));
+  if (ranked.length) L.push(`| Question kind | Answers | Missed | Correct | Answered in |${hasWhy ? " Why missed (newer answers) |" : ""}`, `|---|---|---|---|---|${hasWhy ? "---|" : ""}`,
+    ...ranked.slice(0, 30).map(o => `| ${cell(kindLabel(o))} | ${o.n} | ${o.w} | ${pct(o.n - o.w, o.n)} | ${Object.entries(o.modes).map(([m, c]) => `${m} ${c}`).join(", ")} |${hasWhy ? ` ${whyOf(o)} |` : ""}`));
   else L.push(`No question kind has ${MIN}+ answers yet. Try  --min 2  for an early look, or see the per-experiment tables below.`);
   L.push("");
 
@@ -129,7 +139,11 @@ function report(data, labs, R) {
 async function main() {
   let data;
   if (file) data = JSON.parse(fs.readFileSync(file, "utf8"));
-  else { const r = await fetch(`${STATS_URL}?days=${days}`, { redirect: "follow" }); if (!r.ok) throw new Error("stats request failed: HTTP " + r.status); data = await r.json(); }
+  else {
+    const get = async q => { const r = await fetch(`${STATS_URL}?${q}`, { redirect: "follow" }); if (!r.ok) throw new Error("stats request failed: HTTP " + r.status); return r.json(); };
+    data = await get(`days=${days}`);
+    try { data.items = (await get(`items=1&game=labpractical&days=${days}`)).items || []; } catch (e) { data.items = []; }
+  }
   const labs = gameKinds(), R = analyze(data, labs);
   if (!R.rows) { console.log("No lab practical answers in this window yet (none arrive from Do-Not-Track browsers or local copies)."); return; }
   const L = report(data, labs, R), out = path.join(ROOT, "item-analysis.md");
