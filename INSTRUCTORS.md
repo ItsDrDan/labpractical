@@ -27,6 +27,10 @@ Beginner level shows answer choices. Intermediate and above are typed, with no m
 - **Older labs:** a few questions come from earlier manuals and are labeled "(earlier manual)": the 9a standard curve and the specific heat of a metal. They stay out of the mock practical. Exp 3z (Found or Forgery) is only on Dr. Dan's list.
 - **Partial credit (mock):** readings are graded accuracy 40% / decimal places 40% / unit 20%; calculations answer 80% / sig figs 10% / unit 10%. A reading within the practical's window (about ±0.1 mL on a buret, ±0.3 mL on a 50/100 mL cylinder, ±0.3 °C on a thermometer) gets full accuracy; within twice that window, half. A calculation within 2% of the answer, or one with a known setup slip, gets half the answer points. Wrong sig figs or units lose only their share.
 - **Practice:** the right number with the wrong sig figs counts as correct but shows a yellow "fix your sig figs" box, so students learn the rule without losing their streak.
+- **Rounding:** an answer one sig fig (or one decimal place) short of the key still counts as the right number, with the sig-fig notice. Anything rounded further is marked wrong with "You rounded too far" (207 for 207.23 amu, 5000 for 4840 J). Counts such as valence electrons must be exact.
+- **Second look:** a question type the student missed, or needed a hint or the worked answer for, comes back about three questions later with new numbers. Getting it right on the first try with no help clears it. Missed mock stations go into the same queue, so "Practice what I missed" starts with them.
+- **Hints:** every question has a hint. On calculations a second tap shows the setup with the results hidden, so the student still does the arithmetic and rounding.
+- **Solid types:** each lab tile shows how many of its question types are solid (latest try right the first time, no hint). Practice picks types that aren't solid yet more often.
 - **Privacy:** progress stays on the student's device. The game sends only anonymous practice stats (topic and right or wrong; no names, IDs or typed answers). Browsers set to Do Not Track send nothing.
 
 ## Feedback

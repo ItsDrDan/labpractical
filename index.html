@@ -65,7 +65,7 @@ body.calc-open .tb-btn#calcBtn{background:#ffd166;border-color:#c99a1e}
 
 /* play panel */
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);min-width:0}
-main.panel{padding:20px;scroll-margin-top:calc(var(--topbar) + 10px)}
+main.panel,.mainpanel{padding:20px;scroll-margin-top:calc(var(--topbar) + 10px)}
 .play-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .play-title{margin:0;font-size:1.2rem;font-weight:600}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line2);background:#fff;border-radius:12px;padding:10px 16px;font-weight:750;color:#34416a;min-height:48px}.btn:hover{background:#f6f7fc}
@@ -181,12 +181,12 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
  .seg button{padding:8px 13px}.intro img{width:64px;height:64px}
  .mode-switch,.featured{grid-template-columns:1fr}.mode-switch button{min-height:70px}
  .picker{grid-template-columns:1fr 1fr}.pick{grid-template-columns:1fr;padding:10px}.pick img{grid-row:auto;width:40px;height:40px}
- main.panel{padding:14px}.question{padding:12px}.prompt{font-size:1.1rem}
+ main.panel,.mainpanel{padding:14px}.question{padding:12px}.prompt{font-size:1.1rem}
  .actions{grid-template-columns:1fr 1fr}.stat-row{grid-template-columns:1fr 1fr}.stat.rank{grid-column:1/-1}
  .lesson-layout,.rule-grid{grid-template-columns:1fr}.answer input{flex:1 1 100%}.answer .btn.primary{flex:1}.next-row .btn.primary{width:100%}
  .tapper .digit{min-width:42px;height:58px;font-size:1.7rem}
 }
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important}}
 
 /* chooser (v4) */
 .chooser{margin:6px 0 16px}
@@ -616,6 +616,32 @@ button:disabled{cursor:not-allowed}
 @media (max-width:640px){.results .res-tock{width:84px;height:84px}.feedback .fb-tock{width:52px;height:52px}}
 .cats.labs .cat img{object-fit:contain}
 @media (prefers-reduced-motion:reduce){.tock{animation:none!important}}
+/* ===================== v20: accessibility and small-screen layer ===================== */
+:is(button,a,summary,select,input,[tabindex]):focus-visible{outline:3px solid #3c47b8!important;outline-offset:2px}
+.btn.primary{background-image:linear-gradient(135deg,#6455e8 0%,#8450dc 55%,#9a4acb 100%)}
+.cats.labs .cat:not(.on){opacity:1}
+.intro h1 .h1sub{background-image:linear-gradient(90deg,#1f7a50,#2a6cb0)}
+.tb-name small{color:#1f7a50}
+.howto li:nth-child(1)::before{background:#6455e8}.howto li:nth-child(2)::before{background:#1f7a50}.howto li:nth-child(3)::before{background:#b4521f}
+.calc .keys button.k2nd{background:#2468c4}
+.part input[type=text],.part select{border-color:#868fae}
+.part.good input,.part.good select{border-color:#2f8a63}.part.bad input,.part.bad select{border-color:#c2415a;border-style:dashed}.part.warn input{border-color:#a67c00}
+.part.bad .pnote:not(:empty)::before{content:'✗ ';font-weight:900}.part.good .pnote:not(:empty)::before{content:'✓ ';font-weight:900}.part.warn .pnote:not(:empty)::before{content:'! ';font-weight:900}
+.toasts{pointer-events:none}
+body.mock-on .topbar{position:relative}
+.sheet h3 .clock{float:right;font-size:.95rem}
+.calc-dock{width:min(340px,calc(100vw - 16px))}
+@media(max-width:480px){.calc-dock{right:8px}}
+@media(max-width:999px){body.calc-open .check-row,body.calc-open .next-row{justify-content:flex-start}}
+[tabindex="-1"]:focus{outline:none!important}
+/* ---- v20: second look, skill meter, next-step row ---- */
+.tag.again{background:#fff3c4;color:#6b4e00;border:1px solid #e6c65a}
+.cat .meter{display:block;width:100%;height:6px;border-radius:99px;background:#1f2a441f;overflow:hidden;margin-top:5px}.cat .meter i{display:block;height:100%;border-radius:99px;background:#2f8a63}
+.cat .solid{font-size:.74rem;font-weight:800;color:#3b4664}
+.next-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hint2{margin-top:8px;padding-top:8px;border-top:1px dashed #1f2a4433}
+.review-line{margin:8px 0 0;font-size:.92rem;color:#3b4664}
+.cats.labs.mini .cat .meter,.cats.labs.mini .cat .solid{display:none}
 </style>
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
@@ -633,19 +659,19 @@ button:disabled{cursor:not-allowed}
  <button type="button" class="tb-btn" id="refBtn" aria-label="Open the reference sheet"><span data-icon="book" aria-hidden="true"></span><span class="lbl">Reference</span></button>
 </div></header>
 
-<div class="wrap">
+<div class="wrap" role="main">
  <section class="intro" id="intro"><img class="intro-logo" src="assets/logo-256.webp" data-fbsrc="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%20role%3D%22img%22%20aria-label%3D%22Station%20Rotation%20logo%3A%20a%20clipboard%20answer%20sheet%20with%20green%2C%20yellow%20and%20purple%20version%20tabs%20and%20a%20stopwatch%22%3E%0A%3Cdefs%3E%3CradialGradient%20id%3D%22bg%22%20cx%3D%2250%25%22%20cy%3D%2240%25%22%20r%3D%2265%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23f6f4ff%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e4e8ff%22/%3E%3C/radialGradient%3E%3C/defs%3E%0A%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%22112%22%20height%3D%22112%22%20rx%3D%2228%22%20fill%3D%22url%28%23bg%29%22/%3E%0A%3Crect%20x%3D%2274%22%20y%3D%2226%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%237fd39b%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2246%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23ffd84d%22/%3E%3Crect%20x%3D%2274%22%20y%3D%2266%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%225%22%20fill%3D%22%23b89cff%22/%3E%0A%3Crect%20x%3D%2222%22%20y%3D%2220%22%20width%3D%2260%22%20height%3D%2278%22%20rx%3D%229%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%234b57d1%22%20stroke-width%3D%224%22/%3E%0A%3Crect%20x%3D%2238%22%20y%3D%2214%22%20width%3D%2228%22%20height%3D%2212%22%20rx%3D%225%22%20fill%3D%22%234b57d1%22/%3E%0A%3Cpath%20d%3D%22M46%2036%20L46%2050%20L36%2070%20Q34%2075%2039%2075%20L65%2075%20Q70%2075%2068%2070%20L58%2050%20L58%2036%22%20fill%3D%22%23eaf4fb%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M41%2062%20L63%2062%20L68%2070%20Q70%2075%2065%2075%20L39%2075%20Q34%2075%2036%2070%20Z%22%20fill%3D%22%23a7d8f5%22/%3E%0A%3Cline%20x1%3D%2243%22%20y1%3D%2236%22%20x2%3D%2261%22%20y2%3D%2236%22%20stroke%3D%22%232f4d70%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cline%20x1%3D%2232%22%20y1%3D%2284%22%20x2%3D%2260%22%20y2%3D%2284%22%20stroke%3D%22%23c9cfe6%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%2288%22%20cy%3D%2290%22%20r%3D%2217%22%20fill%3D%22%23fff%22%20stroke%3D%22%23d9577f%22%20stroke-width%3D%224%22/%3E%3Crect%20x%3D%2284%22%20y%3D%2268%22%20width%3D%228%22%20height%3D%226%22%20rx%3D%222%22%20fill%3D%22%23d9577f%22/%3E%0A%3Cpath%20d%3D%22M88%2090%20L88%2080%20M88%2090%20L95%2094%22%20stroke%3D%22%231f2a44%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22/%3E%0A%3C/svg%3E" onerror="this.onerror=null;this.src=this.dataset.fbsrc" alt="Station Rotation logo"><div class="intro-txt"><p class="eyebrow">CHEM 3A · Dr. Dan</p><h1>Station Rotation <span class="h1sub">Lab Practical Practice</span></h1><p class="lede">Get ready for the lab practical: read the glassware, crunch the data, name the equipment.</p></div><img class="tock intro-tock" src="assets/mascot/tock-idle.webp" alt="" aria-hidden="true" onerror="this.remove()"></section>
  <ol class="howto" aria-label="How to use this game">
   <li><span><b>Pick a mode</b> below.</span></li>
   <li><span><b>Answer</b> with a number, unit and the right sig figs. Smart typing: 3.2E-5 → 3.2×10⁻⁵, H2O → H₂O. <button type="button" class="link-btn" id="smartBtn"></button></span></li>
-  <li><span><b>Stuck?</b> Tap <b>Hint</b>, <b>Show answer</b>, or <b>Reference</b> (top right).</span></li>
+  <li><span><b>Stuck?</b> In Practice, tap <b>Hint</b> (twice for the setup) or <b>Show answer</b>. <b>Reference</b> and <b>Calculator</b> are at the top right.</span></li>
  </ol>
  <p class="labset" id="labset"></p>
- <div class="mode-switch" id="modes" role="tablist" aria-label="Choose a mode">
-  <button type="button" data-mode="mock" role="tab"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>10 timed stations: 8 labs + 2 lab-skills stations. Follow your version color.</small></span></button>
-  <button type="button" data-mode="practice" role="tab"><span class="ms-ico" data-icon="flask" aria-hidden="true"><img class="ms-pic" src="assets/modes/practice.webp" alt="" onerror="this.remove()"></span><span><b>Practice by Lab</b><small>Pick labs. No timer, hints on.</small></span></button>
-  <button type="button" data-mode="bench" role="tab"><span class="ms-ico" data-icon="sliders" aria-hidden="true"><img class="ms-pic" src="assets/modes/phet.webp" alt="" onerror="this.remove()"></span><span><b>PhET Lab Bench</b><small>Hands-on simulations with tasks.</small></span></button>
-  <button type="button" data-mode="vlab" role="tab"><span class="ms-ico" data-icon="beaker" aria-hidden="true"><img class="ms-pic" src="assets/modes/vlab.webp" alt="" onerror="this.remove()"></span><span><b>Virtual Lab</b><small>Weigh, pour, mix and measure, then do the math.</small></span></button>
+ <div class="mode-switch" id="modes" role="group" aria-label="Choose a mode">
+  <button type="button" data-mode="mock"><span class="ms-ico" data-icon="stopwatch" aria-hidden="true"><img class="ms-pic" src="assets/modes/mock.webp" alt="" onerror="this.remove()"></span><span><b>Mock Practical</b><small>10 timed stations: 8 labs + 2 lab-skills stations. Follow your version color.</small></span></button>
+  <button type="button" data-mode="practice"><span class="ms-ico" data-icon="flask" aria-hidden="true"><img class="ms-pic" src="assets/modes/practice.webp" alt="" onerror="this.remove()"></span><span><b>Practice by Lab</b><small>Pick labs. No timer, hints on.</small></span></button>
+  <button type="button" data-mode="bench"><span class="ms-ico" data-icon="sliders" aria-hidden="true"><img class="ms-pic" src="assets/modes/phet.webp" alt="" onerror="this.remove()"></span><span><b>PhET Lab Bench</b><small>Hands-on simulations with tasks.</small></span></button>
+  <button type="button" data-mode="vlab"><span class="ms-ico" data-icon="beaker" aria-hidden="true"><img class="ms-pic" src="assets/modes/vlab.webp" alt="" onerror="this.remove()"></span><span><b>Virtual Lab</b><small>Weigh, pour, mix and measure, then do the math.</small></span></button>
  </div>
 
  <!-- ===== Mock practical ===== -->
@@ -669,25 +695,25 @@ button:disabled{cursor:not-allowed}
  <!-- ===== Practice ===== -->
  <section id="practiceView" hidden>
   <section class="chooser">
-   <h2 class="pick-title"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button><button type="button" class="link-btn" id="bigTiles" hidden>Show big tiles</button></h2>
+   <div class="pick-title"><h2 style="margin:0;font:inherit;display:inline-flex;align-items:center;gap:10px"><span class="stepnum">1</span>Which labs? <small>Pick one or more.</small></h2><button type="button" class="btn primary small goq" id="goQ">Go to my question <span aria-hidden="true">↓</span></button><button type="button" class="link-btn" id="bigTiles" hidden>Show big tiles</button></div>
    <div class="cats labs" id="labTiles"></div>
    <div class="lvlpick" role="radiogroup" aria-label="Level"><span>Level</span><button type="button" class="chip" data-lvl="beg">Beginner<small>products given, pick from choices</small></button><button type="button" class="chip" data-lvl="int">Intermediate<small>like the real practical</small></button></div>
    <div class="pick-actions"><button type="button" class="btn" id="allLabs">Select all</button><button type="button" class="btn" id="noLabs">Clear</button></div>
   </section>
-  <main class="panel" id="play">
-   <div class="play-head"><h2 class="play-title" id="playTitle">Practice</h2><button type="button" id="skipBtn" class="btn">New question <span data-icon="arrow" aria-hidden="true"></span></button></div>
+  <div class="panel mainpanel" id="play">
+   <div class="play-head"><h2 class="play-title" id="playTitle">Practice</h2><button type="button" id="skipBtn" class="btn">Skip <span data-icon="arrow" aria-hidden="true"></span></button></div>
    <div class="empty" id="emptyBox"><span data-icon="arrow" aria-hidden="true"></span> Pick a lab above to get your first question.</div>
    <div id="playArea" hidden>
-    <div class="tags"><span class="tag" id="labTag"></span><span class="tag" id="topicTag"></span></div>
-    <section class="question" id="qBox"></section>
+    <div class="tags"><span class="tag" id="labTag"></span><span class="tag" id="topicTag"></span><span class="tag again" id="againTag" hidden>Second look</span></div>
+    <section class="question" id="qBox" tabindex="-1" aria-label="Question"></section>
     <div class="parts" id="qParts"></div>
     <div class="check-row"><button type="button" class="btn primary" id="checkBtn">Check</button></div>
     <div class="feedback" id="feedback" role="status" aria-live="polite" tabindex="-1"></div>
     <div class="actions six"><button type="button" class="btn" id="hintBtn"><span data-icon="bulb" aria-hidden="true"></span>Hint</button><button type="button" class="btn" id="solBtn"><span data-icon="eye" aria-hidden="true"></span>Show answer</button><button type="button" class="btn" id="refBtn2"><span data-icon="book" aria-hidden="true"></span>Reference</button><button type="button" class="btn" id="videoBtn"><span data-icon="video" aria-hidden="true"></span>Video</button><button type="button" class="btn" id="simBtn"><span data-icon="sliders" aria-hidden="true"></span>PhET sim</button><button type="button" class="btn" id="vlBtn"><span data-icon="beaker" aria-hidden="true"></span>Hands-on lab</button></div>
     <div class="detail" id="hintBox" hidden></div>
-    <div class="next-row"><button type="button" id="nextBtn" class="btn primary" hidden>Next question <span data-icon="arrow" aria-hidden="true"></span></button></div>
+    <div class="next-row"><button type="button" id="nextBtn" class="btn primary" hidden>Next question <span data-icon="arrow" aria-hidden="true"></span></button><button type="button" id="againBtn" class="btn" hidden>Try one like it</button></div>
    </div>
-  </main>
+  </div>
  </section>
 
  <!-- ===== PhET bench ===== -->
@@ -715,7 +741,7 @@ button:disabled{cursor:not-allowed}
   <div class="section-head"><h2 id="progressTitle">Progress &amp; achievements</h2><span id="achCount"></span></div>
   <div class="stat-row"><div class="stat rank"><strong id="rankLine">Lab Rookie</strong><small id="xpText">0 XP</small></div><div class="stat"><strong id="sCorrect">0</strong><small>Correct</small></div><div class="stat"><strong id="sTried">0</strong><small>Tried</small></div><div class="stat"><strong id="sMocks">0</strong><small>Mock practicals</small></div><div class="stat"><strong id="sBestMock">–</strong><small>Best mock score</small></div></div>
   <div class="badges" id="achGrid"></div>
-  <div class="section-foot"><span class="note-small" style="margin:0">XP: +10 correct, +5 first try, +5 with no help. Mock practicals earn 1 XP per point. Progress is saved on this device.</span><button type="button" class="reset-btn" id="resetBtn">Reset my progress</button></div>
+  <div class="section-foot"><span class="note-small" style="margin:0">XP: +10 correct, +5 first try, +5 with no help. Mock practicals earn 1 XP per point. A question type is <b>solid</b> when your latest try was right the first time with no hint; types you missed or needed help on come back for a second look. Progress is saved on this device.</span><button type="button" class="reset-btn" id="resetBtn">Reset my progress</button></div>
  </section>
 
  <details class="panel section" id="videoSection"><summary><span>Learn with Dr. Dan<small id="videoContext">Lab practical review videos</small></span></summary>
@@ -830,9 +856,11 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 /* ---------- number formatting ---------- */
 const expOf = v => (v === 0 ? 0 : Math.floor(Math.log10(Math.abs(v)) + 1e-12));
 // value rounded to n sig figs, as {txt (plain or E), html}
+// A value that is an exact tie in decimal (1.0195) can sit a hair low in binary and round down. Nudge it so keys round half up.
+const tie = v => +v * (1 + 2e-12);
 function fmtSF(v, n, forceSci) {
   if (v === 0) return { txt: (0).toFixed(Math.max(0, n - 1)), html: (0).toFixed(Math.max(0, n - 1)) };
-  const r = Number(v.toPrecision(n)), e = expOf(r), dp = n - 1 - e;
+  const r = Number(tie(v).toPrecision(n)), e = expOf(r), dp = n - 1 - e;
   if (!forceSci && e > -4 && e < 6) {
     if (dp >= 0) { let t = r.toFixed(dp); if (dp === 0 && /0$/.test(t)) t += '.'; return { txt: t, html: t }; }
     const s = String(Math.round(Math.abs(r))); if (s.replace(/0+$/, '').length === n) { const t = (r < 0 ? '-' : '') + s; return { txt: t, html: t }; }
@@ -840,9 +868,9 @@ function fmtSF(v, n, forceSci) {
   const coef = (r / Math.pow(10, e)).toFixed(n - 1);
   return { txt: `${coef}E${e}`, html: `${coef} × 10<sup>${e < 0 ? '−' + -e : e}</sup>` };
 }
-const fmtDP = (v, dp) => { const t = (+v).toFixed(dp); return { txt: t, html: t }; };
+const fmtDP = (v, dp) => { const t = tie(v).toFixed(dp); return { txt: t, html: t }; };
 const sfHTML = (v, n) => fmtSF(v, n).html;
-const dpStr = (v, dp) => (+v).toFixed(dp);
+const dpStr = (v, dp) => tie(v).toFixed(dp);
 const sfStr = (v, n) => fmtSF(v, n).txt;
 // sig figs of a data string like "0.04520"
 const sfCount = s => sfOf(String(s).replace(/^[−-]/, ''));
@@ -880,28 +908,28 @@ const eqn = s => `<div class="rxn">${s}</div>`;
 
 /* ---------- typed-answer normalizing ---------- */
 const SUBS = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9' };
-const normFormula = s => String(s).replace(/[₀-₉]/g, c => SUBS[c]).replace(/\((s|l|g|aq)\)\s*$/i, '').replace(/\s+/g, '').replace(/[·•*]/g, '·');
+const normFormula = s => String(s).trim().replace(/[.,;]+$/, '').replace(/[₀-₉]/g, c => SUBS[c]).replace(/\((s|l|g|aq)\)\s*$/i, '').replace(/\s+/g, '').replace(/[·•*]/g, '·');
 const normWords = s => String(s).toLowerCase().replace(/[()]/g, ' ').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 function lev(a, b) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let prev = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[n]; }
 // friendly word match: exact after normalizing, or a small typo allowance on longer words
 function wordMatch(raw, accepts) {
-  const t = normWords(raw); if (!t) return false;
+  const t = normWords(raw).replace(/^((it s|it is|this is|that is) )?((a|an|the) )?/, ''); if (!t) return false;
   const tt = t.replace(/ /g, '');
-  return accepts.some(a => { const n = normWords(a), nn = n.replace(/ /g, ''); if (tt === nn) return true; const allow = nn.length >= 12 ? 2 : nn.length >= 6 ? 1 : 0; return allow && lev(tt, nn) <= allow; });
+  return accepts.some(a => { const n = normWords(a), nn = n.replace(/ /g, ''); if (tt === nn) return true; const allow = nn.length >= 12 ? 2 : nn.length >= 6 ? 1 : 0; return allow && tt.slice(-3) === nn.slice(-3) && lev(tt, nn) <= allow; });
 }
 // roman numeral spacing etc. for compound names: "iron(III) chloride" == "iron (iii) chloride" == "iron 3 chloride"? (no: roman numerals required)
-const normName = s => normWords(s).replace(/\b(i{1,3}|iv|v|vi{0,3})\b/g, m => m.toUpperCase()).replace(/\s+/g, ' ');
+const normName = s => normWords(s).replace(/aluminium/g, 'aluminum').replace(/sulph/g, 'sulf').replace(/\(ll+\)|\bll+\b/g, m => m.replace(/l/g, 'i')).replace(/\b(i{1,3}|iv|v|vi{0,3})\b/g, m => m.toUpperCase()).replace(/\s+/g, ' ');
 
 /* ---------- units ---------- */
 const UNIT_ALIASES = {
-  'g': ['g', 'grams', 'gram', 'gm'], 'mL': ['ml', 'milliliters', 'milliliter', 'cm3', 'cc'], 'cm³': ['cm3', 'cubiccentimeters', 'ml', 'cc'], 'cm': ['cm', 'centimeters', 'centimeter'], 'mm': ['mm', 'millimeters', 'millimeter'],
-  'g/mL': ['g/ml', 'gml-1', 'gml^-1', 'g/cm3', 'gpermL'.toLowerCase()], 'g/cm³': ['g/cm3', 'g/ml', 'gcm-3', 'gcm^-3'], '°C': ['c', '°c', 'degc', 'degreesc', 'celsius', 'degreescelsius', 'ºc'],
-  'J': ['j', 'joules', 'joule'], 'kJ': ['kj', 'kilojoules', 'kilojoule'], 'J/g°C': ['j/g°c', 'j/gc', 'j/g*c', 'j/g·°c', 'j/gºc', 'j/(g°c)', 'j/(gc)', 'jg-1c-1', 'jg-1°c-1'], 'kJ/mol': ['kj/mol', 'kjmol-1', 'kj/mole'],
-  'mol': ['mol', 'moles', 'mole'], 'M': ['m', 'mol/l', 'molar', 'moll-1', 'mol/liter'], 'L': ['l', 'liters', 'liter'], 'mmHg': ['mmhg', 'torr', 'mm hg'], 'atm': ['atm', 'atmospheres', 'atmosphere'], 'K': ['k', 'kelvin'],
-  '%': ['%', 'percent', 'pct'], 'Hz': ['hz', 's-1', '1/s', 's^-1', '/s'], 'nm': ['nm', 'nanometers', 'nanometer'], 'amu': ['amu', 'u', 'g/mol', 'da'], 'g/mol': ['g/mol', 'gmol-1', 'gmol^-1', 'g/mole'],
-  'L·atm/(mol·K)': ['l·atm/mol·k', 'latm/molk', 'l*atm/mol*k', 'latm/(molk)', 'l·atm/(mol·k)', 'latmmol-1k-1', 'l atm/mol k', 'l-atm/mol-k', 'latm/mol/k'], 'in Hg': ['inhg', 'inchesofmercury', 'in'], 'mol/kg': ['mol/kg', 'm', 'molal', 'molkg-1', 'mol/kilogram', 'moles/kg']
+  'g': ['g', 'grams', 'gram', 'gm'], 'mL': ['ml', 'milliliters', 'milliliter', 'millilitres', 'millilitre', 'cm3', 'cc'], 'cm³': ['cm3', 'cubiccentimeters', 'ml', 'cc'], 'cm': ['cm', 'centimeters', 'centimeter'], 'mm': ['mm', 'millimeters', 'millimeter'],
+  'g/mL': ['g/ml', 'gml-1', 'gml^-1', 'g/cm3', 'g/cc', 'grams/ml', 'gpermL'.toLowerCase()], 'g/cm³': ['g/cm3', 'g/ml', 'gcm-3', 'gcm^-3', 'g/cc'], '°C': ['c', '°c', 'degc', 'degreesc', 'celsius', 'degreescelsius', 'ºc', 'oc', 'degrees', 'deg'],
+  'J': ['j', 'joules', 'joule'], 'kJ': ['kj', 'kilojoules', 'kilojoule'], 'J/g°C': ['j/g°c', 'j/gc', 'j/g*c', 'j/g/°c', 'j/g/c', 'j/g·k', 'j/gk', 'j/°c·g', 'j/°cg', 'j/g·°c', 'j/gºc', 'j/(g°c)', 'j/(gc)', 'jg-1c-1', 'jg-1°c-1'], 'kJ/mol': ['kj/mol', 'kjmol-1', 'kj/mole'],
+  'mol': ['mol', 'moles', 'mole', 'mols'], 'M': ['m', 'mol/l', 'molar', 'moll-1', 'mol/liter', 'moles/l', 'mole/l', 'mol/litre', 'moles/liter'], 'L': ['l', 'liters', 'liter', 'litres', 'litre'], 'mmHg': ['mmhg', 'torr', 'mm hg'], 'atm': ['atm', 'atmospheres', 'atmosphere'], 'K': ['k', 'kelvin'],
+  '%': ['%', 'percent', 'pct'], 'Hz': ['hz', 's-1', '1/s', 's^-1', '/s', 'hertz'], 'nm': ['nm', 'nanometers', 'nanometer'], 'amu': ['amu', 'u', 'g/mol', 'da'], 'g/mol': ['g/mol', 'gmol-1', 'gmol^-1', 'g/mole'],
+  'L·atm/(mol·K)': ['l·atm/mol·k', 'latm/molk', 'l*atm/mol*k', 'latm/(molk)', 'l·atm/(mol·k)', 'latmmol-1k-1', 'l atm/mol k', 'l-atm/mol-k', 'latm/mol/k', 'atm·l/mol·k', 'atml/molk', 'l·atm/k·mol', 'latm/kmol', 'atml/kmol'], 'in Hg': ['inhg', 'inchesofmercury', 'in'], 'mol/kg': ['mol/kg', 'm', 'molal', 'molkg-1', 'mol/kilogram', 'moles/kg']
 };
-const normUnit = s => String(s).toLowerCase().replace(/\s+/g, '').replace(/[⁻]/g, '-').replace(/[¹]/g, '1').replace(/[³]/g, '3').replace(/[º˚]/g, '°').replace(/·/g, '·');
+const normUnit = s => String(s).toLowerCase().replace(/\s+/g, '').replace(/[()^]/g, '').replace(/\.$/, '').replace(/[⋅*•]/g, '·').replace(/[⁻]/g, '-').replace(/[¹]/g, '1').replace(/[³]/g, '3').replace(/[º˚]/g, '°').replace(/·/g, '·');
 function unitOk(raw, unit) {
   if (!unit) return true;
   const r0 = String(raw == null ? '' : raw).trim();
@@ -928,10 +956,11 @@ function autoSlip(spec, x) {
   if (near(x, -v)) return 'Check the sign.';
   if (spec.unit === '%' && near(x, v / 100)) return 'That’s a fraction. Multiply by 100 for a percent.';
   if (spec.unit === '%' && near(x, v * 100) ) return 'You multiplied by 100 one time too many.';
-  if (spec.unit === '' && spec.dp != null && v > 0 && v < 14 && near(x, 14 - v, 0.004)) return 'That’s the other one of pH and pOH: pH + pOH = 14.';
+  if (spec.unit === '' && spec.dp != null && spec.tol !== 0 && !spec.read && !spec.reading && v > 0 && v < 14 && near(x, 14 - v, 0.004)) return 'That’s the other one of pH and pOH: pH + pOH = 14.';
   for (const k of [3, 6, 9, 2, 1]) for (const sgn of [1, -1]) if (near(x, v * Math.pow(10, sgn * k))) return `Your answer is ${k === 1 ? '10' : k === 2 ? '100' : k === 3 ? '1000' : '10' + String(k).replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d])} times too ${sgn > 0 ? 'big' : 'small'}: check a unit conversion (mL ↔ L, g ↔ kg, J ↔ kJ, nm ↔ m) or the decimal point.`;
-  for (const f of [2, 3]) { if (near(x, v * f)) return `Your answer is ${f} times too big: check the mole ratio from the balanced equation.`; if (near(x, v / f)) return `Your answer is ${f} times too small: check the mole ratio from the balanced equation.`; }
-  if (near(x * v, 1, 0.012)) return 'It looks like you divided upside down.';
+  const closeTo = near(x, v, 0.05);
+  if (!closeTo && !spec.read && !spec.reading && spec.tol !== 0) { for (const f of [2, 3]) { if (near(x, v * f)) return `Your answer is ${f} times too big: look for a factor of ${f} (a mole ratio, a subscript, or a step done twice).`; if (near(x, v / f)) return `Your answer is ${f} times too small: look for a missed factor of ${f} (a mole ratio or a subscript).`; }
+    if (near(x * v, 1, 0.012)) return 'It looks like you divided upside down.'; }
   if (near(x, v, 0.05)) return spec.read || spec.reading ? 'Outside the accepted range for this reading. Check which numbered line you counted from, and read the bottom of the meniscus.' : spec.tol === 0 ? 'This one has to be exact. Count again.' : 'Close. Use the unrounded numbers until the last step, and check each value you copied.';
   return '';
 }
@@ -939,7 +968,7 @@ function autoSlip(spec, x) {
 function isClose(spec, tol, x) {
   if (spec.tol === 0 || !isFinite(x)) return false;
   const d = Math.abs(x - spec.v);
-  return spec.read ? d <= 2 * tol + 1e-12 : d <= Math.max(2.5 * tol, Math.abs(spec.v) * 0.02) + 1e-12;
+  return spec.read ? d <= 2 * tol + 1e-12 : d <= Math.max(2.5 * tol, Math.abs(spec.v) * 0.02) * (1 + 1e-9);
 }
 function gradeNum(spec, raw, unitRaw, needUnit) {
   const sp = splitNum(raw), u = sp ? parseEntry(sp.num) : null;
@@ -949,11 +978,13 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
     return { score: 0, ok: false, valueOk: false, note: `Check the unit: this answer is in <b>${spec.unit}</b>.` };
   if (!u) return { score: 0, ok: false, valueOk: false, note: 'Type a number (you can use 3.2E-5 for scientific notation).' };
   const x = toNum(u.d);
-  const v = spec.v, tol = needUnit && spec.rtol != null ? spec.rtol : spec.tol != null ? spec.tol : Math.max(Math.abs(v) * (spec.rel != null ? spec.rel : 0.006), 1e-12);
-  let valueOk = Math.abs(x - v) <= tol + 1e-12;
+  const v = spec.v, tol = needUnit && spec.rtol != null ? spec.rtol : spec.tol != null ? spec.tol : Math.abs(v) * (spec.rel != null ? spec.rel : 0.006), eps = Math.abs(v) * 1e-9 + 1e-300;
+  let valueOk = Math.abs(x - v) <= tol + eps;
   // their number may simply be rounded to a different number of sig figs
-  if (!valueOk && u.sf >= (spec.sf != null ? Math.max(1, spec.sf - 1) : 1) && u.sf <= 8) { const r = Number(v.toPrecision(u.sf)); if (Math.abs(x - r) <= Math.abs(r) * 1e-9 + 1e-15) valueOk = 'rounded'; }
-  if (!valueOk && spec.dp != null) { const r = +v.toFixed(Math.max(0, u.dp)); if (Math.abs(x - r) < 1e-9 && Math.abs(x - v) <= Math.max(tol * 4, 0.5 * Math.pow(10, -u.dp))) valueOk = 'rounded'; }
+  // (only one sig fig short, and never down to 1 sig fig: 30 is not 25, and 20 is not a count of 16)
+  const sameAs = r => Math.abs(x - r) <= Math.abs(r) * 1e-9 + 1e-300; let tooRound = false;
+  if (!valueOk && spec.tol !== 0 && u.sf >= 1 && u.sf <= 8 && v !== 0 && sameAs(Number(v.toPrecision(u.sf)))) { if (spec.sf != null && u.sf >= Math.min(spec.sf, Math.max(2, spec.sf - 1))) valueOk = 'rounded'; else if (spec.sf != null || spec.dp != null) tooRound = true; }
+  if (!valueOk && spec.dp != null && spec.tol !== 0 && Math.abs(x - +v.toFixed(Math.min(100, Math.max(0, u.dp)))) < Math.abs(v) * 1e-9 + 1e-300) { if (!spec.read && u.dp >= spec.dp - 1) { valueOk = 'rounded'; tooRound = false; } else tooRound = true; }
   let precOk = true, precNote = '';
   // "110" for a 3-sig-fig answer is ambiguous (trailing zeros with no decimal point), so accept it
   const ambig = spec.sf != null && u.sf < spec.sf && Math.abs(x - Number(v.toPrecision(spec.sf))) <= Math.abs(x) * 1e-9 && !/[.e]/i.test(String(raw)) && /0$/.test(String(raw).replace(/\D+$/, '')) && String(raw).replace(/\D/g, '').replace(/^0+/, '').length >= spec.sf;
@@ -966,7 +997,7 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
     // Precision and units earn their points even when the value is off. A known setup slip earns half the answer points,
     // and so does a value that is close: a reading within twice the accepted window, a calculation within 2%.
     const slipHit = !valueOk && spec.slip && spec.slip(x);
-    const W = spec.read ? [0.4, 0.4, 0.2] : spec.unit ? [0.8, 0.1, 0.1] : [0.8, 0.2, 0];
+    const W = spec.read ? (spec.unit ? [0.4, 0.4, 0.2] : [0.5, 0.5, 0]) : spec.unit ? [0.8, 0.1, 0.1] : [0.8, 0.2, 0];
     const closeHit = !valueOk && !slipHit && isClose(spec, tol, x);
     const a = valueOk ? W[0] : slipHit || closeHit ? W[0] / 2 : 0, pr = precOk ? W[1] : 0, un = spec.unit && uOk ? W[2] : 0;
     if (closeHit) spec = Object.assign({}, spec, { closeNote: spec.read ? 'Close, but outside the accepted range for this reading: half credit for accuracy. Read the meniscus (or line) again.' : 'Close, but not within rounding of the answer: half credit. Keep every digit until the last step and check each value you used.' });
@@ -982,14 +1013,14 @@ function gradeNum(spec, raw, unitRaw, needUnit) {
   const warn = !needUnit && !!valueOk && !precOk && uOk ? `Close, but fix your ${spec.dp != null ? 'decimal places' : 'sig figs'}: ${precNote.replace(/^(Sig figs|Precision): /, '')}` : '';
   const ok = !!valueOk && uOk && (precOk || !!warn);
   let note = '';
-  if (!valueOk) note = spec.closeNote || (spec.slip ? spec.slip(x) || '' : '') || autoSlip(spec, x);
+  if (!valueOk) note = spec.closeNote || (spec.slip ? spec.slip(x) || '' : '') || (tooRound ? `You rounded too far for this to count. Keep <b>${spec.dp != null ? plural(spec.dp, 'decimal place') : plural(spec.sf, 'sig fig')}</b>.` : '') || autoSlip(spec, x);
   else if (!precOk) note = precNote;
   else if (!uOk) note = `Units: write <b>${spec.unit}</b>.`;
   return { score: +score.toFixed(2), ok, warn, valueOk: !!valueOk, precOk, uOk, note, bd };
 }
 // Full chemical equation typed by the student, e.g. "2HCl(aq) + Na2CO3(aq) -> 2NaCl(aq) + H2O(l) + CO2(g)"
 function parseEq(str) {
-  const sides = toPlain(str).split(/→|-+>|=+>|=/); if (sides.length !== 2) return null;
+  const sides = toPlain(str).trim().replace(/[.;,]+$/, '').split(/→|⟶|⇒|[-–—=]+>|=/); if (sides.length !== 2) return null;
   const side = t => t.split('+').map(x => x.trim()).filter(Boolean).map(term => {
     const ph = (term.match(/\((s|l|g|aq)\)\s*$/i) || [])[1]; let f = term.replace(/\((s|l|g|aq)\)\s*$/i, '').trim(); const c = (f.match(/^(\d+)\s*/) || [])[1]; if (c) f = f.slice(f.match(/^(\d+)\s*/)[0].length);
     return { f: normFormula(f), c: c ? +c : 1, ph: ph ? ph.toLowerCase() : '' }; });
@@ -1022,13 +1053,15 @@ const TYPED_SYN = {
   's': ['s', 'solid'], 'l': ['l', 'liquid'], 'g': ['g', 'gas'], 'aq': ['aq', 'aqueous'], 'solid': ['s', 'solid'], 'liquid': ['l', 'liquid'], 'aqueous': ['aq', 'aqueous', 'dissolved'],
   'type i ionic': ['type i', 'type 1', 'type one', 'type i ionic'], 'type ii ionic': ['type ii', 'type 2', 'type two', 'type ii ionic'], 'molecular': ['molecular', 'covalent', 'molecular covalent'], 'acid': ['acid'],
   'actual yield': ['actual', 'actual yield'], 'theoretical yield': ['theoretical', 'theoretical yield'], 'percent yield': ['percent', 'percent yield'],
-  'bent': ['bent', 'v shaped', 'angular'], 'x rays': ['x rays', 'x ray', 'xrays', 'xray'], 'naoh': ['naoh', 'sodium hydroxide'],
+  'bent': ['bent', 'v shaped', 'angular'], 'trigonal pyramidal': ['trigonal pyramidal', 'pyramidal', 'triangular pyramidal', 'trigonal pyramid'], 'green': ['green', 'blue green', 'cyan', 'teal', 'aqua', 'turquoise'], 'x rays': ['x rays', 'x ray', 'xrays', 'xray'], 'naoh': ['naoh', 'sodium hydroxide'],
   'volumetric pipet': ['volumetric pipet', 'volumetric pipette'], 'transfer pipet': ['transfer pipet', 'transfer pipette', 'plastic pipet', 'disposable pipet', 'dropper'], 'graduated cylinder': ['graduated cylinder', 'grad cylinder'], 'erlenmeyer flask': ['erlenmeyer flask', 'erlenmeyer', 'conical flask'], 'buret': ['buret', 'burette']
 };
 const tv = v => String(v == null ? '' : v).replace(/^T:/, '');
 // "these are NOT isotopes": a keyword right after "is/are not" (or isn't/aren't) is a denial, so it doesn't count.
 // Verb negations stay fine ("so heat does not escape", "to not burn yourself" are right answers).
-const DENY = /\b(is|are|was|were|be|it s|they re|that s) not( (a|an|the|really|actually))?$|\b(isn|aren|wasn|weren) t( (a|an|the|really|actually))?$/;
+const DENY = /\b((is|are|was|were|be|it s|they re|that s) not|(will|would|can|could|should) not be|(won|wouldn|couldn|can) t be|(isn|aren|wasn|weren) t)( (a|an|the|really|actually|too|very|any))*$/;
+// "it did not go up", "not exothermic": the option named right after a negation is not the student's answer
+const NEGATED = /\b(not|never|cannot|isn t|aren t|wasn t|weren t|didn t|doesn t|don t|won t|wouldn t|can t|couldn t)( (a|an|the|be|go|get|going|really|actually|too|very|any))* $/;
 function kwHit(t, w) {
   if (/^(not|no|never|isn|aren|don|doesn|can)\b/.test(normWords(w))) return t.includes(w);
   let i = t.indexOf(w);
@@ -1043,11 +1076,11 @@ function claimOf(raw) {
   return ' ' + normWords(r.split(/,|;|\bbecause\b|\bsince\b|\bdue to\b/i)[0]) + ' ';
 }
 function optHit(o, t, raw, fuzzy) {
-  const label = String(o).replace(/<[^>]+>/g, ''), nums = label.match(/\d+(\.\d+)?/g), x = parseFloat((String(raw).match(/\d+(\.\d+)?/) || [])[0]);
-  if (/°/.test(label) && nums) return isFinite(x) && Math.abs(x - parseFloat(nums[0])) <= 1.6;
-  if (/^pH /.test(label) && nums) return isFinite(x) && x >= parseFloat(nums[0]) - 0.25 && x <= parseFloat(nums[nums.length - 1]) + 0.25;
+  const label = String(o).replace(/<[^>]+>/g, ''), nums = label.match(/\d+(\.\d+)?/g), xs = (String(raw).match(/\d+(\.\d+)?/g) || []).map(Number);
+  if (/°/.test(label) && nums) return xs.some(x => Math.abs(x - parseFloat(nums[0])) <= 1.01); // 106–108 is the 107° option only
+  if (/^pH /.test(label) && nums) return xs.some(x => x >= parseFloat(nums[0]) - 0.25 && x <= parseFloat(nums[nums.length - 1]) + 0.25);
   const st = label.match(/^\((s|l|g|aq)\)$/), core = st ? st[1] : normWords(label.replace(/\s*\(.*\)\s*$/, '').replace(/:.*$/, ''));
-  return [core, ...(TYPED_SYN[core] || [])].some(ph => { ph = normWords(ph); if (!ph) return false; if (t.includes(' ' + ph + ' ')) return true; const tt = t.trim(), allow = ph.length >= 10 ? 2 : ph.length >= 6 ? 1 : 0; return fuzzy && allow && lev(tt, ph) <= allow; });
+  return [core, ...(TYPED_SYN[core] || [])].some(ph => { ph = normWords(ph); if (!ph) return false; let at = t.indexOf(' ' + ph + ' '); while (at >= 0) { if (/^(no|not|never)\b/.test(ph) || !NEGATED.test(t.slice(0, at + 1))) return true; at = t.indexOf(' ' + ph + ' ', at + 1); } if (t.includes(' ' + ph + ' ')) return false; const tt = t.trim(), allow = ph.length >= 10 ? 2 : ph.length >= 6 ? 1 : 0; return fuzzy && allow && lev(tt, ph) <= allow; });
 }
 function gradeTyped(p, raw) {
   const t = ' ' + normWords(raw) + ' ';
@@ -1065,7 +1098,7 @@ const SPECT = { 'BaCl2(aq)+Na2SO4(aq)': [['Na', 'Cl'], ['Ba', 'SO4']], 'BaCl2(aq
 const supDigits = s => String(s).replace(/[₀-₉]/g, c => String(c.charCodeAt(0) - 8320)).replace(/[⁰¹²³⁴-⁹]/g, c => '⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)).replace(/⁺/g, '+').replace(/⁻/g, '-');
 function gradeIons(p, raw) {
   raw = supDigits(raw);
-  const t = ' ' + normWords(raw).replace(/(\d)\s*([+-]|plus|minus)/g, '$1') + ' ', has = ion => ION_WORDS[ion].some(w => new RegExp(`(^|\\s|\\d)${w}(?=\\s|\\d|$)`).test(t));
+  const t = ' ' + normWords(raw).replace(/(\d)\s*([+-]|plus|minus)/g, '$1') + ' ', rawI = /(^|[\s,;(+&])I(?=\s*\^?[-−1]|\s*[,;)]|\s*$)/.test(String(raw)), has = ion => (ion === 'I' && rawI) || ION_WORDS[ion].some(w => new RegExp(`(^|\\s|\\d)${w}(?=\\s|\\d|$)`).test(t));
   if (!t.trim()) return { score: 0, ok: false, empty: true, note: '' };
   const named = Object.keys(ION_WORDS).filter(has);
   if (p.none) { const ok = /\bno(ne)?\b|nothing|no spectator/.test(t) && !named.length; return { score: ok ? 1 : 0, ok, note: ok ? '' : named.length ? 'If every ion reacts, there are no spectators: don’t list any ions.' : '' }; }
@@ -1078,7 +1111,7 @@ function gradePart(p, val, unitVal, needUnit) {
   if (p.type === 'eq') return gradeEq(p, val);
   if (p.type === 'num') return gradeNum(p, val, unitVal, needUnit);
   if (p.type === 'choice') { const ok = String(val) === String(p.ok); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.why && p.why[val]) || '' }; }
-  if (p.type === 'text' && p.kw) { const t = ' ' + normWords(val) + ' ', ok = p.kw.some(w => t.includes(w)); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Describe what you saw: a solid, bubbles, a smell, heat, a coating, a color change, or no change.' }; }
+  if (p.type === 'text' && p.kw) { const t = ' ' + normWords(val) + ' ', neg = /\b(no|not|nothing|none|never|without|didn t|doesn t|don t|wasn t|isn t)( \w+){0,2} $/, ok = p.kw.some(w => { if (/^ ?(no|not|nothing|none|clear|same|stay)/.test(w)) return t.includes(w); let i = t.indexOf(w); while (i >= 0) { if (!neg.test(t.slice(0, i).replace(/\S*$/, ''))) return true; i = t.indexOf(w, i + 1); } return false; }); return { score: ok ? 1 : 0, ok, note: ok ? '' : 'Describe what you saw: a solid, bubbles, a smell, heat, a coating, a color change, or no change.' }; }
   if (p.type === 'text') { const ok = wordMatch(val, p.accept); if (!ok && p.whyText) { const tw = ' ' + normWords(val) + ' ', h = p.whyText.find(([ws]) => ws.some(w => tw.includes(' ' + w + ' '))); if (h) return { score: 0, ok: false, note: h[1] }; } if (!ok && p.partial && p.partial.some(w => String(val).toLowerCase().includes(w))) return { score: 0.4, ok: false, note: `Partial name. The full name is <b>${p.ans}</b>.` }; return { score: ok ? 1 : 0, ok, note: '' }; }
   if (p.type === 'name') { const t = normName(val); const ok = p.accept.some(a => normName(a).replace(/ /g, '') === t.replace(/ /g, '')); return { score: ok ? 1 : 0, ok, note: ok ? '' : (p.check ? p.check(val) : '') }; }
   if (p.type === 'formula') { const t = normFormula(val); const ok = p.accept.some(a => normFormula(a) === t); let note = ''; if (!ok && p.accept.some(a => normFormula(a).toLowerCase() === t.toLowerCase())) note = 'Check your capital letters: each element symbol starts with a capital.'; return { score: ok ? 1 : 0, ok, note }; }
@@ -1461,7 +1494,7 @@ const K0a = {
     const empty = rnd(28, 46, 4), water = rnd(49.80, 49.90, 4), full = +(empty + water).toFixed(4);
     return { tag: 'Mass by difference', prompt: 'A dry 50 mL volumetric flask (with stopper) is weighed, filled to the line with DI water, and weighed again. What is the <b>mass of the water</b>?',
       ref: tableHTML([['Mass of flask + stopper (empty)', `${empty.toFixed(4)} g`], ['Mass of flask + stopper + water', `${full.toFixed(4)} g`]]),
-      parts: [num(water, { dp: 4, unit: 'g', tol: 0.00011 })], hint: 'Subtract: (flask + water) − (empty flask). Keep 4 decimal places.', solution: `${full.toFixed(4)} − ${empty.toFixed(4)} = <b>${water.toFixed(4)} g</b> of water.`, video: 'density', skill: 'calc' };
+      parts: [num(water, { dp: 4, unit: 'g', tol: 0.00006 })], hint: 'Subtract: (flask + water) − (empty flask). Keep 4 decimal places.', solution: `${full.toFixed(4)} − ${empty.toFixed(4)} = <b>${water.toFixed(4)} g</b> of water.`, video: 'density', skill: 'calc' };
   },
   equipName() {
     const e = pick(EQ_NAMING.filter(x => !['clampholder', 'utilityclamp'].includes(x[0]) || chance(0.3)));
@@ -1511,7 +1544,7 @@ const K1a = {
       solution: `V = ${Vf.toFixed(1)} − ${Vi.toFixed(1)} = ${V.toFixed(1)} mL. d = ${mass.toFixed(4)} g ÷ ${V.toFixed(1)} mL = <b>${sfHTML(d, sf)} g/mL</b> (${sf} sig figs from the volume).`, video: 'displacement', skill: 'calc' };
   },
   densityBar() {
-    const l = rnd(2.5, 5.0, 2), w = rnd(2.0, 5.5, 2), h = rnd(5.0, 10.5, 2), mass = +(l * w * h * pick([2.70, 7.14, 7.87, 8.47, 8.96]) * rnd(0.99, 1.01, 3)).toFixed(4), V = l * w * h, d = mass / V, sf = sfMin(l.toFixed(2), w.toFixed(2), h.toFixed(2));
+    const l = rnd(1.2, 2.5, 2), w = rnd(1.2, 2.5, 2), h = rnd(3.0, 6.0, 2), mass = +(l * w * h * pick([2.70, 7.14, 7.87, 8.47, 8.96]) * rnd(0.99, 1.01, 3)).toFixed(4), V = l * w * h, d = mass / V, sf = sfMin(l.toFixed(2), w.toFixed(2), h.toFixed(2));
     return { tag: 'Density of a bar', prompt: `A metal bar measures <b>${l.toFixed(2)} cm × ${w.toFixed(2)} cm × ${h.toFixed(2)} cm</b> and has a mass of <b>${mass.toFixed(4)} g</b>. Calculate its density.`, eq: 'V = l × w × h &nbsp;&nbsp; d = m / V',
       parts: [num(d, { sf, unit: 'g/cm³' })], hint: 'Find the volume, then divide mass by volume. The fewest sig figs in the measurements wins.', solution: `V = ${V.toFixed(3)} cm³. d = ${mass.toFixed(4)} ÷ ${V.toFixed(3)} = <b>${sfHTML(d, sf)} g/cm³</b>.`, video: 'density', skill: 'calc' };
   },
@@ -1522,7 +1555,7 @@ const K1a = {
       hint: 'Density is intrinsic: it does not change with the amount of a substance.', solution: 'Density is an <b>intrinsic property</b>. The same substance has the same density at any size, so different densities mean different substances.', video: 'density', skill: 'concept' };
   },
   percentDiff() {
-    const Vd = rnd(12, 40, 2), Vx = +(Vd * (1 + rnd(-0.06, 0.06, 3))).toFixed(1), pd = (Vd - Vx) / Vx * 100;
+    let Vd, Vx, pd; do { Vd = rnd(12, 40, 2); Vx = +(Vd * (1 + rnd(-0.06, 0.06, 3))).toFixed(1); pd = (Vd - Vx) / Vx * 100; } while (Math.abs(pd) < 0.15);
     return { tag: 'Percent difference', prompt: `The volume of a block was <b>${Vd.toFixed(2)} cm³</b> from its dimensions and <b>${Vx.toFixed(1)} mL</b> by displacement. Find the percent difference.`, eq: '% difference = (V<sub>dimensions</sub> − V<sub>displacement</sub>) / V<sub>displacement</sub> × 100',
       parts: [num(pd, { unit: '%', rel: 0.03, tol: 0.06, ans: pd.toFixed(1) })], hint: '1 cm³ = 1 mL, so the two volumes can be compared directly.', solution: `(${Vd.toFixed(2)} − ${Vx.toFixed(1)}) ÷ ${Vx.toFixed(1)} × 100 = <b>${pd.toFixed(1)}%</b>.`, video: 'measure', skill: 'calc' };
   }
@@ -1540,7 +1573,7 @@ const K3a = {
   freq() {
     const nm = rint(405, 690), f = 2.998e8 / (nm * 1e-9);
     return { tag: 'c = λν', prompt: `A line in a spectroscope is read at <b>${nm} nm</b>. What is the frequency of this light?`, eq: 'c = λν &nbsp;&nbsp; c = 2.998 × 10<sup>8</sup> m/s &nbsp;&nbsp; 1 nm = 10<sup>−9</sup> m',
-      parts: [num(f, { sf: 3, unit: 'Hz', slip: x => Math.abs(x - 2.998e8 / nm) / (2.998e8 / nm) < 0.01 ? 'Convert nm to meters first (× 10⁻⁹).' : '' })], hint: 'ν = c ÷ λ, with λ in meters.', solution: `λ = ${nm} × 10⁻⁹ m. ν = 2.998 × 10⁸ ÷ ${nm} × 10⁻⁹ = <b>${sfHTML(f, 3)} s⁻¹ (Hz)</b>.`, video: 'light', skill: 'calc' };
+      parts: [num(f, { sf: 3, unit: 'Hz', slip: x => Math.abs(x - 2.998e8 / nm) / (2.998e8 / nm) < 0.01 ? 'Convert nm to meters first (× 10⁻⁹).' : '' })], hint: 'ν = c ÷ λ, with λ in meters.', solution: `λ = ${nm} × 10⁻⁹ m. ν = 2.998 × 10⁸ ÷ (${nm} × 10⁻⁹) = <b>${sfHTML(f, 3)} s⁻¹ (Hz)</b>.`, video: 'light', skill: 'calc' };
   },
   energy() {
     const nm = rint(410, 680), E = 6.626e-34 * 2.998e8 / (nm * 1e-9);
@@ -1583,7 +1616,7 @@ const K3z = {
   avgMass() {
     const region = pick(Object.keys(PB)), ab = PB[region], m = avgPb(ab);
     return { tag: 'Average atomic mass', prompt: `Calculate the average atomic mass of lead from <b>${region}</b> using the isotope data.`, ref: tableHTML([['Pb-204', `${ab[0].toFixed(2)}%`], ['Pb-206', `${ab[1].toFixed(2)}%`], ['Pb-207', `${ab[2].toFixed(2)}%`], ['Pb-208', `${ab[3].toFixed(2)}%`]], ['Isotope', 'Abundance']),
-      parts: [num(m, { unit: 'amu', tol: 0.006, ans: m.toFixed(2) })], hint: 'Change each percent to a decimal, multiply by the mass number, then add.', solution: `204(${(ab[0] / 100).toFixed(4)}) + 206(${(ab[1] / 100).toFixed(4)}) + 207(${(ab[2] / 100).toFixed(4)}) + 208(${(ab[3] / 100).toFixed(4)}) = <b>${m.toFixed(2)} amu</b>.`, video: 'isotopes', skill: 'calc' };
+      parts: [num(m, { unit: 'amu', tol: 0.006, dp: 2, ans: m.toFixed(2) })], hint: 'Change each percent to a decimal, multiply by the mass number, then add.', solution: `204(${(ab[0] / 100).toFixed(4)}) + 206(${(ab[1] / 100).toFixed(4)}) + 207(${(ab[2] / 100).toFixed(4)}) + 208(${(ab[3] / 100).toFixed(4)}) = <b>${m.toFixed(2)} amu</b>.`, video: 'isotopes', skill: 'calc' };
   },
   whichMine() {
     const keys = Object.keys(PB), target = pick(keys), sampleMass = +avgPb(PB[target]).toFixed(2);
@@ -1595,7 +1628,7 @@ const K3z = {
     const ab = shuffle([[6, rint(15, 30)], [8, 0], [10, rint(5, 20)]]); const total = ab.reduce((s, x) => s + x[1], 0); ab.find(x => x[1] === 0)[1] = 100 - total;
     const m = ab.reduce((s, x) => s + x[0] * x[1] / 100, 0);
     return { tag: 'Average atomic mass', prompt: 'What is the average atomic mass of the made-up element <b>Eggium</b>?', ref: tableHTML(ab.map(x => [`Eggium-${x[0]}`, x[0], `${x[1]}%`]), ['Isotope', 'Mass number', 'Abundance']),
-      parts: [num(m, { unit: 'amu', tol: 0.006, ans: m.toFixed(2) })], hint: 'Percent ÷ 100, times the mass number, then add them up.', solution: ab.map(x => `${x[0]} × ${(x[1] / 100).toFixed(2)}`).join(' + ') + ` = <b>${m.toFixed(2)} amu</b>.`, video: 'isotopes', skill: 'calc' };
+      parts: [num(m, { unit: 'amu', tol: 0.006, dp: 2, ans: m.toFixed(2) })], hint: 'Percent ÷ 100, times the mass number, then add them up.', solution: ab.map(x => `${x[0]} × ${(x[1] / 100).toFixed(2)}`).join(' + ') + ` = <b>${m.toFixed(2)} amu</b>.`, video: 'isotopes', skill: 'calc' };
   }
 };
 
@@ -1629,7 +1662,7 @@ const K4a = {
       hint: 'Sulfur added = C − B. Sulfur reacted = D − B. Excess = added − reacted (which works out to C − D).', solution: `Added = ${d.C.toFixed(4)} − ${d.B.toFixed(4)} = <b>${d.sUsed.toFixed(4)} g</b>. Reacted = D − B = ${d.sR.toFixed(4)} g. Excess = ${d.sUsed.toFixed(4)} − ${d.sR.toFixed(4)} = <b>${d.ex.toFixed(4)} g</b> (burned off as SO₂).`, video: 'empirical', skill: 'calc' };
   },
   pctDiff() {
-    const mine = +rnd(3.80, 4.12, 3).toFixed(3), others = Array.from({ length: 6 }, () => +rnd(3.84, 4.08, 3).toFixed(3)), avg = others.reduce((a, b) => a + b, 0) / others.length, pd = (mine - avg) / avg * 100;
+    let mine, others, avg, pd; do { mine = +rnd(3.80, 4.12, 3).toFixed(3); others = Array.from({ length: 6 }, () => +rnd(3.84, 4.08, 3).toFixed(3)); avg = Math.round(others.reduce((a, b) => a + Math.round(b * 1000), 0) / 6 + 1e-9) / 1000; pd = (mine - avg) / avg * 100; } while (Math.abs(pd) < 0.15 || Math.abs(Math.abs(pd * 10) % 1 - 0.5) < 0.03);
     return { tag: 'Percent difference from the class (Q2–Q3)', prompt: `Your Cu / S mass ratio was <b>${mine.toFixed(3)}</b>. Find the class average (other groups only) and the <b>percent difference</b> of your ratio from it.`,
       ref: tableHTML([others.map(x => x.toFixed(3))], ['Group A', 'Group B', 'Group C', 'Group D', 'Group E', 'Group F']), eq: 'Percent difference = (your ratio − class ratio) ÷ class ratio × 100',
       parts: [num(avg, { sf: 4, unit: '', label: 'Average class ratio (excluding yours)', rel: 0.0005, slip: x => Math.abs(x - (avg * 6 + mine) / 7) < 0.0006 ? 'Leave your own ratio out of the class average.' : '' }), num(pd, { unit: '%', label: 'Percent difference', rel: 0.03, tol: 0.06, ans: pd.toFixed(1), slip: x => Math.abs(x + pd) < 0.06 ? 'Your ratio − class ratio (keep the sign).' : Math.abs(x - (mine - avg) / mine * 100) < 0.06 ? 'Divide by the class ratio, not yours.' : '' })],
@@ -1647,7 +1680,7 @@ const K4a = {
   },
   idea() {
     return { tag: 'Constant composition', prompt: 'Two groups make copper(I) sulfide. Group 1 uses 1.0 g of copper and group 2 uses 2.0 g. How do their mass ratios (g Cu / g S) compare?',
-      parts: [choice(['They are the same: a compound always has the same composition by mass', 'Group 2’s ratio is twice as big', 'Group 2’s ratio is half as big'], 0, { kw: [['same', 'equal', 'identical', 'constant', 'no different', 'not change', 'doesn t change', 'does not change']], nokw: ['twice', 'double', 'half', 'bigger', 'smaller', 'larger'] })], hint: 'The law of constant composition.', solution: 'A pure compound always contains its elements in the <b>same mass ratio</b>, no matter how much you make.', video: 'empirical', skill: 'concept' };
+      parts: [choice(['They are the same: a compound always has the same composition by mass', 'Group 2’s ratio is twice as big', 'Group 2’s ratio is half as big'], 0, { kw: [['same', 'equal', 'identical', 'constant', 'no different', 'not change', 'doesn t change', 'does not change']], nokw: ['twice', 'double', 'half', 'bigger', 'smaller', 'larger', 'not the same', 'not same', 'not be the same', 'not equal', 'not be equal', 'not identical', 'different', 'differ'] })], hint: 'The law of constant composition.', solution: 'A pure compound always contains its elements in the <b>same mass ratio</b>, no matter how much you make.', video: 'empirical', skill: 'concept' };
   }
 };
 
@@ -1700,7 +1733,7 @@ const K4b = {
   type() {
     const r = rint(0, 3); let f, ok;
     if (r === 0) { f = ionic(false).formula; ok = 0; } else if (r === 1) { f = ionic(true).formula; ok = 1; } else if (r === 2) { f = pick(MOLEC)[0]; ok = 2; } else { f = pick(ACIDS)[0]; ok = 3; }
-    return { tag: 'What type of compound?', prompt: `What type of compound is <span class="fbig">${fhtml(f)}</span>?`, parts: [choice(['Type I ionic (metal with one charge)', 'Type II ionic (metal with more than one charge)', 'Molecular (nonmetals only)', 'Acid (starts with H)'], ok)],
+    return { tag: 'What type of compound?', prompt: `What type of compound is <span class="fbig">${fhtml(f)}${ok === 3 ? '(aq)' : ''}</span>?`, parts: [choice(['Type I ionic (metal with one charge)', 'Type II ionic (metal with more than one charge)', 'Molecular (nonmetals only)', 'Acid (starts with H)'], ok)],
       hint: 'Metal + nonmetal (or polyatomic ions) → ionic. Check whether the metal has more than one possible charge. Only nonmetals → molecular. Starts with H → acid.', solution: `<b>${['Type I ionic', 'Type II ionic', 'Molecular', 'Acid'][ok]}</b>.`, video: 'naming', skill: 'concept' };
   }
 };
@@ -1725,11 +1758,11 @@ const K5a = {
     const na = ma / AM[a], nb = mb / AM[b], r = Math.min(na, nb);
     return { tag: 'Empirical formula', pt: true, prompt: `A sample of a compound contains <b>${ma.toFixed(4)} g ${a}</b> and <b>${mb.toFixed(4)} g ${b}</b>. What is its empirical formula?`,
       parts: [{ type: 'formula', accept: [f], ans: fhtml(f) }], hint: 'Grams → moles for each element, divide by the smaller number of moles, then (if needed) multiply to get whole numbers.',
-      solution: `mol ${a} = ${ma.toFixed(4)} ÷ ${AM[a]} = ${na.toFixed(5)}; mol ${b} = ${mb.toFixed(4)} ÷ ${AM[b]} = ${nb.toFixed(5)}. Ratio ${(na / r).toFixed(2)} : ${(nb / r).toFixed(2)} → <b>${fhtml(f)}</b>.`, video: 'empirical', skill: 'calc' };
+      solution: `mol ${a} = ${ma.toFixed(4)} ÷ ${AM[a]} = ${na.toFixed(5)}; mol ${b} = ${mb.toFixed(4)} ÷ ${AM[b]} = ${nb.toFixed(5)}. Ratio ${(na / r).toFixed(2)} : ${(nb / r).toFixed(2)}${[na / r, nb / r].some(x => Math.abs(x - Math.round(x)) > 0.2) ? ' (× 2 to clear the half → ' + Math.round(2 * na / r) + ' : ' + Math.round(2 * nb / r) + ')' : ''} → <b>${fhtml(f)}</b>.`, video: 'empirical', skill: 'calc' };
   },
   pctFormula() {
     const c = pick([['Na2O', 'O'], ['MgO', 'O'], ['MgO', 'Mg'], ['Al2O3', 'Al'], ['CaCl2', 'Cl'], ['Fe2O3', 'Fe'], ['CuSO4', 'Cu'], ['K2CO3', 'K'], ['NH4NO3', 'N'], ['C6H12O6', 'C']]), cnt = parseFormula(c[0])[c[1]], mm = molarMass(c[0]), pc = cnt * AM[c[1]] / mm * 100;
-    return { tag: 'Percent from a formula', prompt: `What is the mass percent of <b>${c[1]}</b> in <b>${fhtml(c[0])}</b>?`, parts: [num(pc, { unit: '%', rel: 0.003, ans: pc.toFixed(2) })], hint: `Mass of all the ${c[1]} in one mole ÷ molar mass × 100.`,
+    return { tag: 'Percent from a formula', prompt: `What is the mass percent of <b>${c[1]}</b> in <b>${fhtml(c[0])}</b>?`, parts: [num(pc, { unit: '%', rel: 0.003, dp: 2, ans: pc.toFixed(2) })], hint: `Mass of all the ${c[1]} in one mole ÷ molar mass × 100.`,
       solution: `${cnt} × ${AM[c[1]]} = ${(cnt * AM[c[1]]).toFixed(2)} g; molar mass = ${mm.toFixed(2)} g/mol. ${(cnt * AM[c[1]]).toFixed(2)} ÷ ${mm.toFixed(2)} × 100 = <b>${pc.toFixed(2)}%</b>.`, video: 'percent', skill: 'calc' };
   },
   equipment() {
@@ -1739,8 +1772,8 @@ const K5a = {
   why() {
     const q = pick([
       ['Why do you heat, cool and weigh the crucible again until the mass stops changing?', ['To be sure all the magnesium has reacted (constant mass)', 'To make the crucible lighter', 'To burn off the oxygen'], 'Heating to <b>constant mass</b> shows the reaction is finished.', [['react', 'complete', 'finish', 'done', 'constant', 'stops changing', 'stop changing', 'no more', 'fully', 'all the mg', 'all the magnesium', 'all magnesium']]],
-      ['Why should you only touch the crucible with tongs, even after it cools?', ['Oils from your fingers add mass and could burn you while hot', 'Tongs make the crucible react faster', 'The crucible is too heavy to lift'], 'Fingerprints add mass (and a hot crucible burns). Always use <b>crucible tongs</b>.', [['oil', 'fingerprint', 'finger', 'skin', 'burn', 'hot', 'mass', 'weight', 'contamin', 'dirt', 'grease']]],
-      ['The magnesium gains mass when it is heated in the crucible. Why?', ['It combines with oxygen from the air to make magnesium oxide', 'The flame adds carbon to it', 'Heat has mass'], 'Mg reacts with <b>O₂ from the air</b>: 2Mg + O₂ → 2MgO, so the product weighs more.', [['oxygen', 'o2', ' air ', 'oxide']]]
+      ['Why should you only touch the crucible with tongs, even after it cools?', ['Oils from your fingers add mass and could burn you while hot', 'Tongs make the crucible react faster', 'The crucible is too heavy to lift'], 'Fingerprints add mass (and a hot crucible burns). Always use <b>crucible tongs</b>.', [['oil', 'fingerprint', 'finger', 'skin', 'mass', 'weight', 'contamin', 'dirt', 'grease', 'residue', 'moisture', 'sweat']]],
+      ['The magnesium gains mass when it is heated in the crucible. Why?', ['It combines with oxygen from the air to make magnesium oxide', 'The flame adds carbon to it', 'Heat has mass'], 'Mg reacts with <b>O₂ from the air</b>: 2Mg + O₂ → 2MgO, so the product weighs more.', [['oxygen', 'o2', ' air ', 'oxide', 'oxid', 'mgo']]]
     ]);
     return { tag: 'Lab technique', prompt: q[0], parts: [choiceShuffled(q[1][0], q[1].slice(1), { kw: q[3] })], hint: 'Think about what is actually being weighed.', solution: q[2], video: 'part2_5a', skill: 'concept' };
   }
@@ -1751,7 +1784,7 @@ const MOLS = [ // formula, central, outer atoms, geometry key, valence e-, lone 
   ['H2O', 'O', ['H', 'H'], 'bent', 8, 2, 4], ['NH3', 'N', ['H', 'H', 'H'], 'trigonalpyramidal', 8, 1, 3], ['CH4', 'C', ['H', 'H', 'H', 'H'], 'tetrahedral', 8, 0, 2], ['CO2', 'C', ['O', 'O'], 'linear', 16, 0, 0],
   ['CH2Cl2', 'C', ['H', 'Cl', 'H', 'Cl'], 'tetrahedral', 20, 0, 2], ['HCN', 'C', ['H', 'N'], 'linear', 10, 0, 0], ['CH2O', 'C', ['O', 'H', 'H'], 'trigonalplanar', 12, 0, 1], ['PCl3', 'P', ['Cl', 'Cl', 'Cl'], 'trigonalpyramidal', 26, 1, 3],
   ['SiCl4', 'Si', ['Cl', 'Cl', 'Cl', 'Cl'], 'tetrahedral', 32, 0, 2], ['OF2', 'O', ['F', 'F'], 'bent', 20, 2, 4], ['NF3', 'N', ['F', 'F', 'F'], 'trigonalpyramidal', 26, 1, 3], ['CS2', 'C', ['S', 'S'], 'linear', 16, 0, 0],
-  ['COCl2', 'C', ['O', 'Cl', 'Cl'], 'trigonalplanar', 24, 0, 1], ['CCl4', 'C', ['Cl', 'Cl', 'Cl', 'Cl'], 'tetrahedral', 32, 0, 2], ['PH3', 'P', ['H', 'H', 'H'], 'trigonalpyramidal', 8, 1, 3], ['H2CS', 'C', ['S', 'H', 'H'], 'trigonalplanar', 12, 0, 1]
+  ['COCl2', 'C', ['O', 'Cl', 'Cl'], 'trigonalplanar', 24, 0, 1], ['CCl4', 'C', ['Cl', 'Cl', 'Cl', 'Cl'], 'tetrahedral', 32, 0, 2], ['NCl3', 'N', ['Cl', 'Cl', 'Cl'], 'trigonalpyramidal', 26, 1, 3], ['H2CS', 'C', ['S', 'H', 'H'], 'trigonalplanar', 12, 0, 1]
 ];
 const GEO_NAMES = { linear: 'Linear', bent: 'Bent', trigonalplanar: 'Trigonal planar', trigonalpyramidal: 'Trigonal pyramidal', tetrahedral: 'Tetrahedral' };
 const ANGLES = ['180°', '120°', '109.5°', 'about 107°', 'about 104.5°'];
@@ -1810,7 +1843,7 @@ const K7a = {
   ice() {
     const cw = rnd(52, 62, 4), ice = rnd(9, 16, 4), n = ice / 18.015;
     return { tag: 'Moles of ice', prompt: 'Ice was added to the water in a calorimeter and allowed to melt. How many <b>moles of ice</b> were added?', ref: tableHTML([['Mass of calorimeter + water', `${cw.toFixed(4)} g`], ['Mass of calorimeter + water + melted ice', `${(cw + ice).toFixed(4)} g`]]),
-      parts: [num(n, { sf: 4, unit: 'mol' })], hint: 'Mass of ice = difference of the two masses. Then divide by 18.015 g/mol.', solution: `${ice.toFixed(4)} g ÷ 18.015 g/mol = <b>${sfHTML(n, 4)} mol</b>.`, video: 'calorimetry', skill: 'calc' };
+      parts: [num(n, { sf: 5, unit: 'mol' })], hint: 'Mass of ice = difference of the two masses. Then divide by 18.015 g/mol (5 sig figs).', solution: `${ice.toFixed(4)} g ÷ 18.015 g/mol = <b>${sfHTML(n, 5)} mol</b> (5 sig figs, from 18.015).`, video: 'calorimetry', skill: 'calc' };
   },
   qWater() {
     const cal = rnd(3.2, 6.8, 4), w = rnd(45, 55, 4), Ti = rnd(22, 27, 1), Tf = +(Ti - rnd(8, 16, 1)).toFixed(1), dT = +(Tf - Ti).toFixed(1), q = w * 4.184 * dT, sf = Math.min(4, sfCount(Math.abs(dT).toFixed(1)));
@@ -1977,13 +2010,15 @@ const S1_NOTE = [[['single displacement', 'single replacement'], 'That is the <b
   [['combination', 'synthesis', 'decomposition'], 'That is a <b>Scheme 1</b> name. This asks for <b>Scheme 2</b> (precipitation, acid/base neutralization, gas evolution, redox, combustion or no reaction).']];
 const S2_NOTE = [[['precipitation', 'precipitate', 'neutralization', 'gas evolution', 'redox'], 'That is a <b>Scheme 2</b> name. This asks for <b>Scheme 1</b>: combination, decomposition, single displacement, double displacement or combustion.']];
 const s2Part = (ok, o = {}) => Object.assign(choice(S2, ok, o), { whyKw: S1_NOTE });
+// a metal + acid does give off a gas, so say why Scheme 2 still calls it redox
+const h2Why = p => { const i = p.options.indexOf('Gas evolution'); if (i >= 0 && i !== p.ok) (p.why = p.why || {})[i] = 'A gas does form here. In Scheme 2, “gas evolution” means two solutions swap partners and one product is a gas (like acid + carbonate). Here an uncombined metal gives electrons to H⁺ to make H₂, so it is <b>redox</b>.'; return p; };
 const sideHTML = (list, coefs) => list.map((x, i) => `${coefs ? (coefs[i] === 1 ? '' : coefs[i]) : ''}${fhtml(x)}`).join(' + ');
 const rxHTML = (rx, withC) => `${sideHTML(rx.r, withC ? rx.c.slice(0, rx.r.length) : null)} → ${sideHTML(rx.p, withC ? rx.c.slice(rx.r.length) : null)}`;
 const rxPlain = list => list.map(x => fhtml(x.replace(/\((s|l|g|aq)\)$/, ''))).join(' + ');
 const K10a = {
   scheme2() {
     const rx = pick(RX);
-    return { tag: 'Reaction type (scheme 2)', prompt: `You mix ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this, using <b>Scheme 2</b>?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [s2Part(rx.s2)],
+    return { tag: 'Reaction type (scheme 2)', prompt: `You ${rx.r.length > 1 ? 'mix' : 'start with'} ${rxPlain(rx.r)}. ${rx.obs} What type of reaction is this, using <b>Scheme 2</b>?`, art: rx.tube ? tubeSVG(Object.assign({ aria: rx.obs }, rx.tube)) : '', parts: [rx.gas === 'H2' ? h2Why(s2Part(rx.s2)) : s2Part(rx.s2)],
       hint: 'Solid forms → precipitation. Gas from a double displacement → gas evolution. Acid + base → neutralization. Something burning in O₂ → combustion (a special redox your lab manual lists on its own). Any other uncombined element → redox.', solution: `${rx.obs} → <b>${S2[rx.s2]}</b>.<br>${eqn(rxHTML(rx, true))}`, video: 'reactions', skill: 'concept' };
   },
   station() {
@@ -2090,12 +2125,12 @@ const K12a = {
   acidMass() {
     const g = rnd(0.8, 3.5, 2), V = pick([0.250, 0.500, 0.750]), M = g / 36.46 / V, pH = -Math.log10(M), sf = Math.min(3, sfCount(g.toFixed(2)));
     return { tag: 'pH of a strong acid', prompt: `<b>${g.toFixed(2)} g HCl</b> is dissolved in water to make <b>${V.toFixed(3)} L</b> of solution. What is the pH?`, eq: PH_EQ,
-      parts: [num(pH, { dp: sf, unit: '', tol: sf < 3 ? 0.02 : 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf)} M. pH = −log(${sfStr(M, sf)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
+      parts: [num(pH, { dp: sf, unit: '', tol: sf < 3 ? 0.02 : 0.006 })], hint: 'g HCl → mol (36.46 g/mol) → M. HCl is a strong acid, so [H₃O⁺] = M. Then pH = −log[H₃O⁺].', solution: `${g.toFixed(2)} ÷ 36.46 ÷ ${V.toFixed(3)} = ${sfStr(M, sf + 2)} M (keep extra digits). pH = −log(${sfStr(M, sf + 2)}) = <b>${pH.toFixed(sf)}</b>.`, video: 'acidbase', skill: 'calc' };
   },
   baseMass() {
     const g = rnd(2.0, 6.0, 2), V = pick([0.500, 0.750, 1.00]), M = g / 121.63 / V, oh = 2 * M, pOH = -Math.log10(oh), pH = 14 - pOH, sf = 3;
     return { tag: 'pH of a strong base', prompt: `<b>${g.toFixed(2)} g Sr(OH)<sub>2</sub></b> is dissolved to make <b>${V.toFixed(V < 1 ? 3 : 2)} L</b> of solution. What is the pH?`, eq: PH_EQ,
-      parts: [num(pH, { dp: sf, unit: '', tol: 0.006, slip: x => Math.abs(x - (14 + Math.log10(M))) < 0.01 ? 'Each Sr(OH)₂ releases <b>2</b> OH⁻. Double the molarity first.' : '' })], hint: 'Sr(OH)₂ = 121.63 g/mol, and each one gives 2 OH⁻. Find pOH, then pH = 14 − pOH.', solution: `${g.toFixed(2)} ÷ 121.63 ÷ ${V.toFixed(V < 1 ? 3 : 2)} = ${sfStr(M, 3)} M Sr(OH)₂ → [OH⁻] = ${sfStr(oh, 3)} M. pOH = ${pOH.toFixed(3)}, pH = <b>${pH.toFixed(3)}</b>.`, video: 'acidbase', skill: 'calc' };
+      parts: [num(pH, { dp: sf, unit: '', tol: 0.006, slip: x => Math.abs(x - (14 + Math.log10(M))) < 0.01 ? 'Each Sr(OH)₂ releases <b>2</b> OH⁻. Double the molarity first.' : '' })], hint: 'Sr(OH)₂ = 121.63 g/mol, and each one gives 2 OH⁻. Find pOH, then pH = 14 − pOH.', solution: `${g.toFixed(2)} ÷ 121.63 ÷ ${V.toFixed(V < 1 ? 3 : 2)} = ${sfStr(M, 5)} M Sr(OH)₂ → [OH⁻] = 2 × that = ${sfStr(oh, 5)} M (keep extra digits). pOH = ${pOH.toFixed(4)}, pH = 14 − pOH = <b>${pH.toFixed(3)}</b>.`, video: 'acidbase', skill: 'calc' };
   }
 };
 
@@ -2161,7 +2196,7 @@ function errQ(o) {
     const right = o.meas[0][0], p = choiceShuffled(right, o.meas.slice(1).map(m => m[0]), { label: 'Which measured value is directly affected?', kw: [o.meas[0][1]], nokw: o.meas.slice(1).flatMap(m => m[1]).filter(w => !o.meas[0][1].includes(w)), kwNote: 'Name the measurement from your data table.' });
     parts.push(attachWhy(p, o.meas.slice(1).map(m => [m[0], `This mistake doesn’t change the ${m[0].replace(/<[^>]+>/g, '').replace(/ \(.*\)$/, '').replace(/^the /i, '').replace(/^./, c => c.toLowerCase())}. ${s1}`, m[1].filter(w => !o.meas[0][1].includes(w))])));
   }
-  if (o.dir) parts.push(dirPart(o.dir, `That measured value would be…`, null, s1));
+  if (o.dir) parts.push(dirPart(o.dir, o.dirLabel || `That measured value would be…`, null, s1));
   parts.push(resPart(o.res, `The ${o.result} would come out…`, o.sol));
   return { tag: 'Error analysis', prompt: o.prompt, ref: o.ref, eq: o.eq, parts, hint: o.hint || 'Write the equation for the result. Is the affected value on top (numerator) or on the bottom (denominator)?', solution: o.sol, video: o.video, skill: 'concept', pt: true };
 }
@@ -2183,7 +2218,7 @@ const WRONG_WHY = {
   'Pour the liquid into the top': ['Pouring can’t set the volume on the line. Draw it up with a bulb and put the bottom of the meniscus on the line.', ['pour']],
   'Directly on the countertop': ['A hot crucible burns the counter and can crack. Set it on the wire mesh.', ['counter', 'table', 'bench']],
   'On a paper towel': ['A hot crucible can scorch or light paper. Use the wire mesh.', ['paper', 'towel']],
-  'Citric acid': ['Citric acid neutralizes base spills. An acid spill needs a base: sodium bicarbonate.', ['citric']],
+  'Citric acid (a weak acid)': ['Citric acid neutralizes base spills. An acid spill needs a base: sodium bicarbonate.', ['citric']],
   'More acid': ['More acid makes it worse. Neutralize an acid with a weak base: baking soda.', ['more acid']],
   'To warm the tube': ['Your finger isn’t about temperature. It keeps the acid and water from pouring out until the stopper is under water.', ['warm', 'heat']],
   'To let air into the tube': ['The opposite: air in the tube adds to the gas volume and makes R too high. Your finger keeps the liquid in.', ['let air', 'air in']],
@@ -2224,7 +2259,7 @@ Object.assign(K1a, {
     return pickErr([
       { prompt: 'A student finds the volume of a metal object by <b>displacement</b>. An <b>air bubble</b> stays stuck to the object under the water.', meas: [['Volume of the object (water level with the object)', ['volume', 'water level', 'final volume', 'displace', 'ml']], ['Mass of the object', ['mass', 'weigh']]], dir: 'high', res: 'low', result: 'density (d = m/V)', sol: 'The bubble pushes the water up too, so the final water level and the <b>volume read too high</b>. Volume is on the bottom of d = m/V, so the <b>density comes out lower</b>.', video: 'displacement' },
       { prompt: 'A student measures the volume of a metal bar by displacement first, then puts the <b>still-wet bar</b> on the balance to get its mass.', meas: [['Mass of the bar', ['mass', 'weigh', 'balance', 'grams']], ['Volume of the bar', ['volume', ' ml']]], dir: 'high', res: 'high', result: 'density (d = m/V)', sol: 'Water on the bar adds mass, so the <b>mass is too high</b>. Mass is on top of d = m/V, so the <b>density comes out higher</b>. Dry the object before weighing.', video: 'density' },
-      { prompt: 'Measuring the dimensions of a rectangular bar, a student lines the edge up with the <b>end of the ruler</b> instead of the 0 cm mark, and the ruler’s end is worn down about 1 mm short of zero.', meas: [['The length measurement', ['length', 'dimension', 'ruler', ' cm', 'side', 'width', 'height']], ['The mass', ['mass']]], dir: 'high', res: 'high', result: 'volume from the dimensions (V = l × w × h)', sol: 'The worn end sits past zero, so each reading is about 0.1 cm <b>too high</b>, and V = l × w × h comes out <b>higher</b>. Always start at the 0 mark, not the end of the ruler.', video: 'measure' }
+      { prompt: 'Measuring the dimensions of a rectangular bar, a student lines the edge up with the <b>end of the ruler</b> instead of the 0 cm mark. The first 1 mm of the ruler (with the 0 mark) has worn off, so the end really sits at 0.1 cm.', meas: [['The length measurement', ['length', 'dimension', 'ruler', ' cm', 'side', 'width', 'height']], ['The mass', ['mass']]], dir: 'high', res: 'high', result: 'volume from the dimensions (V = l × w × h)', sol: 'The worn end sits at 0.1 cm, not 0, so each reading is about 0.1 cm <b>too high</b>, and V = l × w × h comes out <b>higher</b>. Always start at the 0 mark, not the end of the ruler.', video: 'measure' }
     ], 'd = m ÷ V');
   }
 });
@@ -2339,7 +2374,7 @@ Object.assign(K2a, {
     return pickErr([
       { prompt: 'After weighing the red atoms, a student drops the beaker and <b>5 red beads roll under the bench</b>. The student counts the rest and records that number.', meas: [['Number of red atoms', ['number', 'count', 'how many', 'red atoms']], ['Mass of beaker + red atoms', ['mass', 'weigh', 'balance', 'grams']]], dir: 'low', res: 'high', result: 'average mass per red atom', sol: 'The beads were weighed but not counted, so the <b>number of red atoms is too low</b>. Mass per atom = mass ÷ count, with a smaller bottom → <b>too high</b>. Count over a tray, and double-check the count.', video: 'isotopes' },
       { prompt: 'For the black atoms only, a student grabs a <b>different, heavier beaker</b> but still subtracts the mass of the original empty beaker.', meas: [['Mass of the black atoms (beaker + black − empty beaker)', ['black', 'mass', 'weigh', 'beaker']], ['Number of black atoms', ['number', 'count']]], dir: 'high', res: 'high', result: 'average atomic mass of Fresnocitium', sol: 'The heavier beaker’s extra mass gets counted as black atoms, so the <b>mass of the black atoms is too high</b>, their mass per atom is too high, and the weighted <b>average atomic mass comes out higher</b>. The manual says use the same beaker for every weighing.', video: 'isotopes' },
-      { prompt: 'A student forgets to tare the balance. With nothing on the pan, it already reads <b>0.0150 g</b>, so every weighing includes that extra 0.0150 g.', meas: [['Every mass reading (empty beaker and beaker + atoms)', ['every', 'all', 'each', 'reading', 'mass', 'weigh', 'beaker']], ['Number of atoms', ['number', 'count']]], dir: 'high', res: 'none', result: 'mass of the red atoms (by difference)', sol: 'Every reading is 0.0150 g <b>too high</b>, but the mass of the atoms = (beaker + atoms) − (empty beaker), so the extra 0.0150 g <b>cancels out</b>: no change. (Still tare first, like the manual says.)', video: 'isotopes' }
+      { prompt: 'A student forgets to tare the balance. With nothing on the pan, it already reads <b>0.0150 g</b>, so every weighing includes that extra 0.0150 g.', meas: [['Every mass reading (empty beaker and beaker + atoms)', ['every', 'all', 'each', 'reading', 'mass', 'weigh', 'beaker']], ['Number of atoms', ['number', 'count']]], dir: 'high', res: 'none', result: 'mass of the red atoms (by difference)', sol: 'Every reading is 0.0150 g <b>too high</b>. The mass of the atoms = (beaker + atoms) − (empty beaker), so the extra 0.0150 g <b>cancels out</b>: no change. (Still tare first, like the manual says.)', video: 'isotopes' }
     ], 'Mass per atom = mass of atoms ÷ number of atoms &nbsp;&nbsp; Avg. atomic mass = Σ (mass per atom × fractional abundance)');
   }
 });
@@ -2411,7 +2446,7 @@ const HY = [[656, 3, 'Red'], [486, 4, 'Blue-green'], [434, 5, 'Violet'], [410, 6
 Object.assign(SPEC_BANK, {
   // two elements in one sample (a mixture): name both
   fingerprintMix() {
-    const all = Object.keys(SPEC), pair = sample(all, 2), lines = [...new Set([...SPEC[pair[0]], ...SPEC[pair[1]]])].sort((x, y) => x - y);
+    const all = Object.keys(SPEC); let pair; do { pair = sample(all, 2); } while (pair.includes('Helium') && pair.includes('Sodium')); const lines = [...new Set([...SPEC[pair[0]], ...SPEC[pair[1]]])].sort((x, y) => x - y);
     const pairTxt = p => `${p[0]} and ${p[1].toLowerCase()}`, wrong = sample(all.flatMap((x, i) => all.slice(i + 1).map(y => [x, y])).filter(p => !(p.includes(pair[0]) && p.includes(pair[1]))), 3), opts = shuffle([pair, ...wrong]).map(pairTxt);
     const words = e => [e.toLowerCase(), ' ' + SYM[e].toLowerCase() + ' '];
     return { tag: 'Unknown mixture', prompt: 'This unknown sample is a <b>mixture of two elements</b>. Compare its lines with the known spectra. Which <b>two</b> elements are in it?',
@@ -2511,7 +2546,7 @@ Object.assign(K5a, {
   errors() {
     return pickErr([
       { prompt: 'In the empirical formula lab, some of the magnesium in the middle of the pile <b>never reacted</b> (incomplete combustion).', meas: [['Mass of the Mg<sub>x</sub>O<sub>y</sub> compound (crucible + cover + compound)', ['compound', 'product', 'oxide', 'mgo', 'mgxoy', 'crucible cover compound']], ['Mass of Mg used', ['mass of mg', 'mg used', 'magnesium used'], ['mass of mg', 'mg used']]], dir: 'low', res: 'high', result: 'mass percent of Mg (based on the data)', sol: 'Unreacted Mg gains no oxygen, so the <b>compound weighs too little</b> and the mass of oxygen is too low. % Mg = g Mg ÷ g compound, with a smaller bottom → <b>% Mg too high</b> (the formula shows too much Mg). Break up the ash and keep heating to constant mass.', video: 'empirical' },
-      { prompt: 'After weighing the empty crucible, a student picks it up with <b>bare fingers</b> (no gloves) before the final weighings.', meas: [['Mass of crucible + cover + compound', ['compound', 'product', 'oxide', 'final', 'crucible']], ['Mass of oxygen in the air', ['air']]], dir: 'high', res: 'high', result: 'mass of oxygen (and % O)', sol: 'Finger oils add mass, so the <b>later weighings are too high</b>. Mass of O = (crucible + compound) − (crucible + Mg) comes out <b>higher</b>, so % O is too high. The manual says wear gloves after the first mass.', video: 'empirical' },
+      { prompt: 'After weighing the crucible + magnesium, a student picks the crucible up with <b>bare fingers</b> (no gloves) before the final weighing of the crucible + compound.', meas: [['Mass of crucible + cover + compound', ['compound', 'product', 'oxide', 'final', 'crucible']], ['Mass of oxygen in the air', ['air']]], dir: 'high', res: 'high', result: 'mass of oxygen (and % O)', sol: 'Finger oils add mass, so the <b>final weighing is too high</b>. Mass of O = (crucible + compound) − (crucible + Mg) comes out <b>higher</b>, so % O is too high. The manual says wear gloves after the first mass.', video: 'empirical' },
       { prompt: 'Heating in open air, a little of the magnesium reacts with <b>nitrogen</b> (N<sub>2</sub>) instead of oxygen. Mg<sub>3</sub>N<sub>2</sub> adds less mass per Mg than MgO does.', meas: [['Mass of the Mg<sub>x</sub>O<sub>y</sub> compound', ['compound', 'product', 'oxide', 'crucible']], ['Mass of Mg used', ['mass of mg', 'mg used'], ['mg used']]], dir: 'low', res: 'low', result: 'calculated mass of oxygen', sol: 'Mg that becomes nitride gains less mass than it would as oxide, so the <b>compound weighs less</b> and the calculated <b>mass of oxygen is lower</b> (the Mg : O ratio looks Mg-heavy). The manual calls this unavoidable in open air.', video: 'empirical' }
     ], '% Mg = (g Mg ÷ g compound) × 100 &nbsp;&nbsp; g O = g compound − g Mg');
   }
@@ -2530,7 +2565,7 @@ Object.assign(K6a, {
     const m = pick(KIT_MOLS), cnt = {}; m[2].forEach(e => (cnt[e] = (cnt[e] || 0) + 1));
     const desc = `one <b>${KIT[m[1]]}</b> ball in the middle, bonded to ${Object.keys(cnt).map(e => `${cnt[e]} <b>${KIT[e]}</b> ball${cnt[e] > 1 ? 's' : ''}`).join(' and ')}${m[5] ? ` (with ${m[5]}: long flexible connectors)` : ''}`;
     return { tag: 'Model kit → formula', prompt: `Your instructor hands you a model: ${desc}. Every hole is filled. Write the <b>chemical formula</b>.`, ref: tableHTML(Object.keys(KIT).map(e => [KIT[e][0].toUpperCase() + KIT[e].slice(1), e])),
-      parts: [{ type: 'formula', accept: [m[0], ...(m[0] === 'CH2Cl2' ? ['CCl2H2', 'CH2Cl2'] : m[0] === 'CH2O' ? ['H2CO', 'COH2'] : m[0] === 'HOCl' ? ['HClO', 'ClOH'] : m[0] === 'NH2Cl' ? ['NClH2', 'ClNH2'] : m[0] === 'OCl2' ? ['Cl2O'] : m[0] === 'CH3Br' ? ['CH3Br', 'CBrH3'] : m[0] === 'CH3I' ? ['CH3I', 'CIH3'] : [])], ans: fhtml(m[0]) }],
+      parts: [{ type: 'formula', accept: [m[0], ...(m[0] === 'CH2Cl2' ? ['CCl2H2', 'CH2Cl2'] : m[0] === 'CH2O' ? ['H2CO', 'COH2'] : m[0] === 'HOCl' ? ['HClO', 'ClOH'] : m[0] === 'NH2Cl' ? ['NClH2', 'ClNH2'] : m[0] === 'OCl2' ? ['Cl2O'] : m[0] === 'CH3Br' ? ['CH3Br', 'CBrH3'] : m[0] === 'CH3I' ? ['CH3I', 'CIH3'] : m[0] === 'HCN' ? ['CHN', 'NCH', 'CNH'] : [])], ans: fhtml(m[0]) }],
       hint: 'Use the kit’s color key: white H, black C, red O, green Cl, blue N, orange Br, purple I.', solution: `Color key → <b>${fhtml(m[0])}</b>.`, video: 'lewis', skill: 'read' };
   },
   egGeom() {
@@ -2567,7 +2602,7 @@ Object.assign(K7a, {
   errors() {
     return pickErr([
       { prompt: 'For the exothermic Na<sub>2</sub>CO<sub>3</sub> trial, a student forgets the cardboard <b>lid</b>, and heat escapes into the room.', meas: [['Final temperature (so ΔT)', ['temp', 'final', 'delta t', 'change in temp', 'dt', 'degree']], ['Mass of the solution', ['mass']]], dir: 'low', res: 'low', result: 'size of q (heat released)', sol: 'Heat lost to the room never warms the water, so the <b>final temperature and ΔT read too low</b>. q = m·c·ΔT comes out <b>smaller</b> than the true heat released.', video: 'calorimetry' },
-      { prompt: 'A student weighs the calorimeter + solution <b>with the cardboard lid on</b>, but weighed the empty calorimeter without it.', meas: [['Mass of calorimeter + solution', ['mass', 'weigh', 'balance', 'grams']], ['Temperature change', ['temp']]], dir: 'high', res: 'high', result: 'heat of solution, q', sol: 'The lid’s mass sneaks into the mass of solution, so <b>m is too high</b> and q = m·c·ΔT comes out <b>higher</b>. The manual says never include the lid.', video: 'calorimetry' },
+      { prompt: 'A student weighs the calorimeter + solution <b>with the cardboard lid on</b>, but weighed the empty calorimeter without it.', meas: [['Mass of calorimeter + solution', ['mass', 'weigh', 'balance', 'grams']], ['Temperature change', ['temp']]], dir: 'high', res: 'high', result: 'size of q', sol: 'The lid’s mass sneaks into the mass of solution, so <b>m is too high</b> and the size of q = m·c·ΔT comes out <b>higher</b>. The manual says never include the lid.', video: 'calorimetry' },
       { prompt: 'In Part 2, a student records the final temperature <b>before all the ice has melted</b>.', meas: [['Final temperature of the water', ['temp', 'final', 'delta t', 'degree']], ['Mass of ice', ['ice', 'mass']]], dir: 'high', res: 'low', result: 'size of q<sub>water</sub> (heat lost by the water)', sol: 'The water hasn’t cooled all the way yet, so the <b>final temperature is too high</b>, ΔT is too small, and |q<sub>water</sub>| comes out <b>lower</b>. Stir until the ice is gone, then record the lowest temperature.', video: 'calorimetry' }
     ], 'q = m·c·ΔT');
   }
@@ -2598,7 +2633,7 @@ Object.assign(K8a, {
 Object.assign(K9a, {
   molality() {
     const V = pick([25, 50]), a = rnd(V === 50 ? 38 : 26, V === 50 ? 46 : 32, 4), salt = rnd(V === 50 ? 4.5 : 2.2, V === 50 ? 6.0 : 3.0, 4), b = +(a + salt).toFixed(4), dens = 1 + salt / V * 0.68, c = +(a + dens * V).toFixed(4);
-    const solv = +(c - b).toFixed(4), mol = salt / molarMass('NaCl'), mo = mol / (solv / 1000), sf = Math.min(sfCount(salt.toFixed(4)), sfCount(solv.toFixed(4)));
+    const solv = +(c - b).toFixed(4), mol = salt / molarMass('NaCl'), mo = mol / (solv / 1000), sf = Math.min(4, sfCount(salt.toFixed(4)), sfCount(solv.toFixed(4))); // 58.44 g/mol has 4 sig figs
     return { tag: 'Molality (report sheet)', prompt: `Use the data from the Solutions lab to find the <b>mass of solvent</b> and the <b>molality</b> of “Solution A” (NaCl, ${molarMass('NaCl').toFixed(2)} g/mol).`, eq: 'Molality (m) = mol solute ÷ kg solvent',
       ref: tableHTML([[`Mass of ${V}-mL volumetric flask + stopper (empty)`, `${a.toFixed(4)} g`], [`Mass of ${V}-mL volumetric flask + stopper + NaCl`, `${b.toFixed(4)} g`], [`Mass of ${V}-mL volumetric flask + stopper + “Solution A”`, `${c.toFixed(4)} g`]]),
       parts: [num(solv, { dp: 4, unit: 'g', tol: 0.00011, label: 'Mass of solvent (water)', slip: x => Math.abs(x - (c - a)) < 0.0002 ? 'That is the mass of the whole solution. Solvent = solution − solute.' : '' }), num(mo, { sf, unit: 'mol/kg', label: 'Molality of Solution A', slip: x => Math.abs(x - mol / (V / 1000)) < mol / (V / 1000) * 0.01 ? 'That is molarity (per L of solution). Molality is per <b>kg of solvent</b>.' : Math.abs(x - mol / solv) < mol / solv * 0.01 ? 'Convert the grams of solvent to kilograms first.' : '' })],
@@ -2606,8 +2641,8 @@ Object.assign(K9a, {
   },
   errors() {
     return pickErr([
-      { prompt: 'Making Solution A, a student adds water <b>past the line</b> on the 50-mL volumetric flask, but still uses 50.00 mL in the calculation.', meas: [['Volume of the solution', ['volume', ' ml', 'line', 'water']], ['Mass of NaCl', ['nacl', 'salt', 'solute']]], dir: 'high', res: 'high', result: 'calculated molarity, compared to the real molarity', sol: 'The real volume is <b>more than 50.00 mL</b>, so the real solution is more dilute. The molarity calculated with 50.00 mL is <b>higher</b> than the true value. If you overshoot the line, start over.', video: 'molarity' },
-      { prompt: 'Making Solution B, a student draws Solution A into the 10-mL volumetric pipet but stops <b>below the line</b>, then delivers it anyway.', meas: [['Volume of Solution A transferred', ['volume', 'pipet', ' ml', 'transfer', 'solution a']], ['Mass of the empty flask', ['empty']]], dir: 'low', res: 'low', result: 'real molarity of Solution B, compared to the value calculated with 10.00 mL', sol: 'Less than 10.00 mL of Solution A went in, so fewer moles of NaCl are in flask B. Its <b>real molarity is lower</b> than the calculated value. Fill to the line, bottom of the meniscus.', video: 'dilution' }
+      { prompt: 'Making Solution A, a student adds water <b>past the line</b> on the 50-mL volumetric flask, but still uses 50.00 mL in the calculation.', meas: [['Volume of the solution', ['volume', ' ml', 'line', 'water']], ['Mass of NaCl', ['nacl', 'salt', 'solute']]], dir: 'low', dirLabel: 'The 50.00 mL used in the calculation, compared with the real volume, is…', res: 'high', result: 'calculated molarity, compared to the real molarity', sol: 'The real volume is <b>more than 50.00 mL</b>, so the 50.00 mL in the calculation is too low and the real solution is more dilute. The molarity calculated with 50.00 mL is <b>higher</b> than the true value. If you overshoot the line, start over.', video: 'molarity' },
+      { prompt: 'Making Solution B, a student draws Solution A into the 10-mL volumetric pipet but stops <b>below the line</b>, then delivers it anyway.', meas: [['Volume of Solution A transferred', ['volume', 'pipet', ' ml', 'transfer', 'solution a']], ['Mass of the empty flask', ['empty']]], dir: 'high', dirLabel: 'The 10.00 mL used in the calculation, compared with the volume really delivered, is…', res: 'low', result: 'real molarity of Solution B, compared to the value calculated with 10.00 mL', sol: 'Less than 10.00 mL of Solution A went in, so the 10.00 mL in the calculation is too high and fewer moles of NaCl are in flask B. Its <b>real molarity is lower</b> than the calculated value. Fill to the line, bottom of the meniscus.', video: 'dilution' }
     ], 'M = mol solute ÷ L solution');
   }
 });
@@ -2666,7 +2701,7 @@ Object.assign(K0a, {
       ['You are told to check a smell (like NH<sub>3</sub> in the Types of Reactions lab). How do you smell it?', ['Hold it at arm’s length and waft (fan) the vapors toward you', 'Put your nose right over the tube and breathe in', 'Taste a tiny drop'], 'Never sniff directly. <b>Waft</b> the vapors toward your nose with your hand.', [['waft', 'fan', 'wave', 'arm s length', 'arms length', 'arm length', 'hand']], ['taste', 'directly']],
       ['How do you fill a volumetric pipet?', ['With a pipet bulb or pump, never by mouth', 'By mouth, like a straw', 'Pour the liquid into the top'], 'Use a <b>pipet bulb or pump</b>. Never pipet by mouth, and don’t pull liquid up into the bulb.', [['bulb', 'pump', 'filler']], ['like a straw', 'pour']],
       ['A crucible just came off the Bunsen burner. Where do you put it to cool?', ['On the wire mesh (gauze), moved with crucible tongs', 'Directly on the countertop', 'On a paper towel'], 'Hot things go on the <b>wire mesh</b>, moved with <b>tongs</b>. A hot crucible burns the counter or paper.', [['mesh', 'gauze', 'wire', 'clay triangle', 'triangle']], ['counter', 'paper']],
-      ['A small amount of acid spills on the bench. What do you use to neutralize it before wiping it up?', ['Sodium bicarbonate (baking soda)', 'Citric acid', 'More acid'], 'Acid spills are neutralized with <b>sodium bicarbonate</b> (baking soda). Base spills use citric acid.', [['bicarbonate', 'baking soda', 'nahco3', 'sodium hydrogen carbonate']], ['citric']]
+      ['A small amount of acid spills on the bench. What do you use to neutralize it before wiping it up?', ['Sodium bicarbonate (baking soda)', 'Citric acid (a weak acid)', 'More acid'], 'Acid spills are neutralized with <b>sodium bicarbonate</b> (baking soda). Base spills use citric acid.', [['bicarbonate', 'baking soda', 'nahco3', 'sodium hydrogen carbonate']], ['citric']]
     ]);
     return { tag: 'Safety & technique', prompt: q[0], parts: [conceptPart(q[1][0], q[1].slice(1), { kw: q[3], nokw: q[4] })], hint: 'Think about the Lab Safety Contract at the front of your manual.', solution: q[2], video: 'practical1', skill: 'concept' };
   }
@@ -2774,6 +2809,9 @@ function whyFor(q, p) {
 function makeQ(labId, kind) {
   const lab = labById(labId), kinds = Object.keys(lab.K), k = kind || pick(kinds);
   const q = lab.K[k](); q.lab = labId; q.kind = k; q.labName = lab.name;
+  // negative numbers in worked answers use a real minus sign (−), never a hyphen; text only, tags are left alone
+  const minus = h => (typeof h === 'string' ? h.split(/(<[^>]*>)/).map(t => (t[0] === '<' ? t : t.replace(/(^|[\s(=×÷→:])-(?=\d)/g, '$1−'))).join('') : h);
+  q.solution = minus(q.solution); q.hint = minus(q.hint); q.parts.forEach(p => { if (p.type === 'num') p.ans = minus(p.ans); });
   q.parts.forEach(p => { if (p.type === 'choice' && p.options) { const w = whyFor(q, p); if (Object.keys(w).length) p.why = Object.assign(p.why || {}, w); } });
   if (q.skill === 'read') q.parts.forEach(p => { if (p.type === 'num') p.reading = true; });
   if (q.skill === 'read' && k !== 'volumetric') q.parts.forEach(p => { if (p.type === 'num' && p.unit && p.unit !== 'g' && RTOL[p.unit]) { const r = p.rtol != null ? p.rtol : RTOL[p.unit](p); if (p.tol == null || p.tol < r) p.tol = r; } });
@@ -2932,7 +2970,7 @@ const ACH = [
   ['rainbow', 'All Three Colors', 'Finish a mock as Version A, B and C', 'stars', P => P.versions.A && P.versions.B && P.versions.C],
   ['vlab', 'Bench Hand', 'Finish 4 different Virtual Labs', 'burette', P => Object.keys(P.vlab || {}).length >= 4],
   ['phet', 'PhET Explorer', 'Finish 6 PhET bench tasks', 'molecule', P => Object.keys(P.benchDone).length >= 6],
-  ['alllabs', 'Every Lab', 'Get a question right in every lab on your list', 'trophy', P => labSet().every(id => P.lab[id] && P.lab[id].c > 0)]
+  ['alllabs', 'Every Lab', 'Get a question right in every lab on your list', 'trophy', P => labSet().length > 0 && labSet().every(id => P.lab[id] && P.lab[id].c > 0)]
 ];
 
 const state = { mode: null, setAll: true, sel: new Set(), q: null, tries: 0, helped: false, done: false, logged: false, sim: null };
@@ -2944,7 +2982,7 @@ function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forE
 const labPick = () => P.labPick || { kind: 'all' };
 const labIds = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o && o.labs.length ? o.labs : LABS.map(l => l.id); } if (k.kind === 'link') return k.labs && k.labs.length ? k.labs : LABS.map(l => l.id); return null; };
 const rawIds = () => { const k = labPick(); return k.kind === 'sec' ? (SECTIONS.find(x => x.key === k.sec) || {}).labs || [] : labIds() || []; };
-const labSet = () => { const k = labPick(), li = labIds(); if (li) return li.filter(id => labById(id)); const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
+const labSet = () => { const k = labPick(), li = labIds(); if (li) { const f = li.filter(id => labById(id)); return f.length ? f : LABS.map(l => l.id); } const ids = k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).labs || DAN_LABS) : k.kind === 'dan' ? DAN_LABS : k.kind === 'custom' && k.custom && k.custom.length ? k.custom : LABS.map(l => l.id); return ids.filter(id => labById(id)); };
 const labPickName = () => { const k = labPick(); if (k.kind === 'prof') { const o = otherBy(k.prof); return o ? `${o.name}’s class` : 'Your class'; } if (k.kind === 'link') return k.prof ? `${k.prof}’s class` : 'Your class’s labs'; return k.kind === 'sec' ? ((SECTIONS.find(x => x.key === k.sec) || {}).name || 'Dr. Dan’s class') : k.kind === 'dan' ? 'Dr. Dan’s class' : k.kind === 'custom' ? 'Labs you chose' : 'All CHEM 3A labs'; };
 const profOf = () => { const k = labPick(); if (k.kind === 'prof') return (otherBy(k.prof) || {}).name || ''; if (k.kind === 'link') return k.prof || ''; if (k.kind === 'sec') return k.sec === '25787' ? 'Dr. Dan / Professor Xiong' : 'Dr. Dan'; if (k.kind === 'dan') return 'Dr. Dan'; return ''; };
 const labTitle = id => `Exp ${id} · ${labById(id).name}`;
@@ -2972,7 +3010,7 @@ function qHTML(q, opt = {}) {
 }
 function partsHTML(parts, key, mock, saved = []) {
   return parts.map((p, i) => {
-    const id = `${key}-${i}`, v = saved[i] || {}, lab = p.label ? `<label for="${id}">${p.label}</label>` : '';
+    const id = `${key}-${i}`, v = saved[i] || {}, lab = p.label ? `<label for="${id}">${p.label}</label>` : '', aname = p.label ? esc(p.label.replace(/<[^>]+>/g, '')) : parts.length > 1 ? `Answer ${i + 1}` : 'Your answer';
     let inner = '';
     if (p.type === 'num') {
       inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-smart="num" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="${mock ? 'number' : 'Type your answer'}" value="${esc(SMART && v.val ? smartFormat('num', v.val) : v.val || '')}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}">` +
@@ -2980,13 +3018,13 @@ function partsHTML(parts, key, mock, saved = []) {
     } else if (p.type === 'choice' && lvl() !== 'beg') {
       inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-typed="1" autocomplete="off" autocapitalize="off" spellcheck="true" placeholder="${p.ph || (p.kw ? 'Describe it in your own words' : 'Type your answer')}" value="${esc(tv(v.val))}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}"></div>`;
     } else if (p.type === 'choice') {
-      inner = mock ? `<select id="${id}" data-pi="${i}"><option value="">Choose…</option>${p.options.map((o, k) => `<option value="${k}" ${String(v.val) === String(k) ? 'selected' : ''}>${'abcdefgh'[k]}. ${o.replace(/<[^>]+>/g, '')}</option>`).join('')}</select>`
-        : `<div class="opts" role="radiogroup">${p.options.map((o, k) => `<button type="button" class="opt" data-pi="${i}" data-oi="${k}" role="radio" aria-checked="false">${o}</button>`).join('')}</div>`;
+      inner = mock ? `<select id="${id}" data-pi="${i}" aria-label="${aname}"><option value="">Choose…</option>${p.options.map((o, k) => `<option value="${k}" ${String(v.val) === String(k) ? 'selected' : ''}>${'abcdefgh'[k]}. ${o.replace(/<[^>]+>/g, '')}</option>`).join('')}</select>`
+        : `<div class="opts" role="radiogroup" id="${id}" aria-label="${aname}">${p.options.map((o, k) => `<button type="button" class="opt" data-pi="${i}" data-oi="${k}" role="radio" aria-checked="false">${o}</button>`).join('')}</div>`;
     } else if (p.type === 'coef') {
       const cells = p.terms.map((tm, k) => `${k === p.nr ? '<span>→</span>' : k ? '<span>+</span>' : ''}<input type="text" data-pc="${i}" data-k="${k}" inputmode="numeric" autocomplete="off" aria-label="Coefficient for ${tm}" value="${esc((v.val || '').split(',')[k] || '')}"><span>${fhtml(tm.replace(/\((s|l|g|aq)\)$/, ''))}</span>`).join(' ');
       inner = `<div class="coef" id="${id}">${cells}</div>`;
     } else {
-      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" ${p.type === 'formula' ? 'data-smart="formula" ' : p.type === 'eq' ? 'data-smart="eq" ' : ''}autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : p.type === 'eq' ? 'e.g. 2HCl(aq) + Na2CO3(aq) -> …' : p.ph || 'Type your answer'}" value="${esc(v.val || '')}"></div>`;
+      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" ${p.type === 'formula' ? 'data-smart="formula" ' : p.type === 'eq' ? 'data-smart="eq" ' : ''}autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${p.type === 'formula' ? 'Formula, like CaCl2' : p.type === 'eq' ? 'e.g. 2HCl(aq) + Na2CO3(aq) -> …' : p.ph || 'Type your answer'}" value="${esc(v.val || '')}" aria-label="${aname}"></div>`;
     }
     return `<div class="part" data-part="${i}">${lab}${inner}<div class="pnote"></div></div>`;
   }).join('');
@@ -3013,10 +3051,39 @@ const partAns = p => (p.type === 'choice' ? (p.ans || p.options[p.ok]) : p.ans !
 /* ---------- practice mode ---------- */
 function renderLabTiles() {
   const set = labSet();
-  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur || !['all', 'custom', 'dan'].includes(labPick().kind) ? '' : `<span class="oldtag">${l.other ? 'not on Dr. Dan’s list' : 'earlier manual'}</span>`}${s ? `<small>${s.c}/${s.a} right</small>` : ''}</button>`; }).join('');
+  $('labTiles').classList.toggle('mini', !!state.mini); if ($('bigTiles')) { $('bigTiles').hidden = !state.mini; $('bigTiles').onclick = () => { state.mini = false; renderLabTiles(); }; } $('labTiles').innerHTML = set.map(id => { const l = labById(id), on = state.sel.has(id), s = P.lab[id]; return `<button type="button" class="cat${on ? ' on' : ''}${l.cur ? '' : ' old'}" data-lab="${id}" aria-pressed="${on}"><span class="tick" aria-hidden="true">${on ? ico('check') : ''}</span><img src="assets/labs/${id}.webp" onerror="this.onerror=null;this.src='${BADGE(l.badge)}'" alt="" loading="lazy"><span class="labno">Exp ${id}</span><b>${l.name}</b><small>${l.blurb}</small>${l.cur || !['all', 'custom', 'dan'].includes(labPick().kind) ? '' : `<span class="oldtag">${l.other ? 'not on Dr. Dan’s list' : 'earlier manual'}</span>`}${tileMeter(id)}</button>`; }).join('');
 }
+/* ---------- mastery: which question types are solid, and which come back for a second look ---------- */
+const famKey = (lab, kind) => lab + '.' + kind;
+const isSolid = (lab, kind) => { const h = (P.fam || {})[famKey(lab, kind)]; return !!h && h[h.length - 1] === 2; };
+const wpick = (arr, w) => { const ws = arr.map(w); let r = Math.random() * ws.reduce((a, b) => a + b, 0); for (let i = 0; i < arr.length; i++) { r -= ws[i]; if (r <= 0) return arr[i]; } return arr[arr.length - 1]; };
+function queueRedo(lab, kind, wait) { if (!labById(lab) || !labById(lab).K[kind]) return; P.redo = P.redo || []; const x = P.redo.find(r => r.lab === lab && r.kind === kind); if (x) x.wait = wait; else { P.redo.push({ lab, kind, wait }); if (P.redo.length > 12) P.redo.shift(); } }
+// score: 2 = right on the first try with no help, 1 = right after a retry or a hint, 0 = answer shown
+function recordType(q, score) {
+  if (state.scored) return ''; state.scored = true;
+  P.fam = P.fam || {}; const k = famKey(q.lab, q.kind), h = P.fam[k] || (P.fam[k] = []); h.push(score); if (h.length > 3) h.shift();
+  if (score === 2) { const had = (P.redo || []).some(r => r.lab === q.lab && r.kind === q.kind); P.redo = (P.redo || []).filter(r => !(r.lab === q.lab && r.kind === q.kind)); return had ? '<div class="review-line"><b>Second look cleared.</b> You did this type on your own.</div>' : ''; }
+  queueRedo(q.lab, q.kind, 3);
+  return `<div class="review-line">This type will come back in a few questions for a <b>second look</b>${score ? ', so you can do it with no help' : ''}.</div>`;
+}
+function tileMeter(id) {
+  const ks = Object.keys(labById(id).K), tried = ks.filter(k => (P.fam || {})[famKey(id, k)]).length, solid = ks.filter(k => isSolid(id, k)).length;
+  return tried ? `<span class="meter" aria-hidden="true"><i style="width:${Math.round(solid / ks.length * 100)}%"></i></span><span class="solid">${solid} of ${ks.length} types solid</span>` : '';
+}
+// Hint 2 for calculations: the worked answer with each result replaced by ?, so the student still does the arithmetic and rounding.
+function setupHint(q) {
+  if (q.skill !== 'calc' || !q.solution || !/=/.test(q.solution.replace(/<[^>]+>/g, '')) || !/<b>/.test(q.solution)) return '';
+  const B = '<b>(?:[^<]|<su[bp]>[^<]*</su[bp]>)*</b>';
+  const out = q.solution.replace(new RegExp('(=\\s*)[^=<>]*?→\\s*' + B, 'g'), '$1<b>?</b>').replace(new RegExp(B, 'g'), '<b>?</b>');
+  // a later step may reuse an earlier answer: hide that too
+  const keys = (q.parts.length > 1 ? q.parts : []).filter(p => p.type === 'num' && p.ans != null).map(p => String(p.ans).replace(/<[^>]+>/g, '').trim()).filter(k => k.length > 1).sort((x, y) => y.length - x.length);
+  const hide = t => keys.reduce((t2, k) => t2.replace(new RegExp('(^|[^\\d.,])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d]|\\.\\d)', 'g'), '$1(your answer)'), t);
+  const safe = out.split(/(<[^>]*>)/).map(t => (t[0] === '<' ? t : hide(t))).join('');
+  return /\d/.test(safe.replace(/<[^>]+>/g, '')) ? safe : '';
+}
+function nextQ(force) { newQuestion(force); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} try { const i = $('qParts').querySelector('input'); (i && matchMedia('(hover:hover)').matches ? i : $('qBox')).focus({ preventScroll: true }); } catch (e) {} }
 function toggleLab(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderLabTiles(); save(); if (!state.q || state.done || !state.sel.has(state.q.lab)) newQuestion(); }
-function newQuestion() {
+function newQuestion(force) {
   const pool = [...state.sel].filter(id => labSet().includes(id));
   if (!pool.length) { $('emptyBox').hidden = false; $('playArea').hidden = true; state.q = null; return; }
   // Never the same kind of question twice in a row (same skill counts even from a different lab).
@@ -3029,12 +3096,17 @@ function newQuestion() {
   let r = Math.random() * weights.reduce((a, b) => a + b, 0), lab = labs[0];
   for (let i = 0; i < labs.length; i++) { r -= weights[i]; if (r <= 0) { lab = labs[i]; break; } }
   const kinds = depth ? freshK(lab, depth) : Object.keys(labById(lab).K);
-  let q; for (let i = 0; i < 6; i++) { q = makeQ(lab, pick(kinds)); if (!state.q || q.tag !== state.q.tag) break; }
+  // Second look: a type you missed or needed help on comes back after a few other questions, with new numbers.
+  let q; P.redo = (P.redo || []).filter(x => labById(x.lab) && labById(x.lab).K[x.kind]);
+  const due = force || P.redo.find(x => x.wait <= 0 && pool.includes(x.lab) && !(state.q && state.q.lab === x.lab && state.q.kind === x.kind));
+  P.redo.forEach(x => x.wait--);
+  if (due) { lab = due.lab; q = makeQ(lab, due.kind); q.again = P.redo.some(x => x.lab === lab && x.kind === due.kind); }
+  else for (let i = 0; i < 6; i++) { q = makeQ(lab, wpick(kinds, k => (isSolid(lab, k) ? 0.35 : 1))); if (!state.q || q.tag !== state.q.tag) break; }
   state.recent = [famOf(lab, q.kind), ...recent].slice(0, 3);
-  Object.assign(state, { q, tries: 0, helped: false, done: false, logged: false });
+  Object.assign(state, { q, tries: 0, helped: false, done: false, logged: false, scored: false, hintN: 0 }); try { $('hintBtn').lastChild.textContent = 'Hint'; } catch (e) {}
   $('emptyBox').hidden = true; $('playArea').hidden = false;
   $('playTitle').textContent = 'Practice';
-  $('labTag').textContent = labTitle(lab); $('topicTag').textContent = q.tag;
+  $('labTag').textContent = labTitle(lab); $('topicTag').textContent = q.tag; $('againTag').hidden = !q.again; $('againBtn').hidden = true;
   $('qBox').innerHTML = qHTML(q); $('qParts').innerHTML = partsHTML(q.parts, 'pq', false);
   $('feedback').className = 'feedback'; $('feedback').innerHTML = ''; $('hintBox').hidden = true; if (lvl() === 'beg' && q.skill === 'calc' && q.hint) { $('hintBox').hidden = false; $('hintBox').innerHTML = `<b>Beginner tip:</b> ${q.hint}`; } $('nextBtn').hidden = true; $('checkBtn').hidden = false;
   $('simBtn').hidden = !PHET.some(s => s.labs.includes(lab));
@@ -3045,8 +3117,9 @@ function markParts(root, res, parts, reveal) {
   root.querySelectorAll('.part').forEach((el, i) => {
     const r = res[i]; el.classList.remove('good', 'bad', 'warn'); if (!r || r.empty) return;
     el.classList.add(r.ok ? (r.warn ? 'warn' : 'good') : 'bad');
-    let note = r.ok ? r.warn || '' : r.note || (r.valueOk === false ? 'Check this value.' : '');
-    if (reveal && !r.ok) note = `Answer: <b>${partAns(parts[i])}</b>` + (note ? ` · ${note}` : '');
+    let note = r.ok ? r.warn || '' : r.note || (r.valueOk === false ? 'Check this value.' : 'Not this one. Try again.');
+    el.querySelectorAll('input,select').forEach(x => x.setAttribute('aria-invalid', r.ok ? 'false' : 'true'));
+    if (reveal && !r.ok) note = `Answer: <b>${partAns(parts[i])}</b>` + (r.note ? ` · ${r.note}` : '');
     el.querySelector('.pnote').innerHTML = note;
     if (parts[i].type === 'choice') el.querySelectorAll('.opt').forEach(b => { b.classList.remove('right', 'wrong'); if (b.classList.contains('sel')) b.classList.add(r.ok ? 'right' : 'wrong'); });
   });
@@ -3063,26 +3136,26 @@ function check() {
     let xp = 10 + (state.tries === 0 ? 5 : 0) + (!state.helped ? 5 : 0); P.streak++; P.best = Math.max(P.best, P.streak);
     if (!state.logged) { P.tried++; bumpLab(q.lab, true); ddLog('Practice', q, state.tries === 0); state.logged = true; }
     P.correct++; P.xp += xp; P.skill[q.skill] = (P.skill[q.skill] || 0) + 1;
-    fb.className = 'feedback good'; fb.innerHTML = `${tock('correct', 'fb-tock')}<b>Nice work!</b> <span class="xp-pop">+${xp} XP</span>${res.some(r => r.warn) ? '<div class="pnote" style="background:#fff3c4;color:#7a5a00;border-radius:8px;padding:6px 10px;margin-top:6px;font-weight:700">Your number is right. Fix the sig figs (yellow box): the practical takes points off for them.</div>' : ''}<div class="sol">${q.solution}</div>`;
-    finish();
+    fb.className = 'feedback good'; fb.innerHTML = `${tock('correct', 'fb-tock')}<b>Nice work!</b> <span class="xp-pop">+${xp} XP</span>${recordType(q, state.tries === 0 && !state.helped ? 2 : 1)}${res.some(r => r.warn) ? '<div class="pnote" style="background:#fff3c4;color:#7a5a00;border-radius:8px;padding:6px 10px;margin-top:6px;font-weight:700">Your number is right. Fix the sig figs or decimal places (the box marked !): the practical takes points off for them.</div>' : ''}<div class="sol">${q.solution}</div>`;
+    finish(state.tries > 0 || state.helped);
   } else {
     state.tries++;
-    if (!state.logged) { P.tried++; bumpLab(q.lab, false); const slip = res.find(r => !r.ok); ddLog('Practice', q, false, slip && slip.valueOk ? (slip.precOk === false ? 'sigfigs' : 'units') : 'value'); state.logged = true; }
+    if (!state.logged) { P.tried++; bumpLab(q.lab, false); const slip = res.find(r => !r.ok); ddLog('Practice', q, false, slip && slip.valueOk ? (slip.precOk === false ? 'sigfigs' : 'units') : 'value'); state.logged = true; queueRedo(q.lab, q.kind, 3); }
     P.streak = 0;
-    fb.className = 'feedback bad'; fb.innerHTML = `${tock('oops', 'fb-tock')}<b>Not quite.</b> Fix the red part${res.filter(r => !r.ok).length > 1 ? 's' : ''} and check again${state.tries >= 2 ? ', or tap <b>Show answer</b>' : ''}.`;
+    fb.className = 'feedback bad'; fb.innerHTML = `${tock('oops', 'fb-tock')}<b>Not quite.</b> Fix the part${res.filter(r => !r.ok).length > 1 ? 's' : ''} marked ✗ and check again${state.tries >= 2 ? ', or tap <b>Show answer</b>' : ''}.`;
   }
   renderStats(); save(); checkAch();
 }
 function bumpLab(id, ok) { const s = P.lab[id] || (P.lab[id] = { c: 0, a: 0 }); s.a++; if (ok) s.c++; }
-function finish() { state.done = true; $('nextBtn').hidden = false; $('checkBtn').hidden = true; renderLabTiles(); }
+function finish(offerAgain) { const had = $('play').contains(document.activeElement); state.done = true; $('nextBtn').hidden = false; $('againBtn').hidden = !offerAgain; $('checkBtn').hidden = true; renderLabTiles(); if (had) try { $('nextBtn').focus({ preventScroll: true }); } catch (e) {} }
 function showSolution() {
   const q = state.q; if (!q || state.done) return;
   if (!state.logged) { P.tried++; bumpLab(q.lab, false); ddLog('Practice', q, false, 'revealed'); state.logged = true; }
   P.streak = 0; state.helped = true;
   const vals = readParts($('qParts'), q.parts), res = gradeAll(q.parts, vals, false);
   markParts($('qParts'), res.map(r => (r.empty ? { ok: false, note: '' } : r)), q.parts, true);
-  const fb = $('feedback'); fb.className = 'feedback info'; fb.innerHTML = `${tock('thinking', 'fb-tock')}<b>Here’s how to do it:</b><div class="sol">${q.solution}</div>`;
-  finish(); renderStats(); save();
+  const fb = $('feedback'); fb.className = 'feedback info'; fb.innerHTML = `${tock('thinking', 'fb-tock')}<b>Here’s how to do it:</b><div class="sol">${q.solution}</div>${recordType(q, 0)}`;
+  finish(true); renderStats(); save();
 }
 
 /* ---------- mock practical ---------- */
@@ -3187,7 +3260,7 @@ function stationIdx() { return mock.order[mock.pos]; }
 function saveCurrent() { if (!mock) return; const root = $('mockRun').querySelector('.sheet'); if (!root) return; const i = stationIdx(); mock.answers[i] = readParts(root, mock.stations[i].versions[mock.ver].parts); }
 function mockBar(label, clock) {
   const n = mock.stations.length, dots = mock.order.map((s, k) => `<i class="${k < mock.pos ? 'done' : k === mock.pos ? 'now' : ''}"></i>`).join('');
-  return `<div class="mockbar"><span class="vtag v${mock.ver.toLowerCase()}">Version ${mock.ver}</span><span class="st">${label}</span><span class="dots" aria-hidden="true">${dots}</span><span class="clock" id="clock">${clock}</span><button type="button" class="btn" id="quitMock" style="min-height:40px;padding:6px 12px">Quit</button></div>`;
+  return `<div class="mockbar"><span class="vtag v${mock.ver.toLowerCase()}">Version ${mock.ver}</span><span class="st">${label}</span><span class="dots" aria-hidden="true">${dots}</span><span class="clock" id="clock" role="timer" aria-label="Time left">${clock}</span><button type="button" class="btn" id="quitMock" style="min-height:40px;padding:6px 12px">Quit</button></div>`;
 }
 function renderStation() {
   clearInterval(tick);
@@ -3196,15 +3269,16 @@ function renderStation() {
   const mine = s.versions[mock.ver];
   $('mockRun').innerHTML = mockBar(`Station ${i + 1} of ${n}`, mock.timer === 'off' ? '––:––' : '4:00') +
     `<div class="station"><h2>Station ${i + 1} · ${s.title}${s.lab !== 'gen' ? ` <small class="tag">Exp ${s.lab}</small>` : ''}</h2>${s.hands ? '<div class="vl-scene mock-hands" id="vlScene"></div>' : s.shared ? `<div class="artbox">${s.shared}</div>` : ''}${vers}
-    <div class="sheet"><h3>Answer sheet · Station ${i + 1} · <span class="vtag v${mock.ver.toLowerCase()}">Version ${mock.ver}</span></h3><div class="parts">${partsHTML(mine.parts, 'm' + i, true, mock.answers[i])}</div>
+    <div class="sheet"><h3>Answer sheet · Station ${i + 1} · <span class="vtag v${mock.ver.toLowerCase()}">Version ${mock.ver}</span>${mock.timer === 'real' ? '<span class="clock" id="clock2" aria-hidden="true">4:00</span>' : ''}</h3><div class="parts">${partsHTML(mine.parts, 'm' + i, true, mock.answers[i])}</div>
     <p class="note-small">${mine.parts.some(p => p.type === 'num' && p.unit) ? 'Write your number, then its unit. Sig figs count. ' : ''}Short on time? Finish the math during wrap-up at the end.</p>
     <div class="check-row"><button type="button" class="btn primary" id="doneStation">${mock.pos === n - 1 ? 'Done: go to wrap-up' : 'Done: rotate to the next station'} <span data-icon="arrow" aria-hidden="true"></span></button></div></div></div>`;
-  if (s.hands) { VL.bench = s.hands.bench; VL.s = s.hands.s; VL.step = 99; VL.mock = true; VL.sel = null; VL.busy = false; vlScene(); }
+  VL.run++; if (s.hands) { VL.bench = s.hands.bench; VL.s = s.hands.s; VL.step = 99; VL.mock = true; VL.sel = null; VL.busy = false; vlScene(); }
   paintIcons($('mockRun'));
   $('doneStation').onclick = () => endStation();
   bindQuit();
   try { $('mockView').scrollIntoView({ block: 'start' }); } catch (e) {}
-  if (mock.timer === 'real') { mock.deadline = Date.now() + 240000; tick = setInterval(() => { const left = (mock.deadline - Date.now()) / 1000; const c = $('clock'); if (c) { c.textContent = fmtClock(left); c.classList.toggle('low', left < 30); } if (left <= 0) endStation(true); }, 250); }
+  try { const h = $('mockRun').querySelector('.station h2'); h.tabIndex = -1; h.focus({ preventScroll: true }); } catch (e) {}
+  if (mock.timer === 'real') { mock.deadline = Date.now() + 240000; tick = setInterval(() => { const left = (mock.deadline - Date.now()) / 1000; const c = $('clock'), c2 = $('clock2'); if (c2) { c2.textContent = fmtClock(left) + (left < 30 ? ' left' : ''); c2.classList.toggle('low', left < 30); } if (c) { c.textContent = fmtClock(left); c.classList.toggle('low', left < 30); } if (left <= 0) endStation(true); }, 250); }
 }
 function bindQuit() { let armed = 0; const b = $('quitMock'); if (!b) return; b.onclick = () => { if (!armed) { armed = 1; b.textContent = 'Tap again to quit'; setTimeout(() => { armed = 0; if (b) b.textContent = 'Quit'; }, 3500); return; } quitMock(); }; }
 function quitMock() { clearInterval(tick); mock = null; VL.mock = false; VL.bench = null; document.body.classList.remove('mock-on', 'v-a', 'v-b', 'v-c'); $('mockRun').hidden = true; $('mockRun').innerHTML = ''; $('mockSetup').hidden = false; $('modes').hidden = false; $('intro').hidden = false; $('labset').hidden = false; $('progressSec').hidden = false; $('videoSection').hidden = false; const r = document.querySelector('.rotate'); if (r) r.remove(); }
@@ -3216,7 +3290,7 @@ function endStation(timeUp) {
   if (mock.timer === 'off') { mock.pos++; return renderStation(); }
   $('mockRun').querySelectorAll('input,select,button.btn.primary').forEach(el => (el.disabled = true));
   const ov = document.createElement('div'); ov.className = 'rotate';
-  ov.innerHTML = `<div class="box" role="dialog" aria-live="assertive"><p class="eyebrow">${timeUp ? 'Time!' : 'Station done'}</p><p class="big">Pens down. Rotate to Station ${nextNum}.</p><p class="clock2" id="rotClock">1:00</p><p class="small-note">Flip the card over and clean up your station.</p><button type="button" class="btn primary" id="goNext">I’m at Station ${nextNum}</button></div>`;
+  ov.innerHTML = `<div class="box" role="alertdialog" aria-label="Rotate to the next station"><p class="eyebrow">${timeUp ? 'Time!' : 'Station done'}</p><p class="big">Pens down. Rotate to Station ${nextNum}.</p><p class="clock2" id="rotClock">1:00</p><p class="small-note">Flip the card over and clean up your station.</p><button type="button" class="btn primary" id="goNext">I’m at Station ${nextNum}</button></div>`;
   document.body.appendChild(ov);
   const until = Date.now() + 60000;
   const go = () => { clearInterval(tick); ov.remove(); mock.pos++; renderStation(); };
@@ -3233,6 +3307,7 @@ function startWrap() {
   if (mock.timer === 'real') { const until = Date.now() + 300000; tick = setInterval(() => { const left = (until - Date.now()) / 1000; const c = $('clock'); if (c) { c.textContent = fmtClock(left); c.classList.toggle('low', left < 30); } if (left <= 0) turnIn(); }, 250); }
 }
 function turnIn() {
+  if (!mock || mock.phase === 'done') return;
   clearInterval(tick);
   mock.stations.forEach((s, i) => { const row = $('mockRun').querySelector(`.wrow[data-st="${i}"]`); if (row) mock.answers[i] = readParts(row, s.versions[mock.ver].parts); });
   mock.phase = 'done'; let total = 0;
@@ -3240,7 +3315,7 @@ function turnIn() {
     const q = s.versions[mock.ver], vals = mock.answers[i] || q.parts.map(() => ({ val: '' })), res = gradeAll(q.parts, vals, true);
     const wt = q.parts.map(pt => pt.w || 1), wsum = wt.reduce((a, b) => a + b, 0), pts = Math.round(res.reduce((a, r, k) => a + r.score * wt[k], 0) / wsum * 10 * 2) / 2; total += pts;
     if (q.lab !== 'gen') { bumpLab(q.lab, pts >= 10); ddLog('Mock Practical', q, pts >= 10, res.find(r => !r.ok) ? (res.find(r => !r.ok).valueOk ? 'precision-or-units' : 'value') : ''); }
-    if (pts >= 10) P.skill[q.skill] = (P.skill[q.skill] || 0) + 1;
+    if (pts >= 10) P.skill[q.skill] = (P.skill[q.skill] || 0) + 1; else if (q.lab !== 'gen') queueRedo(q.lab, q.kind, 0);
     const lines = q.parts.map((p, k) => { const v = vals[k] || {}, r = res[k]; const mineTxt = p.type === 'choice' ? (String(v.val || '').startsWith('T:') ? tv(v.val) : v.val !== '' && v.val != null ? p.options[+v.val] : '') : v.val; const share = 10 * (p.w || 1) / q.parts.reduce((a, b) => a + (b.w || 1), 0), bdTxt = r && r.bd ? ` <small class="bd">${r.bd.map(b => `${b[0]} ${+(b[1] * share).toFixed(1)}/${+(b[2] * share).toFixed(1)}`).join(' · ')}</small>` : p.type === 'eq' && r ? ` <small class="bd">Equation ${+(r.score * share).toFixed(1)}/${+share.toFixed(1)} (reactants 1 · products 3 · balanced 1 · phases 1, out of 6)</small>` : ''; return `<div>${p.label ? p.label + ': ' : ''}<span class="myans">You wrote: ${mineTxt ? esc(String(mineTxt).replace(/<[^>]+>/g, '')) : '<i>blank</i>'}${v.unit ? ' ' + esc(v.unit) : ''}</span> · Answer: <b>${partAns(p)}</b>${r && !r.ok && r.note ? ` <small>(${r.note})</small>` : ''}${bdTxt}</div>`; }).join('');
     return `<div class="rrow ${pts >= 10 ? 'full' : pts > 0 ? 'part' : 'zero'}"><div class="top"><span>Station ${i + 1} · ${s.title}</span><span class="pts">${pts} / 10</span></div>${lines}<details><summary>Show the question and the worked answer</summary>${stShared(s)}${qHTML(q)}<div class="sol">${q.solution}</div>${q.lab !== 'gen' ? `<p><button type="button" class="link-btn" data-practice="${q.lab}">Practice Exp ${q.lab}</button></p>` : ''}</details></div>`;
   }).join('');
@@ -3249,12 +3324,12 @@ function turnIn() {
   const weak = mock.stations.map((s, i) => ({ s, i })).filter(x => x.s.lab !== 'gen').filter(x => { const q = x.s.versions[mock.ver]; return gradeAll(q.parts, mock.answers[x.i] || [], true).some(r => !r.ok); }).map(x => x.s.lab);
   $('mockRun').innerHTML = `<div class="station results">${tock(pct >= 70 ? 'victory' : pct >= 50 ? 'correct' : 'thinking', 'res-tock')}<p class="eyebrow">Version ${mock.ver} · ${VCOL[mock.ver]} sheet</p><div class="score"><b>${total} / ${maxPts} <small class="pct">${pct}%</small></b><span>${pct >= 90 ? 'Outstanding: you’re ready.' : pct >= 70 ? 'Solid. Review the stations below.' : 'Keep practicing: open the worked answers below.'}</span></div>
     <p class="small-note">Graded like the real practical. <b>Readings:</b> accuracy 4, precision 4, units 2. <b>Calculations:</b> answer 8, sig figs 1, units 1. A known setup mistake earns half the answer points. <b>Equipment:</b> a partial name earns 2 of 5. On the real practical most calculation points come from your written setup, so show every conversion.</p>${rows}
-    <div class="check-row">${weak.length ? `<button type="button" class="btn" id="practiceWeak">Practice the labs I missed (${[...new Set(weak)].length})</button>` : ''}<button type="button" class="btn primary" id="newMock">New mock practical <span data-icon="loop" aria-hidden="true"></span></button></div></div>`;
+    <div class="check-row">${weak.length ? `<button type="button" class="btn" id="practiceWeak">Practice what I missed (${[...new Set(weak)].length} lab${[...new Set(weak)].length === 1 ? '' : 's'})</button>` : ''}<button type="button" class="btn primary" id="newMock">New mock practical <span data-icon="loop" aria-hidden="true"></span></button></div></div>`;
   paintIcons($('mockRun'));
   if (pct >= 90) confetti();
   $('newMock').onclick = () => { quitMock(); };
-  if ($('practiceWeak')) $('practiceWeak').onclick = () => { const w = [...new Set(weak)]; quitMock(); state.sel = new Set(w); setMode('practice'); renderLabTiles(); newQuestion(); };
-  $('mockRun').querySelectorAll('[data-practice]').forEach(b => (b.onclick = () => { const id = b.dataset.practice; quitMock(); state.sel = new Set([id]); setMode('practice'); renderLabTiles(); newQuestion(); }));
+  if ($('practiceWeak')) $('practiceWeak').onclick = () => { const w = [...new Set(weak)]; quitMock(); state.sel = new Set(w); state.q = null; setMode('practice'); renderLabTiles(); if (!state.q) newQuestion(); };
+  $('mockRun').querySelectorAll('[data-practice]').forEach(b => (b.onclick = () => { const id = b.dataset.practice; quitMock(); state.sel = new Set([id]); state.q = null; setMode('practice'); renderLabTiles(); if (!state.q) newQuestion(); }));
   document.body.classList.remove('v-a', 'v-b', 'v-c'); document.body.classList.add('v-' + mock.ver.toLowerCase());
   try { $('mockView').scrollIntoView({ block: 'start' }); } catch (e) {}
 }
@@ -3267,7 +3342,7 @@ function renderBench() {
   const s = PHET.find(x => x.id === state.sim), scr0 = (s.tasks.find(t => t.scr) || {}).scr;
   $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note sim-howto"><b>Tap the simulation</b> to use it. Tap <b>Done: scroll the page</b> to scroll again. <a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open it full screen ↗</a></p>` +
     (s.setup ? `<div class="sim-setup"><h4>Set up the sim first</h4><ol>${s.setup.map(x => `<li>${x}</li>`).join('')}</ol></div>` : '') +
-    s.tasks.map((t, i) => `<div class="task${P.benchDone[s.id + i] ? ' done' : ''}" data-task="${i}"><p class="tq"><span class="tnum">Task ${i + 1}</span>${P.benchDone[s.id + i] ? '<span class="tdone">Done</span>' : ''}</p>${t.steps ? `<ol class="tsteps">${t.steps.map(x => `<li>${x}</li>`).join('')}</ol>` : ''}${t.scr && Object.keys(s.screens || {}).length > 1 ? `<button type="button" class="btn small" data-tscreen="${t.scr}">Open the ${s.screens[t.scr]} screen</button>` : ''}<p class="tqq">${t.q}</p><div class="parts">${partsHTML(t.parts, `b${s.id}${i}`, false)}</div><div class="check-row"><button type="button" class="btn primary" data-tcheck="${i}">Check</button></div><div class="feedback"></div></div>`).join('');
+    s.tasks.map((t, i) => `<div class="task${P.benchDone[s.id + i] ? ' done' : ''}" data-task="${i}"><p class="tq"><span class="tnum">Task ${i + 1}</span>${P.benchDone[s.id + i] ? '<span class="tdone">Done</span>' : ''}</p>${t.steps ? `<ol class="tsteps">${t.steps.map(x => `<li>${x}</li>`).join('')}</ol>` : ''}${t.scr && Object.keys(s.screens || {}).length > 1 ? `<button type="button" class="btn small" data-tscreen="${t.scr}">Open the ${s.screens[t.scr]} screen</button>` : ''}<p class="tqq">${t.q}</p><div class="parts">${partsHTML(t.parts, `b${s.id}${i}`, false)}</div><div class="check-row"><button type="button" class="btn primary" data-tcheck="${i}">Check</button></div><div class="feedback" role="status" aria-live="polite"></div></div>`).join('');
   const sf = $('simArea').querySelector('.simframe');
   if (sf) { sf.querySelector('.sim-shield').onclick = () => sf.classList.add('live'); sf.querySelector('.sim-release').onclick = () => sf.classList.remove('live'); sf.addEventListener('mouseleave', () => sf.classList.remove('live')); }
   paintIcons($('simArea'));
@@ -3287,17 +3362,18 @@ function checkTask(i) {
 }
 
 /* ===================== Virtual Lab: hands-on benches ===================== */
-const VL = { done: [], bench: null, s: null, step: 0, sel: null, busy: false, tries: 0, parts: null, revealed: false };
+const VL = { done: [], bench: null, s: null, step: 0, sel: null, busy: false, tries: 0, parts: null, revealed: false, run: 0 };
 const reduceMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 function tween(ms, fn, done) {
   if (reduceMotion()) ms = 1;
-  const t0 = performance.now();
-  const f = now => { const k = Math.min(1, (now - t0) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; fn(e); if (k < 1) requestAnimationFrame(f); else if (done) done(); };
+  const t0 = performance.now(), run = VL.run;
+  const f = now => { if (VL.run !== run) return; const k = Math.min(1, (now - t0) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; fn(e); if (k < 1) requestAnimationFrame(f); else if (done) done(); };
   requestAnimationFrame(f);
 }
-const wait = ms => new Promise(r => setTimeout(r, reduceMotion() ? 0 : ms));
+const wait = ms => new Promise(r => { const run = VL.run; setTimeout(() => { if (VL.run === run) r(); }, reduceMotion() ? 0 : ms); });
 const tw = (ms, fn) => new Promise(r => tween(ms, fn, r));
-const vlNum = raw => { const m = String(raw).replace(/,/g, '').match(/-?\d*\.?\d+(e[-+]?\d+)?/i); return m ? parseFloat(m[0]) : NaN; };
+// read a typed number the same way the grader does, so 1.302x10^-3 is 0.001302 here too
+const vlNum = raw => { const sp = splitNum(raw), u = sp ? parseEntry(sp.num) : null; if (u) return toNum(u.d); const m = String(raw).replace(/,/g, '').match(/-?\d*\.?\d+(e[-+]?\d+)?/i); return m ? parseFloat(m[0]) : NaN; };
 const vlSet = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
 function vlSay(html, kind = '') { const m = $('vlMsg'); if (m) { m.className = 'vl-msg ' + kind; m.innerHTML = html; } }
 
@@ -3507,7 +3583,7 @@ const BENCH_MIX = {
   id: 'mix', labs: ['10a'], title: 'Mix and Observe', blurb: 'Combine two chemicals in a test tube and watch what happens.',
   setup() { return { added: [], res: null, lvl: lvl() }; },
   scene(s) {
-    const shelf = Object.keys(VR).map(k => shelfBtn('r:' + k, k === 'Zn' ? VLI.slug('#b8bfcc') : VLI.dropper(VR[k].col || '#e8f4fc'), k === 'Zn' ? 'Zn(s)' : fhtml(k) + '(aq)', s.added.includes(k) || s.added.length >= 2 ? 'disabled' : '')).join('');
+    const shelf = Object.keys(VR).map(k => shelfBtn('r:' + k, k === 'Zn' ? VLI.slug('#b8bfcc') : VLI.dropper(VR[k].col || '#e8f4fc'), k === 'Zn' ? 'Zn(s)' : fhtml(k) + '(aq)', s.added.includes(k) || s.added.length >= 2 || (s.added.includes('CuSO4') && k === 'KI') || (s.added.includes('KI') && k === 'CuSO4') ? 'disabled' : '')).join(''); // Cu²⁺ + I⁻ is a redox reaction (CuI + I₂), beyond the solubility rules, so that pair is left out
     return `<div class="vl-shelf many">${shelf}</div><div class="vl-row"><div class="vl-st" data-drop="tube" tabindex="0" role="button" aria-label="Test tube"><div class="vl-st-label">Test tube${s.added.length ? ': ' + s.added.map(k => fhtml(k)).join(' + ') : ''}</div><div id="vlTube" class="vl-tubebox">${vlTube({ level: 300 })}</div>${VL.mock && s.added.length ? '<div class="vl-ctl"><button type="button" class="btn" id="mxRinse">Rinse the tube</button></div>' : ''}</div><div class="vl-st wide vl-popbox" id="vlPop"><div class="empty small">Add two chemicals. A particle view of the reaction pops up here.</div></div></div>`;
   },
   restore(s) { if (s.res) { vlSet('vlTube', vlTube(this.final(s))); vlSet('vlPop', s.seen && !VL.mock ? this.pop(s) : '<div class="empty small">Look closely at the tube and record what you see. The particle view opens after you record your observation.</div>'); } else if (s.added.length) vlSet('vlTube', vlTube({ level: 220, liquid: this.liq(s), pellets: s.added.includes('Zn') ? '#b8bfcc' : null })); const r = $('mxRinse'); if (r) r.onclick = () => { s.added = []; s.res = null; vlScene(); vlSay('Rinsed. The tube is clean and empty.'); }; },
@@ -3544,7 +3620,7 @@ const BENCH_MIX = {
   },
   steps: [
     { title: 'Mix two chemicals', say: s => (s.lvl === 'beg' ? 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then pick what you observed.' : 'Drag <b>two different chemicals</b> into the test tube, one at a time. Then <b>write your observation</b> in your own words.'), act: s => !!s.res, parts: s => [s.lvl === 'beg' ? choice(OBS6, s.res.obs, { label: 'What did you observe?' }) : obsPart(s.res, { label: 'Observation (in your own words)' })], rec: s => { s.seen = true; }, sol: s => { s.seen = true; setTimeout(() => vlSet('vlPop', BENCH_MIX.pop(s)), 0); return s.res.text; } },
-    { title: 'Classify it', say: 'What type of reaction is this?', parts: s => [choice(TYPE5, s.res.type)], sol: s => `<b>${TYPE5[s.res.type]}</b>. ${s.res.kind === 'ppt' ? 'A solid formed from two solutions.' : s.res.kind === 'neutral' ? 'Acid + base → water + a salt, and heat.' : s.res.kind === 'gas' && s.res.gas !== 'H2' ? 'A gas formed from two solutions.' : s.res.kind === 'none' ? 'No evidence of a chemical change.' : 'An uncombined element (Zn) changes into an ion.'}` },
+    { title: 'Classify it', say: 'What type of reaction is this?', parts: s => [(s.res.gas === 'H2' ? h2Why : x => x)(Object.assign(choice(TYPE5, s.res.type), { whyKw: S1_NOTE }))], sol: s => `<b>${TYPE5[s.res.type]}</b>. ${s.res.kind === 'ppt' ? 'A solid formed from two solutions.' : s.res.kind === 'neutral' ? 'Acid + base → water + a salt, and heat.' : s.res.kind === 'gas' && s.res.gas !== 'H2' ? 'A gas formed from two solutions.' : s.res.kind === 'none' ? 'No evidence of a chemical change.' : 'An uncombined element (Zn) changes into an ion.'}` },
     { title: 'Predict and balance', gs: true, skip: s => s.lvl === 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Predict the products and write the <b>balanced equation with phases</b>. Type -> for the arrow.', parts: s => [eqPart(mixEq(s.added[0], s.added[1]), { label: 'Balanced equation with phases' })], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
     { title: 'Balance it', skip: s => s.lvl !== 'beg' || !mixEq(s.added[0], s.added[1]), say: 'Here are the products. Balance the equation with the smallest whole numbers (write 1 where needed).', parts: s => [balPart(mixEq(s.added[0], s.added[1]))], sol: s => eqn(rxHTML(mixEq(s.added[0], s.added[1]), true)) },
     { title: 'Name the product', gs: s => s.res.kind === 'ppt', skip: s => s.lvl !== 'beg' || !(s.res.kind === 'ppt' || s.res.kind === 'gas'), say: s => (s.res.kind === 'ppt' ? 'Write the formula of the <b>precipitate</b>.' : 'Write the formula of the <b>gas</b>.'), parts: s => { const f = s.res.kind === 'ppt' ? s.res.ppt : s.res.gas, alt = f === 'Ag2O' ? ['AgOH'] : []; return [{ type: 'formula', accept: [f, f + '(s)', f + '(g)', ...alt], ans: fhtml(f) }]; }, sol: s => (s.res.kind === 'ppt' ? `Swap partners and check the solubility rules: <b>${fhtml(s.res.ppt)}</b> is insoluble.` : `<b>${fhtml(s.res.gas)}</b>.`) }
@@ -3587,7 +3663,7 @@ const BENCH_PH = {
     { title: 'Add a product', say: 'Drag a <b>household product</b> into the test tube.', act: s => !!s.item, auto: true },
     { title: 'Add the indicator', say: 'Drag the <b>red cabbage juice</b> into the tube. About what pH is it?', act: s => s.ind, parts: s => [choice(CABBAGE.map(c => `pH ${c[2]}`), cabIdx(s.pH))], sol: s => `${CABBAGE[cabIdx(s.pH)][1]} → about <b>pH ${CABBAGE[cabIdx(s.pH)][2]}</b>.` },
     { title: 'Measure the pH', skip: () => !USE_PH_METER, say: 'Drag the <b>pH meter</b> into the tube and record the reading.', act: s => s.meter, parts: s => [num(s.pH, { dp: 2, unit: '', tol: 0.001, label: 'pH' })], rec: (s, v) => { s.pHR = v[0]; }, sol: s => `Copy the display: <b>${s.pH.toFixed(2)}</b>.` },
-    { title: 'Acid or base?', say: s => `${USE_PH_METER ? '' : `A pH meter in the stockroom read <b>${s.pH.toFixed(2)}</b>. `}Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic?`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. In this lab: below 6.5 is acidic, 6.5 to 7.5 is about neutral, above 7.5 is basic.` },
+    { title: 'Acid or base?', say: s => `${USE_PH_METER ? '' : `A pH meter in the stockroom read <b>${s.pH.toFixed(2)}</b>. `}Is ${s.item[0].toLowerCase()} acidic, about neutral, or basic? (In this lab, pH 6.5 to 7.5 counts as about neutral.)`, parts: s => [choice(ACIDITY, s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2)], sol: s => `<b>${ACIDITY[s.pH < 6.5 ? 0 : s.pH <= 7.5 ? 1 : 2]}</b>. In this lab: below 6.5 is acidic, 6.5 to 7.5 is about neutral, above 7.5 is basic.` },
     { title: 'Calculate', say: s => `${USE_PH_METER ? 'Use your pH' : `The measured pH was <b>${s.pH.toFixed(2)}</b>. Use it`} to calculate <b>${s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]'}</b>.`, eq: PH_EQ, parts: s => { const v = s.calc === 'h3o' ? Math.pow(10, -s.pHR) : Math.pow(10, -(14 - s.pHR)); return [num(v, { sf: 2, unit: 'M', rel: 0.06, label: s.calc === 'h3o' ? '[H₃O⁺]' : '[OH⁻]' })]; }, sol: s => (s.calc === 'h3o' ? `[H₃O⁺] = 10<sup>−${s.pHR.toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -s.pHR), 2)} M</b>` : `pOH = 14 − ${s.pHR.toFixed(2)} = ${(14 - s.pHR).toFixed(2)}; [OH⁻] = 10<sup>−${(14 - s.pHR).toFixed(2)}</sup> = <b>${sfHTML(Math.pow(10, -(14 - s.pHR)), 2)} M</b>`) + ' (2 decimal places in pH → 2 sig figs).' }
   ]
 };
@@ -3770,7 +3846,7 @@ const BENCH_WATER = {
     this.draw(s);
     const tare = $('wTare'); if (tare) tare.onclick = () => { s.tared = true; vlScene(); vlSay('Tared: the balance now ignores the cylinder’s mass.', 'good'); vlSteps(); };
     const sq = $('wSquirt'); if (!sq) return;
-    const add = dv => { s.v = +Math.max(0, Math.min(10.4, s.v + dv)).toFixed(3); this.draw(s); if (s.v > 10) vlSay('Past the top line! Pour some out.', 'bad'); else vlSay(''); };
+    const run = VL.run, add = dv => { if (VL.run !== run || s.filled || VL.s !== s) return end(); s.v = +Math.max(0, Math.min(10.4, s.v + dv)).toFixed(3); this.draw(s); if (s.v > 10) vlSay('Past the top line! Pour some out.', 'bad'); else vlSay(''); };
     let timer = null; const end = () => { clearInterval(timer); timer = null; };
     sq.addEventListener('pointerdown', e => { e.preventDefault(); if (!timer) timer = setInterval(() => add(0.09), 60); }); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => sq.addEventListener(ev, end));
     sq.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') add(0.5); });
@@ -3799,7 +3875,7 @@ const BENCH_SALT = Object.assign({}, BENCH_WATER, {
     Object.assign({}, BENCH_WATER.steps[1], { say: s => `Fill to about <b>${s.target.toFixed(2)} mL</b> of the NaCl solution, then read the volume.` }),
     Object.assign({}, BENCH_WATER.steps[2], { title: 'Mass of the solution', say: 'The balance was tared, so it shows only the solution. Record every digit.' }),
     Object.assign({}, BENCH_WATER.steps[3], { title: 'Density of the solution' }),
-    { title: 'Concentration from the curve', say: 'Your class standard curve for NaCl solutions is below. Solve it for x (the concentration).', ref: () => '<div class="eqline">y = 0.0435x + 0.9984 &nbsp;&nbsp; (y = density in g/mL, x = concentration in mol/L)</div>', parts: s => [num((s.dR - 0.9984) / 0.0435, { sf: 3, unit: 'M', rel: 0.02, label: 'NaCl concentration' })], sol: s => `x = (y − 0.9984) ÷ 0.0435 = (${s.dR.toFixed(4)} − 0.9984) ÷ 0.0435 = <b>${sfHTML((s.dR - 0.9984) / 0.0435, 3)} M</b>.` }
+    { title: 'Concentration from the curve', say: 'Your class standard curve for NaCl solutions is below. Solve it for x (the concentration).', ref: () => '<div class="eqline">y = 0.0435x + 0.9984 &nbsp;&nbsp; (y = density in g/mL, x = concentration in mol/L)</div>', parts: s => { const xs = [s.dR, s.mR / s.VR, Number((s.mR / s.VR).toPrecision(4))].map(d => (d - 0.9984) / 0.0435), lo = Math.min(...xs), hi = Math.max(...xs); return [num((lo + hi) / 2, { sf: 3, unit: 'M', tol: (hi - lo) / 2 + 0.011, label: 'NaCl concentration', ans: fmtSF((s.mR / s.VR - 0.9984) / 0.0435, 3).html })]; }, sol: s => `Keep the extra digits of your density until the end: d = ${(s.mR / s.VR).toFixed(4)} g/mL. x = (y − 0.9984) ÷ 0.0435 = (${(s.mR / s.VR).toFixed(4)} − 0.9984) ÷ 0.0435 = <b>${sfHTML((s.mR / s.VR - 0.9984) / 0.0435, 3)} M</b>.` }
   ]
 });
 VBENCH.push(BENCH_SALT);
@@ -3923,7 +3999,7 @@ const HANDS = {
     const nm = x => `${fhtml(x[0])} and ${fhtml(x[1])}`;
     return { lab: '10a', title: 'Types of Reactions (hands-on)', hands: { bench: b, s, snap: () => `A: ${nm(ppt)} · B: ${nm(other)} · C: ${nm(third)}` }, versions: {
       A: handQ('10a', `Mix <b>${nm(ppt)}</b> in the test tube. Predict the products and write the <b>balanced equation with phases</b>.`, [eqPart(mixEq(ppt[0], ppt[1]), { label: 'Balanced equation with phases' })], () => `${ppt[2].text}${eqn(rxHTML(mixEq(ppt[0], ppt[1]), true))}`, 'concept'),
-      B: handQ('10a', `Mix <b>${nm(other)}</b> in the test tube. What type of reaction is it?`, [choice(TYPE5, other[2].type)], () => `${other[2].text} → <b>${TYPE5[other[2].type]}</b>.`, 'concept'),
+      B: handQ('10a', `Mix <b>${nm(other)}</b> in the test tube. What type of reaction is it?`, [(other[2].gas === 'H2' ? h2Why : x => x)(Object.assign(choice(TYPE5, other[2].type), { whyKw: S1_NOTE }))], () => `${other[2].text} → <b>${TYPE5[other[2].type]}</b>.`, 'concept'),
       C: handQ('10a', `Mix <b>${nm(third)}</b> in the test tube. Write your observation.`, [obsPart(third[2], { label: 'Observation' })], () => third[2].text, 'concept') } };
   },
   '12a'() {
@@ -3952,7 +4028,7 @@ const HANDS = {
       C: handQ('6a', `Build the Lewis structure of <b>${fhtml(m[0])}</b>. About what is the bond angle?`, [choice(ANGLES, m[6])], () => `<b>${ANGLES[m[6]]}</b>.`, 'concept') } };
   }
 };
-const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${s.hands.snap()}</p></div>` : s.shared ? `<div class="artbox">${s.shared}</div>` : '');
+const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${mock && mock.phase !== 'done' ? 'This was a hands-on station. Use the measurements you wrote down there.' : s.hands.snap()}</p></div>` : s.shared ? `<div class="artbox">${s.shared}</div>` : '');
 
 
 
@@ -3964,7 +4040,7 @@ function renderVLab() {
   if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
   vlRenderAll();
 }
-function vlStart(id) { VL.mock = false; VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+function vlStart(id) { VL.run++; VL.mock = false; VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
 function vlRenderAll() {
   const b = VL.bench;
   $('vlArea').innerHTML = `<div class="vl-head"><h3 class="play-title">${b.title}</h3><button type="button" class="btn" id="vlNew">New run <span data-icon="arrow" aria-hidden="true"></span></button></div><div class="vl-wrap"><div class="vl-scene" id="vlScene"></div><div class="vl-steps" id="vlSteps"></div></div>`;
@@ -3990,7 +4066,7 @@ function vlWire(root) {
     el.addEventListener('click', e => { e.stopPropagation(); if (e.detail === 0) vlSelect(el.dataset.drag); });
   });
   root.querySelectorAll('[data-drop]').forEach(el => {
-    el.addEventListener('click', e => { if (e.target.closest('[data-drag]')) return; if (VL.sel) vlDrop(VL.sel, el.dataset.drop); else vlSay('Pick an item first: drag it here, or tap it and then tap here.'); });
+    el.addEventListener('click', e => { if (e.target.closest('[data-drag], button, .vl-ctl')) return; if (VL.sel) vlDrop(VL.sel, el.dataset.drop); else vlSay('Pick an item first: drag it here, or tap it and then tap here.'); });
     el.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === el) { e.preventDefault(); el.click(); } });
   });
 }
@@ -4057,7 +4133,7 @@ function vlCheck(reveal) {
   }
   renderStats(); save(); checkAch();
 }
-function vlFinish() { VL.step = VL.bench.steps.length; P.vlab = P.vlab || {}; P.vlab[VL.bench.id] = (P.vlab[VL.bench.id] || 0) + 1; P.xp += 15; renderStats(); save(); checkAch(); try { confetti(); } catch (e) {} const card = $('vlGrid').querySelector(`[data-vlb="${VL.bench.id}"] small:last-child`); if (card) card.textContent = ` Finished ${P.vlab[VL.bench.id]}×`; }
+function vlFinish() { VL.step = VL.bench.steps.length; P.vlab = P.vlab || {}; P.vlab[VL.bench.id] = (P.vlab[VL.bench.id] || 0) + 1; P.xp += 15; renderStats(); save(); checkAch(); try { confetti(); } catch (e) {} const card = $('vlGrid').querySelector(`[data-vlb="${VL.bench.id}"] .sc-status`); if (card) { card.textContent = `Finished ${P.vlab[VL.bench.id]}×`; card.classList.add('done'); } }
 
 /* ===================== TI-36X Pro-style calculator =====================
    A practice calculator with the keys this game needs. MathPrint-style entry:
@@ -4107,7 +4183,8 @@ function parseTokens(T){let i=0;const pk=()=>T[i];
  function mul(){let v=neg();for(;;){const t=pk();if(t&&t.k==='op'&&(t.v==='×'||t.v==='÷')){i++;const r=neg();if(t.v==='÷'){if(r===0)throw new CalcErr('DIVIDE BY 0');v/=r}else v*=r}
    else if(startsPrimary(t)&&t.k!=='neg'){v*=neg()}else break}return v}
  function neg(){if(pk()&&pk().k==='neg'){i++;return-neg()}return post()}
- function post(){let v=prim();for(;;){const t=pk();if(!t)break;if(t.k==='post'){i++;v=t.v==='²'?v*v:(v===0?(()=>{throw new CalcErr('DIVIDE BY 0')})():1/v)}else if(t.k==='powt'){i++;v=Math.pow(v,t.v)}else break}return v}
+ function rootPow(b,e){if(b<0&&!Number.isInteger(e)){const d=Math.round(1/e);if(d%2&&Math.abs(1/e-d)<1e-9)return-Math.pow(-b,1/d)}return Math.pow(b,e)}
+ function post(){let v=prim();for(;;){const t=pk();if(!t)break;if(t.k==='post'){i++;v=t.v==='²'?v*v:(v===0?(()=>{throw new CalcErr('DIVIDE BY 0')})():1/v)}else if(t.k==='powt'){i++;v=rootPow(v,t.v)}else break}return v}
  function prim(){const t=T[i++];if(!t)throw new CalcErr('SYNTAX');
   if(t.k==='val')return t.v;
   if(t.k==='lp'){const v=add();if(pk()&&pk().k==='rp')i++;return v}
@@ -4153,7 +4230,7 @@ function press(k){
  else if(k==='ee')ins({t:'c',v:'E'});
  else if(k==='pi')ins({t:'c',v:'π'});
  else if(k==='sq'){if(s2)lastTok=ins({t:'f',v:'√'});else ins({t:'c',v:'²'})}
- else if(k==='pow'){if(s2)ins({t:'c',v:'⁻¹'});else{const fr=top();if(fr.tok&&fr.tok.t==='pow'){if(!fr.tok.e.length){frames.pop();const pf=top();pf.list.splice(fr.at,1);pf.i=fr.at}else exitRight()}else ins({t:'pow',e:[]})}}
+ else if(k==='pow'){if(s2)ins({t:'c',v:'⁻¹'});else{const fr=top();if(fr.tok&&fr.tok.t==='pow'){if(!fr.tok.e.length){frames.pop();const pf=top();pf.list.splice(fr.at,1);pf.i=fr.at}else{exitRight();ins({t:'pow',e:[]})}}else ins({t:'pow',e:[]})}}
  else if(k==='lnlog'){const f=top();if(prevLast==='lnlog'&&lastTok&&f.list[f.i-1]===lastTok&&lastTok.t==='f'){lastTok.v=lastTok.v==='ln'?'log':'ln'}else lastTok=ins({t:'f',v:'ln'})}
  else if(k==='expk'){const f=top();if(prevLast==='expk'&&lastTok&&f.tok===lastTok&&!lastTok.e.length){lastTok.b=lastTok.b==='e'?'10':'e'}else lastTok=ins({t:'base',b:'e',e:[]})}
  else if(k==='frac'){const f=top(),prev=f.list[f.i-1];
@@ -4231,14 +4308,14 @@ document.addEventListener('focusin', e => { const t = e.target; if (t.matches &&
 function openCalc(focus) {
   const d = $('calcDock');
   if (!calcMounted) { Calc.mount($('calcMount'), v => { const a = lastBox && document.body.contains(lastBox) && !lastBox.disabled ? lastBox : null; if (a) { a.value = v; a.dispatchEvent(new Event('input', { bubbles: true })); if (window.innerWidth <= 640) closeCalc(); a.focus({ preventScroll: true }); a.scrollIntoView({ block: 'center', behavior: 'smooth' }); } else toast('Tap an answer box first, then press <b>Put ans in my answer</b>.', 'stars'); }); calcMounted = true; }
-  d.hidden = false; document.body.classList.add('calc-open'); if (focus) { const b = d.querySelector('[data-k="7"]'); if (b) b.focus({ preventScroll: true }); }
+  d.hidden = false; document.body.classList.add('calc-open'); $('calcBtn').setAttribute('aria-expanded', 'true'); if (focus) { const b = d.querySelector('[data-k="7"]'); if (b) b.focus({ preventScroll: true }); }
 }
-function closeCalc() { $('calcDock').hidden = true; document.body.classList.remove('calc-open'); }
+function closeCalc() { const had = $('calcDock').contains(document.activeElement); $('calcDock').hidden = true; document.body.classList.remove('calc-open'); $('calcBtn').setAttribute('aria-expanded', 'false'); if (had) $('calcBtn').focus(); }
 
 /* ---------- modes, stats, videos, reference ---------- */
 function setMode(m) {
   state.mode = m; P.mode = m; save();
-  document.querySelectorAll('#modes [data-mode]').forEach(b => { b.classList.toggle('active', b.dataset.mode === m); b.setAttribute('aria-selected', b.dataset.mode === m); });
+  document.querySelectorAll('#modes [data-mode]').forEach(b => { b.classList.toggle('active', b.dataset.mode === m); b.setAttribute('aria-pressed', b.dataset.mode === m); });
   $('mockView').hidden = m !== 'mock'; $('practiceView').hidden = m !== 'practice'; $('benchView').hidden = m !== 'bench'; $('vlabView').hidden = m !== 'vlab';
   if (m === 'practice') { renderLabTiles(); if (!state.q && state.sel.size) newQuestion(); }
   if (m === 'bench') renderBench();
@@ -4248,7 +4325,7 @@ function setMode(m) {
 function setCompact(on) { P.compact = !!on; document.body.classList.toggle('compact', !!on); save(); renderLabset(); }
 function renderLabset() {
   const n = labSet().length, k = labPick();
-  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} labs</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'Pick your professor or choose your labs' : 'Change labs'}</button>${missingLabs(rawIds()).length ? `<span class="small-note">Not in the game yet: ${esc(missingLabs(rawIds()).join(', '))}</span>` : ''}${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
+  $('labset').innerHTML = `<span class="pill">${esc(labPickName())} · ${n} lab${n === 1 ? '' : 's'}</span><button type="button" class="link-btn" id="setToggle">${k.kind === 'all' ? 'Pick your professor or choose your labs' : 'Change labs'}</button>${missingLabs(rawIds()).length ? `<span class="small-note">Not in the game yet: ${esc(missingLabs(rawIds()).join(', '))}</span>` : ''}${P.compact ? '<button type="button" class="link-btn" id="howBtn">Show directions</button>' : ''}`;
   $('setToggle').onclick = openLabPicker; const hb = $('howBtn'); if (hb) hb.onclick = () => setCompact(false);
 }
 function applyLabPick(pick) {
@@ -4266,7 +4343,7 @@ function openLabPicker() {
     ${opt('all', 'All CHEM 3A labs', 'Every lab in the game, old and new')}
     ${opt('custom', 'My professor isn’t listed: let me choose my labs', 'Check the labs your class did')}
     <div class="lp-grid" id="lpGrid">${LABS.map(l => `<label><input type="checkbox" value="${l.id}" ${custom.has(l.id) ? 'checked' : ''}> <b>Exp ${l.id}</b> ${esc(l.name)}</label>`).join('')}</div>
-    <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb"></p>
+    <div class="check-row"><button type="button" class="btn primary" id="lpSave">Save my labs</button></div><p class="feedback" id="lpFb" role="status" aria-live="polite"></p>
     <p class="small-note">Instructor? <a href="https://itsdrdan.github.io/labpractical/setup.html" target="_blank" rel="noopener">Set this game up for your class</a> and get a Canvas link that opens with your labs.</p>`;
   const grid = $('lpGrid'), sync = () => { grid.hidden = (document.querySelector('#lpBody input[name=lp]:checked') || {}).value !== 'custom'; };
   $('lpBody').querySelectorAll('input[name=lp]').forEach(r => (r.onchange = sync)); sync();
@@ -4324,10 +4401,10 @@ function openRef() { renderRef(); try { $('refDialog').showModal(); } catch (e) 
 
 function bind() {
   const sb = $('smartBtn'), sbTxt = () => { sb.textContent = SMART ? 'Turn off' : 'Turn on'; }; sbTxt(); sb.onclick = () => { SMART = !SMART; try { localStorage.setItem('sr-smart', SMART ? '1' : '0'); } catch (e) {} sbTxt(); toast(SMART ? 'Smart typing on: H2O → H₂O, 1.5E4 → 1.5×10⁴' : 'Smart typing off: what you type stays as typed.', 'stars'); };
-  $('calcBtn').onclick = () => { $('calcDock').hidden ? openCalc(true) : closeCalc(); }; $('calcClose').onclick = closeCalc;
+  $('calcBtn').onclick = () => { $('calcDock').hidden ? openCalc(true) : closeCalc(); }; $('calcBtn').setAttribute('aria-expanded', 'false'); $('calcClose').onclick = closeCalc;
   $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) { setMode(b.dataset.mode); setCompact(true); const v = { mock: 'mockView', practice: 'practiceView', bench: 'benchView', vlab: 'vlabView' }[b.dataset.mode]; try { $(v).scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) {} } });
-  $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => x.classList.toggle('on', x === b)); });
-  $('timerpick').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#timerpick .chip').forEach(x => x.classList.toggle('on', x === b)); });
+  $('vpick').addEventListener('click', e => { const b = e.target.closest('.vbtn'); if (!b) return; document.querySelectorAll('#vpick .vbtn').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); });
+  $('timerpick').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; document.querySelectorAll('#timerpick .chip').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); });
   $('mockStart').onclick = startMock;
   paintLvl(); document.querySelectorAll('.lvlpick .chip').forEach(b => (b.onclick = () => { P.level = b.dataset.lvl; save(); paintLvl(); toast(P.level === 'beg' ? '<b>Beginner</b>: products are given and observations are multiple choice.' : '<b>Intermediate</b>: predict the products, balance with phases, and write your own observations.', 'stars'); if (state.mode === 'practice' && state.q && !state.done) newQuestion(); if (state.mode === 'vlab' && VL.bench && VL.bench.id === 'mix') vlStart('mix'); }));
   $('labTiles').addEventListener('click', e => { const b = e.target.closest('[data-lab]'); if (b) toggleLab(b.dataset.lab); });
@@ -4342,10 +4419,10 @@ function bind() {
     const ts = e.target.closest('[data-tscreen]'); if (ts) { const s = PHET.find(x => x.id === state.sim), f = $('simFrame'), n = ts.dataset.tscreen; if (f && f.dataset.scr !== n) { f.dataset.scr = n; f.src = PHET_URL(s.sim, n); $('simFull').href = f.src; } try { f.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {} }
     const vb = e.target.closest('[data-vlb]'); if (vb) vlStart(vb.dataset.vlb);
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('#qParts input')) { e.preventDefault(); state.done ? newQuestion() : check(); } });
-  $('checkBtn').onclick = check; $('nextBtn').onclick = () => { newQuestion(); try { $('play').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('calcDock').hidden && !document.querySelector('dialog[open]')) closeCalc(); if (e.key === 'Enter' && e.target.matches('#qParts input')) { e.preventDefault(); if (e.repeat) return; state.done ? nextQ() : check(); } });
+  $('checkBtn').onclick = check; $('nextBtn').onclick = () => nextQ(); $('againBtn').onclick = () => { const q = state.q; if (q) nextQ({ lab: q.lab, kind: q.kind }); };
   $('skipBtn').onclick = () => newQuestion();
-  $('hintBtn').onclick = () => { if (!state.q) return; state.helped = true; const h = $('hintBox'); h.hidden = false; h.innerHTML = `<b>Hint:</b> ${state.q.hint}`; };
+  $('hintBtn').onclick = () => { const q = state.q; if (!q) return; state.helped = true; const h = $('hintBox'), s2 = setupHint(q); state.hintN = Math.min((state.hintN || 0) + 1, s2 ? 2 : 1); h.hidden = false; h.innerHTML = `<b>Hint${s2 ? ' 1' : ''}:</b> ${q.hint}` + (state.hintN > 1 ? `<div class="hint2"><b>Hint 2, the setup:</b> ${s2}<br><span class="small-note">You finish it: do the arithmetic, then round to the right sig figs.</span></div>` : ''); $('hintBtn').lastChild.textContent = s2 && state.hintN === 1 ? 'More help' : 'Hint'; if (state.hintN > 1) try { h.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} };
   $('solBtn').onclick = showSolution;
   $('vlBtn').onclick = () => { const b = VBENCH.find(x => x.labs.includes(state.q.lab)); if (b) { setMode('vlab'); vlStart(b.id); } };
   $('simBtn').onclick = () => { const s = PHET.find(x => x.labs.includes(state.q.lab)); if (s) { state.sim = s.id; setMode('bench'); try { $('benchView').scrollIntoView({ block: 'start' }); } catch (e) {} } };
@@ -4353,7 +4430,7 @@ function bind() {
   $('refDialog').addEventListener('click', e => { if (e.target === $('refDialog')) $('refDialog').close(); });
   $('videoBtn').onclick = () => { const d = $('videoSection'); d.open = true; const pl = $('player'); pl.src = pl.dataset.src; try { d.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} };
   $('videoSection').addEventListener('toggle', () => { const pl = $('player'); if ($('videoSection').open && pl.src !== pl.dataset.src) pl.src = pl.dataset.src; });
-  let armed = 0; $('resetBtn').onclick = () => { const b = $('resetBtn'); if (!armed) { armed = 1; b.classList.add('armed'); b.textContent = 'Tap again to erase your progress'; setTimeout(() => { armed = 0; b.classList.remove('armed'); b.textContent = 'Reset my progress'; }, 4000); return; } P = fresh(); state.sel.clear(); save(); armed = 0; b.classList.remove('armed'); b.textContent = 'Reset my progress'; renderStats(); renderLabTiles(); };
+  let armed = 0; $('resetBtn').onclick = () => { const b = $('resetBtn'); if (!armed) { armed = 1; b.classList.add('armed'); b.textContent = 'Tap again to erase your progress'; setTimeout(() => { armed = 0; b.classList.remove('armed'); b.textContent = 'Reset my progress'; }, 4000); return; } const keep = { labPick: P.labPick, linkSig: P.linkSig, level: P.level, compact: P.compact }; P = Object.assign(fresh(), keep); state.sel = new Set(labSet()); state.recent = []; save(); armed = 0; renderLabset(); b.classList.remove('armed'); b.textContent = 'Reset my progress'; renderStats(); renderLabTiles(); };
   window.addEventListener('beforeunload', e => { if (mock && mock.phase !== 'done') { e.preventDefault(); e.returnValue = ''; } });
 }
 function init() {
@@ -4365,13 +4442,15 @@ function init() {
   const secOther = sec && !secHit ? OTHER.find(x => (x.sections || []).includes(sec)) : null;
   const profRaw = (sp.get('prof') || sp.get('professor') || '').trim(), profHit = otherBy(profRaw);
   const linkLabs = [...new Set(ls.split(/[\s,;]+/).map(x => x.replace(/^exp/, '')).filter(x => /^\d{1,2}[a-z]$/.test(x)))];
-  if (linkLabs.length) P.labPick = { kind: 'link', labs: linkLabs, prof: profHit ? profHit.name : /^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw) ? 'Dr. Dan' : cleanName(profRaw) };
+  const sig = [ls, sec, profRaw].join('|'), newLink = !P.labPick || P.linkSig !== sig;
+  if (!newLink) {}
+  else if (linkLabs.length) P.labPick = { kind: 'link', labs: linkLabs, prof: profHit ? profHit.name : /^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw) ? 'Dr. Dan' : cleanName(profRaw) };
   else if (sec && secHit) P.labPick = { kind: 'sec', sec: secHit.key };
   else if (secOther) P.labPick = { kind: 'prof', prof: secOther.key };
   else if (profHit) P.labPick = { kind: 'prof', prof: profHit.key };
   else if (/^(dan|dr\.? ?dan|kwasniewski)$/i.test(profRaw)) P.labPick = { kind: 'dan' };
   // a NEW ?labs=dan link wins over an older saved choice; reopening the same link keeps what the student picked since
-  else if (['dan', 'class', 'current', 'fcc'].includes(ls) && (!P.labPick || P.linkSig !== [ls, sec, profRaw].join('|'))) P.labPick = { kind: 'dan' };
+  else if (['dan', 'class', 'current', 'fcc'].includes(ls)) P.labPick = { kind: 'dan' };
   if (ls || sec || profRaw) P.linkSig = [ls, sec, profRaw].join('|');
   window.ddProfessor = profOf() || (profRaw ? cleanName(profRaw) : '');
   save();
@@ -4380,7 +4459,7 @@ function init() {
   document.body.classList.toggle('compact', !!P.compact);
   bind(); renderLabset(); renderStats(); renderRef();
   const m = (sp.get('mode') || '').toLowerCase();
-  setMode(['mock', 'practice', 'bench'].includes(m) ? m : (P.mode || 'mock'));
+  setMode(['mock', 'practice', 'bench', 'vlab'].includes(m) ? m : ['mock', 'practice', 'bench', 'vlab'].includes(P.mode) ? P.mode : 'mock');
   setVideoFor('practical1');
   paintIcons();
   window.addEventListener('load', () => paintIcons());

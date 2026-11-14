@@ -2,6 +2,10 @@
   "name": "station-rotation-check",
   "private": true,
   "description": "Regression check for Station Rotation (run: npm install, then npm test)",
-  "scripts": { "test": "node check.js" },
-  "dependencies": { "jsdom": "^24.0.0" }
+  "scripts": {
+    "test": "node check.js && node grading.js"
+  },
+  "dependencies": {
+    "jsdom": "^24.0.0"
+  }
 }
