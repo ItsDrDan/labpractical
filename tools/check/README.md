@@ -14,3 +14,7 @@ cd tools/check
 npm install
 npm test
 ```
+
+# Which questions students miss
+
+`node tools/item-analysis.js` (from the repo folder) reads the anonymous answer counts from the stats sheet and writes `item-analysis.md` (not committed): correct rate by mode, the most-missed kinds of question, every experiment's kinds with their miss rates, kinds nobody has answered yet, and skills that appear in more than one experiment. Options: `--min 5` (answers before a kind is ranked), `--mode mock|practice|vlab|phet`, `--days 60`, `--file stats.json`. It uses jsdom from this folder, so run `npm install` here once.
