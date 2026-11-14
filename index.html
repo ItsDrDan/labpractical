@@ -3037,7 +3037,7 @@ function partsHTML(parts, key, mock, saved = []) {
     const id = `${key}-${i}`, v = saved[i] || {}, lab = p.label ? `<label for="${id}">${p.label}</label>` : '', aname = p.label ? esc(p.label.replace(/<[^>]+>/g, '')) : parts.length > 1 ? `Answer ${i + 1}` : 'Your answer';
     let inner = '';
     if (p.type === 'num') {
-      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-smart="num" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="${mock ? 'number' : 'Type your answer'}" value="${esc(SMART && v.val ? smartFormat('num', v.val) : v.val || '')}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}">` +
+      inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-smart="num" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${mock ? 'number' : 'Type your answer'}" value="${esc(SMART && v.val ? smartFormat('num', v.val) : v.val || '')}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}">` +
         (mock && p.unit ? `<input type="text" class="unit-in" data-pu="${i}" autocomplete="off" spellcheck="false" placeholder="unit" value="${esc(v.unit || '')}" aria-label="Unit">` : p.unit ? `<span class="unit">${p.unit}</span>` : '') + `</div>`;
     } else if (p.type === 'choice' && lvl() !== 'beg') {
       inner = `<div class="row"><input type="text" id="${id}" data-pi="${i}" data-typed="1" autocomplete="off" autocapitalize="off" spellcheck="true" placeholder="${p.ph || (p.kw ? 'Describe it in your own words' : 'Type your answer')}" value="${esc(tv(v.val))}" aria-label="${p.label ? p.label.replace(/<[^>]+>/g, '') : 'Your answer'}"></div>`;
