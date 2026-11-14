@@ -634,6 +634,26 @@ body.mock-on .topbar{position:relative}
 @media(max-width:480px){.calc-dock{right:8px}}
 @media(max-width:999px){body.calc-open .check-row,body.calc-open .next-row{justify-content:flex-start}}
 [tabindex="-1"]:focus{outline:none!important}
+/* ---- v20: sim and virtual-lab cards read as buttons: picture, title, and a Start pill that is always there ---- */
+.simgrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.simcard{display:grid;grid-template-columns:72px 1fr;grid-template-areas:'art txt' 'foot foot';gap:8px 12px;align-items:center;padding:14px;cursor:pointer;border-width:2px;box-shadow:0 2px 0 #1f2a441a,0 6px 14px #1f2a4410}
+.simcard .sc-art{grid-area:art;width:72px;height:72px;border-radius:16px;background:#ffffffc9;border:1px solid #1f2a4414;display:grid;place-items:center}
+.simcard .sc-art img{width:60px;height:60px;object-fit:contain}
+.simcard .sc-art.none{display:none}.simcard .sc-art.none+.sc-txt{grid-column:1/-1}
+.simcard .sc-txt{grid-area:txt;display:flex;flex-direction:column;gap:2px;min-width:0}
+.simcard .sc-txt small{line-height:1.3}
+.simcard .sc-foot{grid-area:foot;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:8px;border-top:1px dashed #1f2a4426}
+.simcard .sc-status{margin-top:0}
+.simcard .sc-go{position:static;opacity:1;transform:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;color:#fff;font-size:.88rem;font-weight:800;background-image:linear-gradient(135deg,#6455e8 0%,#8450dc 55%,#9a4acb 100%);box-shadow:0 2px 0 #4a3bb8}
+.simcard:hover .sc-go .sc-arrow{transform:translateX(3px)}.sc-arrow{display:inline-block;transition:transform .15s}
+.simcard:hover{box-shadow:0 3px 0 #1f2a441a,0 14px 26px #1f2a441f}
+.simcard.on .sc-go{background:#fff;color:#3c47b8;box-shadow:inset 0 0 0 2px #3c47b8}
+.pick-sim{margin:2px 0 12px}
+.simgrid.mini{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.simgrid.mini .simcard{grid-template-columns:28px 1fr;grid-template-areas:'art txt';gap:8px;padding:7px 10px}
+.simgrid.mini .sc-art{width:28px;height:28px;border-radius:8px;border:0;background:none}.simgrid.mini .sc-art img{width:26px;height:26px}
+.simgrid.mini .sc-foot{display:none}
+@media(prefers-reduced-motion:reduce){.sc-arrow{transition:none}}
 /* ---- v20: second look, skill meter, next-step row ---- */
 .tag.again{background:#fff3c4;color:#6b4e00;border:1px solid #e6c65a}
 .cat .meter{display:block;width:100%;height:6px;border-radius:99px;background:#1f2a441f;overflow:hidden;margin-top:5px}.cat .meter i{display:block;height:100%;border-radius:99px;background:#2f8a63}
@@ -720,6 +740,7 @@ body.mock-on .topbar{position:relative}
  <section id="benchView" hidden>
   <div class="panel section">
    <div class="section-head"><h2>PhET Lab Bench</h2><span>Simulations by PhET Interactive Simulations, University of Colorado Boulder</span></div>
+   <p class="pick-title pick-sim"><span class="stepnum">1</span>Pick a simulation <small>It opens right here with a few short tasks to check.</small></p>
    <div class="simgrid" id="simGrid"></div>
    <div id="simArea"></div>
   </div>
@@ -729,6 +750,7 @@ body.mock-on .topbar{position:relative}
  <section id="vlabView" hidden>
   <div class="panel section">
    <div class="section-head"><h2>Virtual Lab</h2><span>Drag items onto the equipment, or tap an item and then tap where it goes.</span></div>
+   <p class="pick-title pick-sim"><span class="stepnum">1</span>Pick a lab to run <small>You do the lab on screen, then the math.</small></p>
    <div class="lvlpick" role="radiogroup" aria-label="Level"><span>Level</span><button type="button" class="chip" data-lvl="beg">Beginner<small>products given, pick from choices</small></button><button type="button" class="chip" data-lvl="int">Intermediate<small>like the real practical</small></button></div>
    <div class="simgrid" id="vlGrid"></div>
    <div id="vlArea"></div>
@@ -3335,10 +3357,14 @@ function turnIn() {
 }
 
 /* ---------- PhET bench ---------- */
+// Card pictures reuse art the game already has (lab tile icons and equipment). To give a card its own art, change its path here.
+const VL_PIC = { density: 'equip/gradcyl', mix: 'equip/testtube', ph: 'labs/12a', gas: 'equip/eudiometer', titrate: 'equip/buret', model: 'labs/6a', water: 'equip/washbottle', salt: 'equip/volflask', beads: 'equip/beaker' };
+const cardPic = path => `<span class="sc-art" aria-hidden="true"><img src="assets/${path}.webp" alt="" onerror="this.parentNode.classList.add('none');this.remove()"></span>`;
+const cardHTML = (attr, on, pic, labs, title, blurb, status, done, go) => `<button type="button" class="simcard${on ? ' on' : ''}" ${attr}>${pic}<span class="sc-txt"><span class="labno">${labs}</span><b>${title}</b><small>${blurb}</small></span><span class="sc-foot"><span class="sc-status${done ? ' done' : ''}">${status}</span><span class="sc-go" aria-hidden="true">${go} <span class="sc-arrow">→</span></span></span></button>`;
 function renderBench() {
   const set = labSet(), sims = PHET.filter(s => s.labs.some(l => set.includes(l)));
-  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => `<button type="button" class="simcard${state.sim === s.id ? ' on' : ''}" data-sim="${s.id}"><img class="sc-pic" src="assets/sims/${s.id}.webp" alt="" onerror="this.remove()"><span class="labno">${s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · ')}</span><b>${s.title}</b><small>${s.blurb}</small>${(() => { const d = s.tasks.filter((t, i) => P.benchDone[s.id + i]).length; return `<span class="sc-status${d === s.tasks.length ? ' done' : ''}">${d}/${s.tasks.length} tasks</span>`; })()}<span class="sc-go" aria-hidden="true">Open →</span></button>`).join('');
-  if (!state.sim || !sims.some(s => s.id === state.sim)) { $('simArea').innerHTML = '<div class="empty">Pick a simulation to open it here.</div>'; return; }
+  $('simGrid').classList.toggle('mini', !!state.sim); $('simGrid').innerHTML = sims.map(s => { const d = s.tasks.filter((t, i) => P.benchDone[s.id + i]).length, lab = s.labs.find(l => set.includes(l)) || s.labs[0]; return cardHTML(`data-sim="${s.id}"`, state.sim === s.id, cardPic(lab === '2a' ? 'modes/phet' : 'labs/' + lab), s.labs.filter(l => set.includes(l)).map(l => 'Exp ' + l).join(' · '), s.title, s.blurb, `${d}/${s.tasks.length} tasks done`, d === s.tasks.length, d ? 'Keep going' : 'Open the sim'); }).join('');
+  if (!state.sim || !sims.some(s => s.id === state.sim)) { $('simArea').innerHTML = ''; return; }
   const s = PHET.find(x => x.id === state.sim), scr0 = (s.tasks.find(t => t.scr) || {}).scr;
   $('simArea').innerHTML = `<h3 class="play-title">${s.title}</h3><div class="simframe"><button type="button" class="sim-shield" aria-label="Use the simulation"><span>Tap to use the simulation</span></button><button type="button" class="sim-release">Done: scroll the page</button><iframe id="simFrame" data-scr="${scr0 || ''}" title="PhET simulation: ${s.title}" src="${PHET_URL(s.sim, scr0)}" allowfullscreen loading="lazy"></iframe></div><p class="small-note sim-howto"><b>Tap the simulation</b> to use it. Tap <b>Done: scroll the page</b> to scroll again. <a id="simFull" href="${PHET_URL(s.sim, scr0)}" target="_blank" rel="noopener noreferrer">Open it full screen ↗</a></p>` +
     (s.setup ? `<div class="sim-setup"><h4>Set up the sim first</h4><ol>${s.setup.map(x => `<li>${x}</li>`).join('')}</ol></div>` : '') +
@@ -3358,7 +3384,7 @@ function checkTask(i) {
     try { window.ddTrack && window.ddTrack({ game: 'labpractical', course: '3A', mode: 'PhET Bench', topic: `PhET ${s.title} · task ${i + 1}`, correct: true }); } catch (e) {}
   } else { fb.className = 'feedback bad'; fb.innerHTML = tock('oops', 'fb-tock') + 'Not quite. Look at the sim again and fix the red part.'; }
   renderStats(); save(); checkAch();
-  const card = $('simGrid').querySelector(`[data-sim="${s.id}"] .sc-status`); if (card) { const d = s.tasks.filter((x, k) => P.benchDone[s.id + k]).length; card.textContent = `${d}/${s.tasks.length} tasks`; card.classList.toggle('done', d === s.tasks.length); }
+  const card = $('simGrid').querySelector(`[data-sim="${s.id}"] .sc-status`); if (card) { const d = s.tasks.filter((x, k) => P.benchDone[s.id + k]).length; card.textContent = `${d}/${s.tasks.length} tasks done`; card.classList.toggle('done', d === s.tasks.length); }
 }
 
 /* ===================== Virtual Lab: hands-on benches ===================== */
@@ -4036,8 +4062,8 @@ const stShared = s => (s.hands ? `<div class="artbox"><p class="small-note">${mo
 function renderVLab() {
   const set = labSet(), list = VBENCH.filter(b => b.labs.some(l => set.includes(l)));
   P.vlab = P.vlab || {};
-  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => `<button type="button" class="simcard${VL.bench && VL.bench.id === b.id ? ' on' : ''}" data-vlb="${b.id}"><img class="sc-pic" src="assets/vlab/${b.id}.webp" alt="" onerror="this.remove()"><span class="labno">${b.labs.map(l => 'Exp ' + l).join(' · ')}</span><b>${b.title}</b><small>${b.blurb}</small><span class="sc-status${P.vlab[b.id] ? ' done' : ''}">${P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet'}</span><span class="sc-go" aria-hidden="true">Start →</span></button>`).join('');
-  if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = '<div class="empty">Pick a bench to start. Drag items with your mouse or finger, or tap an item and then tap where it goes.</div>'; return; }
+  $('vlGrid').classList.toggle('mini', !!VL.bench); $('vlGrid').innerHTML = list.map(b => cardHTML(`data-vlb="${b.id}"`, VL.bench && VL.bench.id === b.id, cardPic(VL_PIC[b.id] || 'modes/vlab'), b.labs.map(l => 'Exp ' + l).join(' · '), b.title, b.blurb, P.vlab[b.id] ? `Finished ${P.vlab[b.id]}×` : 'Not done yet', !!P.vlab[b.id], P.vlab[b.id] ? 'Do it again' : 'Start the lab')).join('');
+  if (!VL.bench || !list.includes(VL.bench)) { $('vlArea').innerHTML = ''; return; }
   vlRenderAll();
 }
 function vlStart(id) { VL.run++; VL.mock = false; VL.bench = VBENCH.find(b => b.id === id); VL.s = VL.bench.setup(); VL.step = 0; VL.done = []; VL.sel = null; VL.tries = 0; VL.revealed = false; VL.busy = false; renderVLab(); try { $('vlArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
