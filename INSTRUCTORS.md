@@ -31,6 +31,7 @@ Beginner level shows answer choices. Intermediate and above are typed, with no m
 - **Second look:** a question type the student missed, or needed a hint or the worked answer for, comes back about three questions later with new numbers. Getting it right on the first try with no help clears it. Missed mock stations go into the same queue, so "Practice what I missed" starts with them.
 - **Hints:** every question has a hint. On calculations a second tap shows the setup with the results hidden, so the student still does the arithmetic and rounding.
 - **Solid types:** each lab tile shows how many of its question types are solid (latest try right the first time, no hint). Practice picks types that aren't solid yet more often.
+- **Embedding one lab:** inside an iframe (for example a textbook page), a link like `?mode=vlab&labs=1a` or `?mode=bench&labs=8a` skips the intro and the mode cards and shows that lab's cards at the top. Opened directly, the same link shows the full game. Add `&embed=1` to preview the embedded look in a normal tab.
 - **Privacy:** progress stays on the student's device. The game sends only anonymous practice stats (topic and right or wrong; no names, IDs or typed answers). Browsers set to Do Not Track send nothing.
 
 ## Feedback

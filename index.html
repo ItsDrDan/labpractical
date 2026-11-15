@@ -320,7 +320,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
 .lp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;margin:6px 0 4px 30px;font-size:.92rem}.lp-grid[hidden]{display:none}.lp-grid label{display:flex;gap:6px;align-items:center}
 .simframe{position:relative}.sim-shield{position:absolute;inset:0;z-index:2;border:0;background:linear-gradient(transparent 70%,#1f2a4455);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px}.sim-shield span{background:#1f2a44e6;color:#fff;border-radius:999px;padding:9px 18px;font-weight:800;box-shadow:0 6px 18px #0004}
 .sim-release{position:absolute;top:8px;right:8px;z-index:3;display:none;border:0;border-radius:999px;background:#1f2a44e6;color:#fff;font-weight:800;padding:7px 14px;cursor:pointer}.simframe.live .sim-shield{display:none}.simframe.live .sim-release{display:block}
-body.compact .howto{display:none}body.compact .intro{margin-bottom:4px;gap:10px}body.compact .intro img{width:48px;height:48px}body.compact .intro .lede,body.compact .intro .eyebrow{display:none}body.compact .intro h1{font-size:1.5rem}
+body.lab-embed #intro,body.lab-embed .howto,body.lab-embed #labset,body.lab-embed #modes{display:none}body.compact .howto{display:none}body.compact .intro{margin-bottom:4px;gap:10px}body.compact .intro img{width:48px;height:48px}body.compact .intro .lede,body.compact .intro .eyebrow{display:none}body.compact .intro h1{font-size:1.5rem}
 body.compact .mode-switch{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}body.compact .mode-switch button{min-height:0;padding:6px 10px;gap:8px;border-radius:14px}body.compact .mode-switch small{display:none}body.compact .mode-switch b{font-size:1rem}body.compact .ms-ico,body.compact .ms-ico:has(.ms-pic){width:38px;height:38px}
 @media(max-width:760px){body.compact .mode-switch{grid-template-columns:1fr 1fr}}
 .cats.labs.mini{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.cats.labs.mini .cat{min-height:0;padding:7px 30px 7px 10px;flex-direction:column;align-items:flex-start;text-align:left;gap:0;border-radius:12px}.cats.labs.mini .cat img,.cats.labs.mini .cat small,.cats.labs.mini .cat .oldtag{display:none}.cats.labs.mini .cat b{font-size:.88rem;line-height:1.2}.cats.labs.mini .cat .labno{font-size:.68rem}
@@ -4488,6 +4488,9 @@ function init() {
   bind(); renderLabset(); renderStats(); renderRef();
   const m = (sp.get('mode') || '').toLowerCase();
   setMode(['mock', 'practice', 'bench', 'vlab'].includes(m) ? m : ['mock', 'practice', 'bench', 'vlab'].includes(P.mode) ? P.mode : 'mock');
+  // embedded in a textbook page with one lab chosen (?mode=bench|vlab&labs=..): skip the intro and mode cards so the lab cards are on top
+  let inFrame = false; try { inFrame = window.self !== window.top; } catch (e) { inFrame = true; }
+  if ((inFrame || sp.get('embed') === '1') && ['bench', 'vlab'].includes(m) && linkLabs.length) document.body.classList.add('lab-embed');
   setVideoFor('practical1');
   paintIcons();
   window.addEventListener('load', () => paintIcons());
